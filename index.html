@@ -22,13 +22,16 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 @keyframes glow{0%,100%{box-shadow:0 0 20px var(--red-glow)}50%{box-shadow:0 0 40px var(--red-glow),0 0 80px rgba(255,59,59,0.08)}}
-.fade-up{animation:fadeUp .5s ease forwards}.fade-up-d1{animation:fadeUp .5s .1s ease both}.fade-up-d2{animation:fadeUp .5s .2s ease both}.fade-up-d3{animation:fadeUp .5s .3s ease both}.fade-up-d4{animation:fadeUp .5s .4s ease both}.fade-up-d5{animation:fadeUp .5s .5s ease both}
+.fade-up{animation:fadeUp .5s ease forwards}
+.fade-up-d1{animation:fadeUp .5s .1s ease both}
+.fade-up-d2{animation:fadeUp .5s .2s ease both}
+.fade-up-d3{animation:fadeUp .5s .3s ease both}
+.fade-up-d5{animation:fadeUp .5s .5s ease both}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px}
 .card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:var(--radius);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;transition:all .18s ease}
-.btn-primary{background:var(--red);color:#fff}.btn-primary:hover{background:var(--red-dark);transform:translateY(-1px);box-shadow:0 8px 24px var(--red-glow)}
+.btn-primary{background:var(--red);color:#fff}.btn-primary:hover{background:var(--red-dark);transform:translateY(-1px)}
 .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}.btn-secondary:hover{background:var(--bg4)}
 .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
 .tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
@@ -39,74 +42,89 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .divider{height:1px;background:var(--border);margin:20px 0}
 input,textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;width:100%;outline:none;transition:border-color .18s}
 input:focus,textarea:focus{border-color:var(--red)}
-input::placeholder,textarea::placeholder{color:var(--text3)}
+input::placeholder{color:var(--text3)}
 label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
 .spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 .progress-track{background:var(--bg3);border-radius:20px;height:6px;overflow:hidden}
 .progress-fill{height:100%;border-radius:20px;background:var(--red);transition:width .6s ease}
-.error-box{background:rgba(255,59,59,.08);border:1px solid rgba(255,59,59,.2);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:#FF6B6B;margin-bottom:16px}
+.err{background:rgba(255,59,59,.08);border:1px solid rgba(255,59,59,.2);border-radius:var(--radius);padding:14px;font-size:13px;color:#FF6B6B;margin-bottom:16px}
 .sidebar{width:220px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:4px;position:fixed;left:0;top:0}
-.sidebar-logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:28px;padding:0 8px;display:flex;align-items:center;gap:8px}
+.sidebar-logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:28px;padding:0 8px;display:flex;align-items:center;gap:8px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;font-size:14px;color:var(--text2);transition:all .15s;border:none;background:none;width:100%;text-align:left}
-.nav-item:hover{background:var(--bg3);color:var(--text)}.nav-item.active{background:rgba(255,59,59,.1);color:var(--red);font-weight:500}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(255,59,59,.1);color:var(--red);font-weight:500}
 .sidebar-bottom{margin-top:auto}
 .avatar-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);background:var(--bg3)}
-.avatar{width:32px;height:32px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;overflow:hidden}
-.avatar img{width:100%;height:100%;object-fit:cover}
+.ava{width:32px;height:32px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;overflow:hidden}
+.ava img{width:100%;height:100%;object-fit:cover}
 .main{margin-left:220px;padding:32px;min-height:100vh;max-width:1100px}
-.page-header{margin-bottom:32px}.page-header h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:700}.page-header p{color:var(--text2);margin-top:4px;font-size:14px}
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
-.stat-label{font-size:12px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
-.stat-value{font-family:'Syne',sans-serif;font-size:24px;font-weight:700}.stat-delta{font-size:12px;margin-top:4px}
-.stat-delta.up{color:var(--green)}.stat-delta.down{color:var(--red)}
-.action-plan{display:grid;grid-template-columns:1fr 320px;gap:20px}
-.task-list{display:flex;flex-direction:column;gap:10px}
-.task-item{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s}
-.task-item:hover{border-color:var(--border2)}.task-item.done{opacity:.5}.task-item.done .task-title{text-decoration:line-through}
-.task-checkbox{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.task-checkbox.checked{background:var(--red);border-color:var(--red)}
-.task-title{font-size:14px;font-weight:500;color:var(--text);line-height:1.4}.task-meta{font-size:12px;color:var(--text3);margin-top:3px}
-.msg{display:flex;gap:10px;max-width:100%}
-.msg-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
-.msg-ai .msg-avatar{background:var(--red);color:#fff}.msg-user .msg-avatar{background:var(--bg4);color:var(--text2)}
-.msg-bubble{padding:10px 14px;border-radius:12px;font-size:13.5px;line-height:1.6;max-width:calc(100% - 40px)}
-.msg-ai .msg-bubble{background:var(--bg3);border:1px solid var(--border)}.msg-user .msg-bubble{background:rgba(255,59,59,.12);border:1px solid rgba(255,59,59,.2);margin-left:auto}
-.msg-user{flex-direction:row-reverse}
-.chat-input-row{display:flex;gap:10px;margin-top:16px}.chat-input-row input{flex:1}
-.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:pulse 1s ease infinite}
-.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
-.onboard-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
-.onboard-card{width:100%;max-width:540px}
-.step-pills{display:flex;gap:6px;margin-bottom:32px}
-.step-pill{height:4px;border-radius:4px;flex:1;background:var(--bg3);transition:background .3s}
-.step-pill.done{background:var(--red)}.step-pill.active{background:var(--red);opacity:.5}
-.landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;position:relative;overflow:hidden}
-.landing-glow{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(255,59,59,.12) 0%,transparent 70%);pointer-events:none}
-.landing h1{font-family:'Syne',sans-serif;font-size:clamp(36px,6vw,72px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:20px}
-.landing h1 em{font-style:normal;color:var(--red)}
-.landing-sub{font-size:16px;color:var(--text2);max-width:460px;margin:0 auto 36px;line-height:1.7}
-.login-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:32px;width:100%;max-width:400px;margin:0 auto}
-.google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:13px 20px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--text);transition:all .18s}
-.google-btn:hover{background:var(--bg4);transform:translateY(-1px)}
-.guide-step{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}.guide-step:last-child{border-bottom:none}
-.step-num{width:28px;height:28px;border-radius:50%;background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--red);flex-shrink:0}
-.section-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
-.idea-chip{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:13px;margin-bottom:8px}
-.trend-bar{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}.trend-bar:last-child{border-bottom:none}
-.trend-name{font-size:13px;color:var(--text);flex:1}.trend-score{font-size:12px;color:var(--text3);width:32px;text-align:right}
-.trend-mini-bar{flex:1;max-width:80px;height:4px;background:var(--bg4);border-radius:4px;overflow:hidden}
-.trend-mini-fill{height:100%;background:var(--red);border-radius:4px}
-.goal-ring{position:relative;width:120px;height:120px;margin:0 auto 20px}
-.goal-ring svg{transform:rotate(-90deg)}
-.goal-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.goal-ring-pct{font-family:'Syne',sans-serif;font-size:22px;font-weight:700}.goal-ring-sub{font-size:10px;color:var(--text3)}
-.bar-chart{display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:8px}
-.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-.bar{width:100%;border-radius:4px 4px 0 0;background:var(--bg4)}.bar.highlight{background:var(--red)}
-.bar-label{font-size:10px;color:var(--text3)}
-.full-loader{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-.full-loader p{color:var(--text2);font-size:14px}
+.ph{margin-bottom:32px}
+.ph h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:700}
+.ph p{color:var(--text2);margin-top:4px;font-size:14px}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.slabel{font-size:12px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.sval{font-family:'Syne',sans-serif;font-size:24px;font-weight:700}
+.sdelta{font-size:12px;margin-top:4px}
+.sdelta.up{color:var(--green)}.sdelta.down{color:var(--red)}
+.aplan{display:grid;grid-template-columns:1fr 320px;gap:20px}
+.tlist{display:flex;flex-direction:column;gap:10px}
+.titem{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s}
+.titem:hover{border-color:var(--border2)}
+.titem.done{opacity:.5}
+.titem.done .ttitle{text-decoration:line-through}
+.tcheck{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.tcheck.on{background:var(--red);border-color:var(--red)}
+.ttitle{font-size:14px;font-weight:500;line-height:1.4}
+.tmeta{font-size:12px;color:var(--text3);margin-top:3px}
+.msg{display:flex;gap:10px}
+.mava{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.mai .mava{background:var(--red);color:#fff}
+.muser .mava{background:var(--bg4);color:var(--text2)}
+.mbub{padding:10px 14px;border-radius:12px;font-size:13.5px;line-height:1.6;max-width:calc(100% - 40px)}
+.mai .mbub{background:var(--bg3);border:1px solid var(--border)}
+.muser .mbub{background:rgba(255,59,59,.12);border:1px solid rgba(255,59,59,.2);margin-left:auto}
+.muser{flex-direction:row-reverse}
+.cir{display:flex;gap:10px;margin-top:16px}
+.cir input{flex:1}
+.td{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:pulse 1s ease infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+.owrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.ocard{width:100%;max-width:540px}
+.spills{display:flex;gap:6px;margin-bottom:32px}
+.spill{height:4px;border-radius:4px;flex:1;background:var(--bg3);transition:background .3s}
+.spill.done{background:var(--red)}.spill.act{background:var(--red);opacity:.5}
+.land{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;position:relative;overflow:hidden}
+.lglow{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(255,59,59,.12) 0%,transparent 70%);pointer-events:none}
+.land h1{font-family:'Syne',sans-serif;font-size:clamp(36px,6vw,68px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:20px}
+.land h1 em{font-style:normal;color:var(--red)}
+.lsub{font-size:16px;color:var(--text2);max-width:460px;margin:0 auto 36px;line-height:1.7}
+.lcard{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:32px;width:100%;max-width:400px;margin:0 auto}
+.gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:13px 20px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--text);transition:all .18s}
+.gbtn:hover{background:var(--bg4);transform:translateY(-1px)}
+.gstep{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.gstep:last-child{border-bottom:none}
+.snum{width:28px;height:28px;border-radius:50%;background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--red);flex-shrink:0}
+.sectitle{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.ichip{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:13px;margin-bottom:8px}
+.tbar{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.tbar:last-child{border-bottom:none}
+.tbarname{font-size:13px;flex:1}
+.tbarscore{font-size:12px;color:var(--text3);width:32px;text-align:right}
+.tbartrack{flex:1;max-width:80px;height:4px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.tbarfill{height:100%;background:var(--red);border-radius:4px}
+.gring{position:relative;width:120px;height:120px;margin:0 auto 20px}
+.gring svg{transform:rotate(-90deg)}
+.gringlabel{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gringpct{font-family:'Syne',sans-serif;font-size:22px;font-weight:700}
+.gringsub{font-size:10px;color:var(--text3)}
+.barchart{display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:8px}
+.barwrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;background:var(--bg4)}
+.bar.hi{background:var(--red)}
+.barlbl{font-size:10px;color:var(--text3)}
+.fullload{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.fullload p{color:var(--text2);font-size:14px}
 </style>
 </head>
 <body>
@@ -114,36 +132,44 @@ label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script>
-const {useState,useEffect,useRef}=React;
+var h=React.createElement;
+var useState=React.useState;
+var useEffect=React.useEffect;
+var useRef=React.useRef;
 
-/* ══════════════════════════════════════════════
-   CHANGE THIS if your backend URL is different
-   ══════════════════════════════════════════════ */
-const API='https://tubecoach-backend-production.up.railway.app';
+/* ── CONFIG ── change this if your backend URL changes */
+var API='https://tubecoach-backend-production.up.railway.app';
 
 /* ── Token helpers ── */
-const getToken=()=>localStorage.getItem('tc_token');
-const setToken=t=>localStorage.setItem('tc_token',t);
-const clearToken=()=>localStorage.removeItem('tc_token');
+function getToken(){return localStorage.getItem('tc_token');}
+function setToken(t){localStorage.setItem('tc_token',t);}
+function clearToken(){localStorage.removeItem('tc_token');}
 
-/* ── API helper — adds auth header automatically ── */
-async function api(path,opts={}){
-  const token=getToken();
-  const res=await fetch(API+path,{
-    headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},
-    ...opts,
-    body:opts.body?JSON.stringify(opts.body):undefined,
+/* ── API helper ── */
+function api(path,opts){
+  opts=opts||{};
+  var token=getToken();
+  var headers={'Content-Type':'application/json'};
+  if(token) headers['Authorization']='Bearer '+token;
+  return fetch(API+path,{
+    method:opts.method||'GET',
+    headers:headers,
+    body:opts.body?JSON.stringify(opts.body):undefined
+  }).then(function(res){
+    return res.json().then(function(data){
+      if(!res.ok) throw new Error(data.error||'Something went wrong');
+      return data;
+    });
   });
-  const data=await res.json();
-  if(!res.ok)throw new Error(data.error||'Something went wrong');
-  return data;
 }
 
-/* ── Icons ── */
-const Icon=({d,size=16,stroke='currentColor',fill='none',sw=1.5})=>
-  React.createElement('svg',{width:size,height:size,viewBox:'0 0 24 24',fill,stroke,strokeWidth:sw,strokeLinecap:'round',strokeLinejoin:'round'},
-    React.createElement('path',{d}));
-const ic={
+/* ── SVG Icon ── */
+function Icon(props){
+  return h('svg',{width:props.size||16,height:props.size||16,viewBox:'0 0 24 24',fill:props.fill||'none',stroke:props.stroke||'currentColor',strokeWidth:props.sw||1.5,strokeLinecap:'round',strokeLinejoin:'round'},
+    h('path',{d:props.d}));
+}
+
+var ic={
   plan:'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
   chat:'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z',
   chart:'M18 20V10M12 20V4M6 20v-6',
@@ -153,444 +179,1021 @@ const ic={
   spark:'M13 2L3 14h9l-1 8 10-12h-9l1-8',
   trend:'M23 6l-9.5 9.5-5-5L1 18',
   logout:'M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9',
-  send:'M22 2L11 13M22 2l-7 20-4-9-9-4 20-7',
+  send:'M22 2L11 13M22 2l-7 20-4-9-9-4 20-7'
 };
 
-function FullLoader({text='Loading…'}){
-  return React.createElement('div',{className:'full-loader'},
-    React.createElement('div',{className:'spinner',style:{width:32,height:32,borderWidth:3}}),
-    React.createElement('p',null,text));
+function FullLoader(props){
+  return h('div',{className:'fullload'},
+    h('div',{className:'spinner',style:{width:32,height:32,borderWidth:3}}),
+    h('p',null,props.text||'Loading...'));
 }
 
-/* ══════════════ LANDING ══════════════ */
-function Landing({onLogin,onNewUser}){
-  return React.createElement('div',{className:'landing'},
-    React.createElement('div',{className:'landing-glow'}),
-    React.createElement('div',{className:'fade-up',style:{marginBottom:12}},
-      React.createElement('span',{className:'tag tag-red'},React.createElement(Icon,{d:ic.spark,size:12}),' AI-Powered Growth')),
-    React.createElement('h1',{className:'fade-up-d1'},'Grow your YouTube\n',React.createElement('em',null,'10x faster'),'\nwith AI'),
-    React.createElement('p',{className:'landing-sub fade-up-d2'},"India's smartest YouTube growth assistant. Weekly action plan, trend-based video ideas, and an AI coach — all for ₹499/month."),
-    React.createElement('div',{className:'login-card fade-up-d3'},
-      React.createElement('h2',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700,marginBottom:4}},'Get started'),
-      React.createElement('p',{style:{fontSize:13,color:'var(--text2)',marginBottom:20}},'Login with your Google / YouTube account'),
-      React.createElement('button',{className:'google-btn',onClick:onLogin,style:{marginBottom:12}},
-        React.createElement('svg',{width:18,height:18,viewBox:'0 0 24 24'},
-          React.createElement('path',{d:'M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z',fill:'#4285F4'}),
-          React.createElement('path',{d:'M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z',fill:'#34A853'}),
-          React.createElement('path',{d:'M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z',fill:'#FBBC05'}),
-          React.createElement('path',{d:'M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z',fill:'#EA4335'})
-        ),'Continue with Google'),
-      React.createElement('div',{style:{height:1,background:'var(--border)',margin:'16px 0'}}),
-      React.createElement('p',{style:{fontSize:12,color:'var(--text3)',textAlign:'center',marginBottom:12}},"Don't have a YouTube channel yet?"),
-      React.createElement('button',{className:'btn btn-ghost',style:{width:'100%',justifyContent:'center'},onClick:onNewUser},'See how to create one →')),
-    React.createElement('p',{className:'fade-up-d5',style:{marginTop:24,fontSize:12,color:'var(--text3)'}},'7-day free trial · Cancel anytime · Made for Indian creators'));
+/* ══ LANDING ══ */
+function Landing(props){
+  return h('div',{className:'land'},
+    h('div',{className:'lglow'}),
+    h('div',{className:'fade-up',style:{marginBottom:12}},
+      h('span',{className:'tag tag-red'},h(Icon,{d:ic.spark,size:12}),' AI-Powered Growth')),
+    h('h1',{className:'fade-up-d1'},'Grow your YouTube ',h('em',null,'10x faster'),' with AI'),
+    h('p',{className:'lsub fade-up-d2'},"India's smartest YouTube growth assistant. Weekly action plan, trend-based video ideas, and an AI coach — all for Rs.499/month."),
+    h('div',{className:'lcard fade-up-d3'},
+      h('h2',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700,marginBottom:4}},'Get started'),
+      h('p',{style:{fontSize:13,color:'var(--text2)',marginBottom:20}},'Login with your Google / YouTube account'),
+      h('button',{className:'gbtn',onClick:props.onLogin,style:{marginBottom:12}},
+        h('svg',{width:18,height:18,viewBox:'0 0 24 24'},
+          h('path',{d:'M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z',fill:'#4285F4'}),
+          h('path',{d:'M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z',fill:'#34A853'}),
+          h('path',{d:'M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z',fill:'#FBBC05'}),
+          h('path',{d:'M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z',fill:'#EA4335'})),
+        'Continue with Google'),
+      h('div',{style:{height:1,background:'var(--border)',margin:'16px 0'}}),
+      h('p',{style:{fontSize:12,color:'var(--text3)',textAlign:'center',marginBottom:12}},"Don't have a YouTube channel yet?"),
+      h('button',{className:'btn btn-ghost',style:{width:'100%',justifyContent:'center'},onClick:props.onNewUser},'See how to create one')),
+    h('p',{className:'fade-up-d5',style:{marginTop:24,fontSize:12,color:'var(--text3)'}},'7-day free trial · Cancel anytime · Made for Indian creators'));
 }
 
-/* ══════════════ GUIDE ══════════════ */
-function GuidePage({onBack,onLogin}){
-  const steps=[
+/* ══ GUIDE ══ */
+function GuidePage(props){
+  var steps=[
     {title:'Go to youtube.com and sign in',desc:'Use your Google account to sign in to YouTube.'},
-    {title:'Click your profile icon → "Create a channel"',desc:"You'll see an option to create a personal or custom-name channel."},
+    {title:'Click your profile icon, then Create a channel',desc:'You will see an option to create a personal or custom-name channel.'},
     {title:'Enter your channel name',desc:'Choose a name that matches your niche. You can change it later.'},
     {title:'Add a profile picture and banner',desc:'Use Canva (free) to create a professional banner in minutes.'},
     {title:'Write your channel description',desc:'Tell viewers what you make, in which language, and how often you post.'},
-    {title:'Come back and login with Google',desc:'Once your channel is ready, return here to get your AI growth plan!'},
+    {title:'Come back and login with Google',desc:'Once your channel is ready, return here to get your AI growth plan!'}
   ];
-  return React.createElement('div',{className:'onboard-wrap'},
-    React.createElement('div',{className:'onboard-card'},
-      React.createElement('button',{className:'btn btn-ghost',style:{marginBottom:24,fontSize:13},onClick:onBack},'← Back'),
-      React.createElement('span',{className:'tag tag-blue',style:{marginBottom:16}},React.createElement(Icon,{d:ic.yt,size:12}),' Channel Setup Guide'),
-      React.createElement('h2',{style:{fontFamily:'Syne',fontSize:24,fontWeight:700,marginBottom:8}},'Create your YouTube channel'),
-      React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'Follow these steps then come back to login.'),
-      React.createElement('div',{className:'card',style:{padding:'8px 20px',marginBottom:20}},
-        steps.map((s,i)=>React.createElement('div',{className:'guide-step',key:i},
-          React.createElement('div',{className:'step-num'},i+1),
-          React.createElement('div',null,
-            React.createElement('div',{style:{fontSize:14,fontWeight:500,marginBottom:2}},s.title),
-            React.createElement('div',{style:{fontSize:13,color:'var(--text3)'}},s.desc))))),
-      React.createElement('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center'},onClick:onLogin},
-        React.createElement(Icon,{d:ic.yt,size:16,stroke:'#fff'})," I've created my channel — Login now")));
+  return h('div',{className:'owrap'},
+    h('div',{className:'ocard'},
+      h('button',{className:'btn btn-ghost',style:{marginBottom:24,fontSize:13},onClick:props.onBack},'Back'),
+      h('span',{className:'tag tag-blue',style:{marginBottom:16}},h(Icon,{d:ic.yt,size:12}),' Channel Setup Guide'),
+      h('h2',{style:{fontFamily:'Syne',fontSize:24,fontWeight:700,marginBottom:8}},'Create your YouTube channel'),
+      h('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'Follow these steps then come back to login.'),
+      h('div',{className:'card',style:{padding:'8px 20px',marginBottom:20}},
+        steps.map(function(s,i){
+          return h('div',{className:'gstep',key:i},
+            h('div',{className:'snum'},i+1),
+            h('div',null,
+              h('div',{style:{fontSize:14,fontWeight:500,marginBottom:2}},s.title),
+              h('div',{style:{fontSize:13,color:'var(--text3)'}},s.desc)));
+        })),
+      h('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center'},onClick:props.onLogin},
+        h(Icon,{d:ic.yt,size:16,stroke:'#fff'})," I've created my channel — Login now")));
 }
 
-/* ══════════════ ONBOARDING ══════════════ */
-function Onboarding({onDone}){
-  const [step,setStep]=useState(0);
-  const [form,setForm]=useState({niche:'',lang:'',goal:'',freq:'',goalNumber:10000});
-  const [loading,setLoading]=useState(false);
-  const [error,setError]=useState('');
-  const niches=['Tech Reviews','Gaming','Cooking','Fitness','Finance','Education','Comedy','Vlogs','Beauty','Other'];
-  const langs=['Tamil','Telugu','Hindi','Kannada','Malayalam','English','Bengali'];
-  const goals=[{l:'1,000 subscribers',n:1000},{l:'10,000 subscribers',n:10000},{l:'1,00,000 subscribers',n:100000},{l:'Monetization (4K hrs + 1K subs)',n:1000},{l:'Brand deals',n:10000}];
-  const freqs=['1 video/week','2 videos/week','3-4 videos/week','Daily'];
-  const canNext=(step===0&&form.niche&&form.lang)||(step===1&&form.goal)||(step===2&&form.freq);
+/* ══ ONBOARDING ══ */
+function Onboarding(props){
+  var stepState=useState(0);
+  var step=stepState[0]; var setStep=stepState[1];
 
-  async function finish(){
-    setLoading(true);setError('');
-    try{
-      await api('/dashboard/onboard',{method:'POST',body:{niche:form.niche,lang:form.lang,goal:form.goal,freq:form.freq,goalNumber:form.goalNumber}});
-      onDone();
-    }catch(e){setError(e.message);setLoading(false);}
+  // step 0 = niche description + lang
+  // step 1 = AI clarification chat (only if needed)
+  // step 2 = goal
+  // step 3 = posting frequency
+  var formState=useState({nicheDesc:'',lang:'',goal:'',freq:'',goalNumber:10000,nicheResolved:'',clarifications:[]});
+  var form=formState[0]; var setForm=formState[1];
+  var loadState=useState(false);
+  var loading=loadState[0]; var setLoading=loadState[1];
+  var errState=useState('');
+  var error=errState[0]; var setError=errState[1];
+
+  // Clarification chat state
+  var clarifMsgsState=useState([]);
+  var clarifMsgs=clarifMsgsState[0]; var setClarifMsgs=clarifMsgsState[1];
+  var clarifInputState=useState('');
+  var clarifInput=clarifInputState[0]; var setClarifInput=clarifInputState[1];
+  var clarifDoneState=useState(false);
+  var clarifDone=clarifDoneState[0]; var setClarifDone=clarifDoneState[1];
+  var clarifLoadState=useState(false);
+  var clarifLoading=clarifLoadState[0]; var setClarifLoading=clarifLoadState[1];
+
+  var langs=['Tamil','Telugu','Hindi','Kannada','Malayalam','English','Bengali'];
+  var goals=[
+    {l:'1,000 subscribers',n:1000},
+    {l:'10,000 subscribers',n:10000},
+    {l:'1,00,000 subscribers',n:100000},
+    {l:'Monetization (4K hrs + 1K subs)',n:1000},
+    {l:'Brand deals',n:10000}
+  ];
+  var freqs=['1 video/week','2 videos/week','3-4 videos/week','Daily'];
+
+  var totalSteps=4;
+  var canNext=(
+    (step===0 && form.nicheDesc.trim().length>10 && form.lang) ||
+    (step===1 && clarifDone) ||
+    (step===2 && form.goal) ||
+    (step===3 && form.freq)
+  );
+
+  // Step 0 → Step 1: send description to Claude, get clarification question or confirm
+  function analyseNiche(){
+    setLoading(true); setError('');
+    var prompt='A YouTube creator described their niche as: "'+form.nicheDesc+'". '+
+      'Analyze this description. If it is specific enough to build a weekly content plan (you understand platform, format, audience, content type), respond with JSON: {"clear":true,"summary":"one line summary of their exact niche"}. '+
+      'If something important is ambiguous (like gaming but unclear if PC/mobile/console, or cooking but unclear cuisine type, etc), respond with JSON: {"clear":false,"question":"your single most important clarifying question"}. '+
+      'Only ask ONE question maximum. Respond with JSON only, no other text.';
+    fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:prompt}]})
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var text=(d.content&&d.content[0]&&d.content[0].text)||'{"clear":true,"summary":"'+form.nicheDesc+'"}';
+      try{
+        var parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+        setLoading(false);
+        if(parsed.clear){
+          // Niche is clear — skip clarification step
+          setForm(Object.assign({},form,{nicheResolved:parsed.summary||form.nicheDesc}));
+          setClarifDone(true);
+          setStep(2); // skip to goal
+        } else {
+          // Need clarification — show chat
+          setClarifMsgs([{role:'ai',text:parsed.question}]);
+          setForm(Object.assign({},form,{nicheResolved:''}));
+          setStep(1);
+        }
+      }catch(e){
+        setLoading(false);
+        setForm(Object.assign({},form,{nicheResolved:form.nicheDesc}));
+        setClarifDone(true);
+        setStep(2);
+      }
+    })
+    .catch(function(){
+      setLoading(false);
+      setForm(Object.assign({},form,{nicheResolved:form.nicheDesc}));
+      setClarifDone(true);
+      setStep(2);
+    });
   }
 
-  return React.createElement('div',{className:'onboard-wrap'},
-    React.createElement('div',{className:'onboard-card'},
-      React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:28}},
-        React.createElement(Icon,{d:ic.yt,size:22,stroke:'var(--red)',sw:2}),
-        React.createElement('span',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},'Tube',React.createElement('span',{style:{color:'var(--red)'}},'C'),'oach')),
-      React.createElement('div',{className:'step-pills'},[0,1,2].map(i=>React.createElement('div',{key:i,className:'step-pill'+(i<step?' done':i===step?' active':'')}))),
-      error&&React.createElement('div',{className:'error-box'},error),
-      step===0&&React.createElement('div',{className:'fade-up'},
-        React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},'What content will you make?'),
-        React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'This helps us find the best trends for you.'),
-        React.createElement('label',null,'Your niche'),
-        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:8,marginBottom:20}},
-          niches.map(n=>React.createElement('button',{key:n,className:'btn'+(form.niche===n?' btn-primary':' btn-secondary'),style:{justifyContent:'flex-start',fontSize:13},onClick:()=>setForm({...form,niche:n})},n))),
-        React.createElement('label',null,'Language'),
-        React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:8}},
-          langs.map(l=>React.createElement('button',{key:l,className:'btn'+(form.lang===l?' btn-primary':' btn-ghost'),style:{fontSize:13},onClick:()=>setForm({...form,lang:l})},l)))),
-      step===1&&React.createElement('div',{className:'fade-up'},
-        React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},"What's your goal?"),
-        React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},"We'll build your roadmap around this."),
-        React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:10}},
-          goals.map(g=>React.createElement('button',{key:g.l,className:'btn'+(form.goal===g.l?' btn-primary':' btn-secondary'),style:{justifyContent:'flex-start',fontSize:14,padding:'13px 16px'},onClick:()=>setForm({...form,goal:g.l,goalNumber:g.n})},
-            React.createElement(Icon,{d:ic.goal,size:15,stroke:form.goal===g.l?'#fff':'var(--text3)'}),g.l)))),
-      step===2&&React.createElement('div',{className:'fade-up'},
-        React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},'How often can you post?'),
-        React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'Be realistic — consistency beats frequency.'),
-        React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:10}},
-          freqs.map(f=>React.createElement('button',{key:f,className:'btn'+(form.freq===f?' btn-primary':' btn-secondary'),style:{justifyContent:'flex-start',fontSize:14,padding:'13px 16px'},onClick:()=>setForm({...form,freq:f})},
-            React.createElement(Icon,{d:ic.chart,size:15,stroke:form.freq===f?'#fff':'var(--text3)'}),f)))),
-      React.createElement('div',{style:{display:'flex',gap:10,marginTop:28}},
-        step>0&&React.createElement('button',{className:'btn btn-ghost',onClick:()=>setStep(s=>s-1)},'← Back'),
-        React.createElement('button',{className:'btn btn-primary',style:{flex:1,justifyContent:'center',opacity:canNext?1:0.4},disabled:!canNext||loading,onClick:step<2?()=>setStep(s=>s+1):finish},
-          loading?React.createElement('div',{className:'spinner'}):null,
-          loading?'Saving…':step<2?'Continue →':'Launch my dashboard 🚀'))));
+  // Handle clarification answer
+  function sendClarif(){
+    if(!clarifInput.trim()||clarifLoading) return;
+    var ans=clarifInput.trim();
+    setClarifInput('');
+    var newMsgs=clarifMsgs.concat([{role:'user',text:ans}]);
+    setClarifMsgs(newMsgs);
+    setClarifLoading(true);
+    var history=newMsgs.map(function(m){return{role:m.role==='ai'?'assistant':'user',content:m.text};});
+    var prompt='Original niche description: "'+form.nicheDesc+'". The creator just answered your clarifying question. Based on the full conversation, you now have enough info. Respond with JSON only: {"summary":"detailed one-line niche summary including all specifics like platform, genre, audience, format etc"}';
+    history.push({role:'user',content:prompt});
+    fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:history})
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var text=(d.content&&d.content[0]&&d.content[0].text)||'{}';
+      try{
+        var parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+        var resolved=parsed.summary||form.nicheDesc+' - '+ans;
+        setForm(Object.assign({},form,{nicheResolved:resolved}));
+        setClarifMsgs(newMsgs.concat([{role:'ai',text:'Got it! Your niche: "'+resolved+'". This will be used to personalise your weekly plan.'}]));
+        setClarifDone(true);
+      }catch(e){
+        setForm(Object.assign({},form,{nicheResolved:form.nicheDesc+' - '+ans}));
+        setClarifDone(true);
+      }
+      setClarifLoading(false);
+    })
+    .catch(function(){
+      setClarifLoading(false);
+      setForm(Object.assign({},form,{nicheResolved:form.nicheDesc}));
+      setClarifDone(true);
+    });
+  }
+
+  function finish(){
+    setLoading(true); setError('');
+    api('/dashboard/onboard',{method:'POST',body:{
+      niche:form.nicheResolved||form.nicheDesc,
+      nicheDesc:form.nicheDesc,
+      lang:form.lang,
+      goal:form.goal,
+      freq:form.freq,
+      goalNumber:form.goalNumber
+    }})
+    .then(function(){ props.onDone(); })
+    .catch(function(e){ setError(e.message); setLoading(false); });
+  }
+
+  // ── Step 0: Describe your niche ──
+  var step0=h('div',{className:'fade-up'},
+    h('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},'Tell us about your channel'),
+    h('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'Describe what content you make or want to make. Be as specific as possible — the more detail, the better your weekly plan.'),
+    h('textarea',{
+      placeholder:'Example: I make PC gaming videos focused on FPS games like Valorant and CS2 for Tamil audience. I do tips, tricks and tournament highlights...',
+      value:form.nicheDesc,
+      onChange:function(e){setForm(Object.assign({},form,{nicheDesc:e.target.value}));},
+      style:{height:120,resize:'vertical',marginBottom:20,lineHeight:1.6}
+    }),
+    h('label',null,'What language will you speak in?'),
+    h('div',{style:{display:'flex',flexWrap:'wrap',gap:8}},
+      langs.map(function(l){
+        return h('button',{key:l,className:'btn '+(form.lang===l?'btn-primary':'btn-ghost'),style:{fontSize:13},onClick:function(){setForm(Object.assign({},form,{lang:l}))}},l);
+      })));
+
+  // ── Step 1: AI Clarification ──
+  var endRef=useRef(null);
+  useEffect(function(){
+    if(endRef.current) endRef.current.scrollIntoView({behavior:'smooth'});
+  },[clarifMsgs]);
+
+  var step1=h('div',{className:'fade-up'},
+    h('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},'One quick question'),
+    h('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:20}},'To make your plan more accurate, we need one clarification.'),
+    h('div',{style:{background:'var(--bg3)',borderRadius:'var(--radius)',padding:16,marginBottom:16,maxHeight:200,overflowY:'auto'}},
+      clarifMsgs.map(function(m,i){
+        return h('div',{key:i,style:{display:'flex',gap:10,marginBottom:12,flexDirection:m.role==='user'?'row-reverse':'row'}},
+          h('div',{style:{width:26,height:26,borderRadius:'50%',background:m.role==='ai'?'var(--red)':'var(--bg4)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:600,color:'#fff',flexShrink:0}},m.role==='ai'?'AI':'U'),
+          h('div',{style:{background:m.role==='ai'?'var(--bg2)':'rgba(255,59,59,.12)',border:'1px solid '+(m.role==='ai'?'var(--border)':'rgba(255,59,59,.2)'),borderRadius:10,padding:'8px 12px',fontSize:13,lineHeight:1.6,maxWidth:'80%'}},m.text));
+      }),
+      clarifLoading?h('div',{style:{display:'flex',gap:5,padding:'8px 0'}},
+        h('div',{className:'td'}),h('div',{className:'td'}),h('div',{className:'td'})):null,
+      h('div',{ref:endRef})),
+    !clarifDone?h('div',{style:{display:'flex',gap:8}},
+      h('input',{
+        placeholder:'Type your answer...',
+        value:clarifInput,
+        onChange:function(e){setClarifInput(e.target.value);},
+        onKeyDown:function(e){if(e.key==='Enter')sendClarif();}
+      }),
+      h('button',{className:'btn btn-primary',onClick:sendClarif,disabled:clarifLoading||!clarifInput.trim()},
+        h(Icon,{d:ic.send,size:15,stroke:'#fff'}))):
+    h('div',{className:'tag tag-green',style:{fontSize:13,padding:'8px 14px'}},
+      h(Icon,{d:ic.check,size:14,stroke:'var(--green)',sw:2.5}),' Niche confirmed! Click Continue'));
+
+  // ── Step 2: Goal ──
+  var step2=h('div',{className:'fade-up'},
+    h('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},"What's your goal?"),
+    h('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},"We'll build your roadmap around this."),
+    h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+      goals.map(function(g){
+        return h('button',{key:g.l,className:'btn '+(form.goal===g.l?'btn-primary':'btn-secondary'),style:{justifyContent:'flex-start',fontSize:14,padding:'13px 16px'},onClick:function(){setForm(Object.assign({},form,{goal:g.l,goalNumber:g.n}))}},
+          h(Icon,{d:ic.goal,size:15,stroke:form.goal===g.l?'#fff':'var(--text3)'}),g.l);
+      })));
+
+  // ── Step 3: Frequency ──
+  var step3=h('div',{className:'fade-up'},
+    h('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},'How often can you post?'),
+    h('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'Be realistic — consistency beats frequency.'),
+    h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+      freqs.map(function(f){
+        return h('button',{key:f,className:'btn '+(form.freq===f?'btn-primary':'btn-secondary'),style:{justifyContent:'flex-start',fontSize:14,padding:'13px 16px'},onClick:function(){setForm(Object.assign({},form,{freq:f}))}},
+          h(Icon,{d:ic.chart,size:15,stroke:form.freq===f?'#fff':'var(--text3)'}),f);
+      })));
+
+  var stepContent=step===0?step0:step===1?step1:step===2?step2:step3;
+
+  // pill count: 0=niche, 1=clarify(optional), 2=goal, 3=freq
+  // show 3 pills always (niche, goal, freq) — clarify is invisible in pills
+  var pillSteps=step===1?[0,1,2,3]:[0,1,2,3];
+  var pillCurrent=step;
+
+  return h('div',{className:'owrap'},
+    h('div',{className:'ocard'},
+      h('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:28}},
+        h(Icon,{d:ic.yt,size:22,stroke:'var(--red)',sw:2}),
+        h('span',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},'TubeCoach')),
+      h('div',{className:'spills'},
+        [0,1,2,3].map(function(i){
+          return h('div',{key:i,className:'spill'+(i<step?' done':i===step?' act':'')});
+        })),
+      error?h('div',{className:'err'},error):null,
+      stepContent,
+      h('div',{style:{display:'flex',gap:10,marginTop:28}},
+        step>0?h('button',{className:'btn btn-ghost',onClick:function(){
+          if(step===2&&clarifDone&&clarifMsgs.length===0) setStep(0);
+          else setStep(step-1);
+        }},'Back'):null,
+        h('button',{
+          className:'btn btn-primary',
+          style:{flex:1,justifyContent:'center',opacity:canNext?1:0.4},
+          disabled:!canNext||loading,
+          onClick:function(){
+            if(step===0) analyseNiche();
+            else if(step===1) setStep(2);
+            else if(step===2) setStep(3);
+            else finish();
+          }
+        },
+          loading?h('div',{className:'spinner'}):null,
+          loading?(step===0?'Analysing your niche...':'Saving...'):step===3?'Launch my dashboard':'Continue'))));
 }
 
-/* ══════════════ SIDEBAR ══════════════ */
-function Sidebar({tab,setTab,user,onLogout}){
-  const navs=[{id:'plan',icon:ic.plan,label:'Weekly Plan'},{id:'analysis',icon:ic.chart,label:'Analysis'},{id:'chat',icon:ic.chat,label:'AI Coach'},{id:'goal',icon:ic.goal,label:'Goal Tracker'}];
-  return React.createElement('div',{className:'sidebar'},
-    React.createElement('div',{className:'sidebar-logo'},React.createElement(Icon,{d:ic.yt,size:20,stroke:'var(--red)',sw:2}),'Tube',React.createElement('span',{style:{color:'var(--red)'}},'C'),'oach'),
-    navs.map(n=>React.createElement('button',{key:n.id,className:'nav-item'+(tab===n.id?' active':''),onClick:()=>setTab(n.id)},React.createElement(Icon,{d:n.icon,size:16}),n.label)),
-    React.createElement('div',{className:'sidebar-bottom'},
-      React.createElement('div',{className:'avatar-row'},
-        React.createElement('div',{className:'avatar'},user.avatar?React.createElement('img',{src:user.avatar,alt:'',onError:e=>e.target.style.display='none'}):(user.name||'U')[0]),
-        React.createElement('div',{style:{flex:1,overflow:'hidden'}},
-          React.createElement('div',{style:{fontSize:13,fontWeight:500,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},user.name),
-          React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},user.channel?.title||'Your Channel')),
-        React.createElement('button',{style:{background:'none',border:'none',cursor:'pointer',color:'var(--text3)',padding:4},onClick:onLogout},React.createElement(Icon,{d:ic.logout,size:15})))));
+/* ══ SIDEBAR ══ */
+function Sidebar(props){
+  var navs=[
+    {id:'plan',icon:ic.plan,label:'Weekly Plan'},
+    {id:'analysis',icon:ic.chart,label:'Analysis'},
+    {id:'chat',icon:ic.chat,label:'AI Coach'},
+    {id:'goal',icon:ic.goal,label:'Goal Tracker'}
+  ];
+  var u=props.user||{};
+  return h('div',{className:'sidebar'},
+    h('div',{className:'sidebar-logo'},
+      h(Icon,{d:ic.yt,size:20,stroke:'var(--red)',sw:2}),
+      h('span',null,'Tube'),h('span',{style:{color:'var(--red)'}},'Coach')),
+    navs.map(function(n){
+      return h('button',{key:n.id,className:'nav-item'+(props.tab===n.id?' active':''),onClick:function(){props.setTab(n.id);}},
+        h(Icon,{d:n.icon,size:16}),n.label);
+    }),
+    h('div',{className:'sidebar-bottom'},
+      h('div',{className:'avatar-row'},
+        h('div',{className:'ava',style:{background:u.avatar?'transparent':'var(--red)'}},
+          u.avatar
+            ?h('img',{
+                src:API+'/auth/avatar?url='+encodeURIComponent(u.avatar),
+                alt:'',
+                style:{width:'100%',height:'100%',objectFit:'cover',borderRadius:'50%'},
+                onError:function(e){
+                  e.target.style.display='none';
+                  e.target.parentNode.style.background='var(--red)';
+                  e.target.parentNode.textContent=(u.name||'U')[0].toUpperCase();
+                }
+              })
+            :(u.name||'U')[0].toUpperCase()),
+        h('div',{style:{flex:1,overflow:'hidden'}},
+          h('div',{style:{fontSize:13,fontWeight:500,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},u.name||''),
+          h('div',{style:{fontSize:11,color:'var(--text3)'}},u.channel&&u.channel.title||'Your Channel')),
+        h('button',{style:{background:'none',border:'none',cursor:'pointer',color:'var(--text3)',padding:4},onClick:props.onLogout},
+          h(Icon,{d:ic.logout,size:15})))));
 }
 
-/* ══════════════ WEEKLY PLAN TAB ══════════════ */
-function PlanTab({user}){
-  const [plan,setPlan]=useState(null);
-  const [loading,setLoading]=useState(true);
-  const [error,setError]=useState('');
-  const [taskStates,setTaskStates]=useState({});
+/* ══ COPY BUTTON — standalone component outside TaskGuide ══ */
+function CopyBtn(props){
+  var copiedState=useState(false);
+  var copied=copiedState[0]; var setCopied=copiedState[1];
+  function doCopy(e){
+    e.stopPropagation();
+    if(!props.text) return;
+    navigator.clipboard.writeText(String(props.text)).then(function(){
+      setCopied(true);
+      setTimeout(function(){ setCopied(false); },2000);
+    }).catch(function(){
+      // fallback for older browsers
+      var ta=document.createElement('textarea');
+      ta.value=String(props.text);
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setCopied(true);
+      setTimeout(function(){ setCopied(false); },2000);
+    });
+  }
+  return h('button',{
+    onClick:doCopy,
+    style:{background:copied?'rgba(34,197,94,.15)':'var(--bg4)',border:'1px solid '+(copied?'rgba(34,197,94,.3)':'var(--border2)'),borderRadius:6,padding:'3px 10px',fontSize:11,color:copied?'var(--green)':'var(--text3)',cursor:'pointer',flexShrink:0,whiteSpace:'nowrap',transition:'all .15s'}
+  },copied?'✓ Copied':'Copy');
+}
 
-  useEffect(()=>{
-    api('/dashboard/plan')
-      .then(d=>{setPlan(d);setTaskStates(d.taskStates||{});setLoading(false);})
-      .catch(e=>{setError(e.message);setLoading(false);});
+/* ══ TASK GUIDE — step-by-step guide via backend, cached permanently ══ */
+function TaskGuide(props){
+  var task=props.task;
+  var cachedGuide=props.cachedGuide||null;
+  var onGuideLoaded=props.onGuideLoaded||function(){};
+
+  // ALL hooks must be at the top — never after conditional returns
+  var guideState=useState(cachedGuide);
+  var guide=guideState[0]; var setGuide=guideState[1];
+  var loadState=useState(!cachedGuide);
+  var loading=loadState[0]; var setLoading=loadState[1];
+  var errState=useState('');
+  var err=errState[0]; var setErr=errState[1];
+
+  useEffect(function(){
+    if(!task) return;
+    if(cachedGuide){ setGuide(cachedGuide); setLoading(false); return; }
+    setLoading(true); setErr('');
+    api('/dashboard/task-guide',{method:'POST',body:{task:task}})
+      .then(function(d){
+        setGuide(d);
+        setLoading(false);
+        onGuideLoaded(task.id, d);
+      })
+      .catch(function(e){
+        setErr('Could not generate guide. '+e.message);
+        setLoading(false);
+      });
+  },[task&&task.id]);
+
+  if(loading) return h('div',{style:{padding:'20px 16px',display:'flex',alignItems:'center',gap:10,color:'var(--text3)',fontSize:13,borderTop:'1px solid var(--border)'}},
+    h('div',{className:'spinner',style:{width:16,height:16,borderWidth:2}}),
+    'Generating guide — this takes about 15 seconds...');
+
+  if(err) return h('div',{style:{padding:'12px 16px',fontSize:12,color:'#FF6B6B',borderTop:'1px solid var(--border)'}},err);
+
+  // Safe access — make sure guide and steps exist and are the right type
+  if(!guide||!guide.steps||!Array.isArray(guide.steps)||guide.steps.length===0){
+    return h('div',{style:{padding:'12px 16px',fontSize:12,color:'var(--text3)',borderTop:'1px solid var(--border)'}},'Guide not available. Try again later.');
+  }
+
+  var steps=guide.steps;
+  var seo=guide.seoContent&&typeof guide.seoContent==='object'?guide.seoContent:null;
+  var isVideoTask=task.type==='video'||task.type==='short';
+
+  return h('div',{style:{borderTop:'1px solid var(--border)',padding:'16px'}},
+    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}},
+      h('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},'Step-by-step guide'),
+      guide.totalTime?h('div',{className:'tag tag-blue',style:{fontSize:11}},String(guide.totalTime)):null),
+
+    steps.map(function(step,i){
+      if(!step||typeof step!=='object') return null;
+      var scriptText=step.script&&step.script!=='null'?String(step.script):null;
+      var onScreenText=step.onScreen&&step.onScreen!=='null'?String(step.onScreen):null;
+      var tipText=step.tip&&step.tip!=='null'?String(step.tip):null;
+      var titleText=step.title?String(step.title):'Step '+(i+1);
+      var whatText=step.what?String(step.what):'';
+      var tsText=step.timestamp&&step.timestamp!=='null'?String(step.timestamp):null;
+      var durText=step.duration&&step.duration!=='null'?String(step.duration):null;
+      return h('div',{key:i,style:{display:'flex',gap:12,marginBottom:16}},
+        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0}},
+          h('div',{style:{width:28,height:28,borderRadius:'50%',background:i===0?'var(--red)':'var(--bg4)',border:'2px solid '+(i===0?'var(--red)':'var(--border2)'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:i===0?'#fff':'var(--text2)'}},step.stepNum||i+1),
+          i<steps.length-1?h('div',{style:{width:2,flex:1,background:'var(--border)',margin:'4px 0',minHeight:20}}):null),
+        h('div',{style:{flex:1,paddingBottom:i<steps.length-1?8:0}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6,flexWrap:'wrap'}},
+            h('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},titleText),
+            tsText?h('div',{className:'tag tag-amber',style:{fontSize:10,padding:'1px 7px'}},tsText):
+            durText?h('div',{className:'tag tag-amber',style:{fontSize:10,padding:'1px 7px'}},durText):null),
+          whatText?h('div',{style:{fontSize:13,color:'var(--text2)',lineHeight:1.7,marginBottom:scriptText||onScreenText||tipText?10:0}},whatText):null,
+          scriptText?h('div',{style:{background:'rgba(59,130,246,.06)',border:'1px solid rgba(59,130,246,.15)',borderRadius:8,padding:'10px 14px',marginBottom:8}},
+            h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}},
+              h('div',{style:{fontSize:9,fontWeight:700,color:'var(--blue)',textTransform:'uppercase',letterSpacing:1}},'Script — say this on camera'),
+              h(CopyBtn,{text:scriptText})),
+            h('div',{style:{fontSize:12.5,color:'var(--text)',lineHeight:1.8,fontStyle:'italic',whiteSpace:'pre-wrap'}},scriptText)):null,
+          onScreenText?h('div',{style:{background:'rgba(34,197,94,.05)',border:'1px solid rgba(34,197,94,.18)',borderRadius:8,padding:'10px 14px',marginBottom:8}},
+            h('div',{style:{fontSize:9,fontWeight:700,color:'var(--green)',textTransform:'uppercase',letterSpacing:1,marginBottom:6}},'On Screen — show this'),
+            h('div',{style:{fontSize:12.5,color:'var(--text2)',lineHeight:1.7}},onScreenText)):null,
+          tipText?h('div',{style:{display:'flex',gap:8,alignItems:'flex-start',background:'var(--bg3)',borderRadius:7,padding:'8px 10px'}},
+            h('span',{style:{fontSize:13,flexShrink:0}},'💡'),
+            h('div',{style:{fontSize:12,color:'var(--text3)',lineHeight:1.6}},tipText)):null));
+    }),
+
+    isVideoTask&&seo?h('div',{style:{marginTop:20,borderTop:'1px solid var(--border)',paddingTop:16}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:16}},
+        h('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},'Ready-to-upload SEO package'),
+        h('div',{className:'tag tag-green',style:{fontSize:11}},'Copy & paste directly')),
+
+      seo.title&&typeof seo.title==='object'?h('div',{style:{marginBottom:14}},
+        h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1,marginBottom:8}},'Video Titles (pick one)'),
+        ['option1','option2','option3'].map(function(opt,i){
+          var t=seo.title[opt];
+          if(!t||typeof t!=='string') return null;
+          return h('div',{key:i,style:{display:'flex',alignItems:'flex-start',gap:8,marginBottom:6,background:'var(--bg3)',borderRadius:8,padding:'8px 12px'}},
+            h('div',{style:{flex:1,fontSize:13,color:'var(--text)',lineHeight:1.5}},t),
+            h(CopyBtn,{text:t}));
+        })):null,
+
+      seo.description&&typeof seo.description==='string'?h('div',{style:{marginBottom:14}},
+        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
+          h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Description'),
+          h(CopyBtn,{text:seo.description})),
+        h('div',{style:{background:'var(--bg3)',borderRadius:8,padding:'12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.8,whiteSpace:'pre-wrap',maxHeight:200,overflowY:'auto'}},seo.description)):null,
+
+      seo.tags&&Array.isArray(seo.tags)&&seo.tags.length>0?h('div',{style:{marginBottom:14}},
+        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
+          h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Tags ('+seo.tags.length+')'),
+          h(CopyBtn,{text:seo.tags.filter(function(t){return typeof t==='string';}).join(', ')})),
+        h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}},
+          seo.tags.map(function(tag,i){
+            if(typeof tag!=='string') return null;
+            return h('div',{key:i,style:{background:'var(--bg3)',border:'1px solid var(--border2)',borderRadius:6,padding:'3px 9px',fontSize:12,color:'var(--text2)'}},tag);
+          }))):null,
+
+      seo.thumbnailConcept&&typeof seo.thumbnailConcept==='string'?h('div',{style:{marginBottom:14}},
+        h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1,marginBottom:8}},'Thumbnail Concept'),
+        h('div',{style:{background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.15)',borderRadius:8,padding:'10px 12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.7}},seo.thumbnailConcept)):null,
+
+      seo.firstComment&&typeof seo.firstComment==='string'?h('div',null,
+        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
+          h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Pinned First Comment'),
+          h(CopyBtn,{text:seo.firstComment})),
+        h('div',{style:{background:'var(--bg3)',borderRadius:8,padding:'10px 12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.7,fontStyle:'italic'}},seo.firstComment)):null):null);
+}
+
+/* ══ WEEKLY PLAN TAB ══ */
+function PlanTab(props){
+  var planState=useState(null);
+  var plan=planState[0]; var setPlan=planState[1];
+  var loadState=useState(true);
+  var loading=loadState[0]; var setLoading=loadState[1];
+  var errState=useState('');
+  var error=errState[0]; var setError=errState[1];
+  var tsState=useState({});
+  var taskStates=tsState[0]; var setTaskStates=tsState[1];
+  var expandedState=useState(null);
+  var expandedId=expandedState[0]; var setExpandedId=expandedState[1];
+  var guideCacheState=useState({});
+  var guideCache=guideCacheState[0]; var setGuideCache=guideCacheState[1];
+
+  function saveGuideToCache(taskId, guide){
+    setGuideCache(function(prev){ var next=Object.assign({},prev); next[taskId]=guide; return next; });
+  }
+
+  function loadPlan(refresh){
+    setLoading(true); setError('');
+    var url='/dashboard/plan'+(refresh?'?refresh=true':'');
+    api(url)
+      .then(function(d){ setPlan(d); setTaskStates(d.taskStates||{}); setLoading(false); })
+      .catch(function(e){ setError(e.message); setLoading(false); });
+  }
+
+  useEffect(function(){ loadPlan(false); },[]);
+
+  function toggleTask(id){
+    var newDone=!taskStates[id];
+    var ns=Object.assign({},taskStates); ns[id]=newDone;
+    setTaskStates(ns);
+    api('/dashboard/plan/task',{method:'PATCH',body:{taskId:id,done:newDone}}).catch(function(){
+      var revert=Object.assign({},taskStates); revert[id]=!newDone;
+      setTaskStates(revert);
+    });
+  }
+
+  function toggleExpand(id){
+    setExpandedId(function(prev){ return prev===id?null:id; });
+  }
+
+  if(loading) return h(FullLoader,{text:'Generating your weekly plan with AI...'});
+  if(error) return h('div',{className:'err',style:{marginTop:40}},error);
+  if(!plan) return null;
+
+  var tasks=plan.tasks||[];
+  var trends=plan.trends||[];
+  var ideas=tasks.filter(function(t){return t.isIdea;});
+  var doneCount=tasks.filter(function(t){return taskStates[t.id];}).length;
+  var pct=tasks.length?Math.round((doneCount/tasks.length)*100):0;
+  var tagCol={video:'tag-red',short:'tag-blue',engage:'tag-green',seo:'tag-amber',community:'tag-blue'};
+  var user=props.user||{};
+
+  var taskNodes=tasks.map(function(task){
+    var isDone=!!taskStates[task.id];
+    var isExpanded=expandedId===task.id;
+    return h('div',{key:task.id,style:{background:'var(--bg2)',border:'1px solid '+(isExpanded?'var(--border2)':'var(--border)'),borderRadius:'var(--radius)',overflow:'hidden',transition:'border-color .15s',opacity:isDone?0.55:1}},
+      h('div',{style:{display:'flex',alignItems:'flex-start',gap:12,padding:'14px 16px',cursor:'pointer'},onClick:function(e){e.stopPropagation();toggleExpand(task.id);}},
+        h('div',{className:'tcheck'+(isDone?' on':''),style:{cursor:'pointer',flexShrink:0,marginTop:2},onClick:function(e){e.stopPropagation();toggleTask(task.id);}},
+          isDone?h(Icon,{d:ic.check,size:12,stroke:'#fff',sw:2.5}):null),
+        h('div',{style:{flex:1,minWidth:0}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4,flexWrap:'wrap'}},
+            h('span',{className:'tag '+(tagCol[task.type]||'tag-blue'),style:{fontSize:11,padding:'2px 8px'}},task.type||'task'),
+            task.isIdea?h('span',{className:'tag',style:{fontSize:11,padding:'2px 8px',background:'rgba(245,158,11,.08)',color:'var(--amber)',border:'1px solid rgba(245,158,11,.15)'}},h(Icon,{d:ic.spark,size:10}),' idea'):null),
+          h('div',{style:{fontSize:14,fontWeight:500,color:isDone?'var(--text3)':'var(--text)',lineHeight:1.4,textDecoration:isDone?'line-through':'none'}},task.title),
+          task.detail?h('div',{style:{fontSize:12,color:'var(--text3)',marginTop:3}},task.detail):null,
+          task.trendReason?h('div',{style:{marginTop:6,fontSize:11,color:'#FCD34D',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.12)',borderRadius:6,padding:'4px 8px'}},'📈 ',task.trendReason):null),
+        h('div',{style:{display:'flex',alignItems:'center',gap:8,flexShrink:0,marginTop:2}},
+          h('div',{style:{fontSize:11,color:'var(--text3)'}},isExpanded?'Hide guide':'See guide'),
+          h('div',{style:{fontSize:14,color:'var(--text3)',transform:isExpanded?'rotate(180deg)':'none',transition:'transform .2s'}},'▾'))),
+      isExpanded?h('div',{style:{padding:'0 16px 16px 16px'}},
+        h(TaskGuide,{task:task,user:user,cachedGuide:guideCache[task.id]||null,onGuideLoaded:saveGuideToCache})):null);
+  });
+
+  var trendNodes=trends.length>0?h('div',{className:'card',style:{marginBottom:14}},
+    h('div',{className:'sectitle'},'Trending in your niche'),
+    trends.map(function(t){
+      return h('div',{className:'tbar',key:t.name},
+        h('div',{className:'tbarname'},t.name),
+        h('div',{className:'tbartrack'},h('div',{className:'tbarfill',style:{width:t.score+'%'}})),
+        h('div',{className:'tbarscore'},t.score));
+    })):null;
+
+  var ideaNodes=ideas.length>0?h('div',{className:'card'},
+    h('div',{className:'sectitle'},"This week's video ideas"),
+    h('p',{style:{fontSize:12,color:'var(--text3)',marginBottom:10}},'Already included in your action plan above'),
+    ideas.map(function(t,i){
+      return h('div',{className:'ichip',key:i},
+        h('div',{style:{fontWeight:500,color:'var(--text)',marginBottom:3}},t.title.replace(/^Post:\s*/,'')),
+        t.trendReason?h('div',{style:{fontSize:12,color:'var(--text3)'}},t.trendReason):null);
+    })):null;
+
+  return h('div',{className:'fade-up'},
+    h('div',{className:'ph'},
+      h('div',{style:{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}},
+        h('div',null,
+          h('h1',null,"This Week's Action Plan"),
+          h('p',null,plan.weekSummary||('Personalised for '+(user.profile&&user.profile.niche||'your niche')+' · Updated every Monday'))),
+        h('span',{className:'tag tag-amber'},h(Icon,{d:ic.trend,size:12}),' Trends analysed'))),
+    h('div',{className:'aplan'},
+      h('div',null,
+        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}},
+          h('div',{className:'sectitle',style:{margin:0}},doneCount+'/'+tasks.length+' tasks complete'),
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,flex:1,maxWidth:180,marginLeft:16}},
+            h('div',{className:'progress-track',style:{flex:1}},h('div',{className:'progress-fill',style:{width:pct+'%'}})),
+            h('span',{style:{fontSize:12,color:'var(--text2)',minWidth:30}},pct+'%'))),
+        h('div',{className:'tlist',style:{gap:10}},taskNodes)),
+      h('div',null,trendNodes,ideaNodes)));
+}
+
+/* ══ ANALYSIS TAB ══ */
+function AnalysisTab(){
+  var dataState=useState(null);
+  var data=dataState[0]; var setData=dataState[1];
+  var loadState=useState(true);
+  var loading=loadState[0]; var setLoading=loadState[1];
+  var errState=useState('');
+  var error=errState[0]; var setError=errState[1];
+
+  useEffect(function(){
+    api('/dashboard/analysis')
+      .then(function(d){ setData(d); setLoading(false); })
+      .catch(function(e){ setError(e.message); setLoading(false); });
   },[]);
 
-  async function toggleTask(id){
-    const newDone=!taskStates[id];
-    setTaskStates(s=>({...s,[id]:newDone}));
-    try{await api('/dashboard/plan/task',{method:'PATCH',body:{taskId:id,done:newDone}});}
-    catch{setTaskStates(s=>({...s,[id]:!newDone}));}
-  }
+  if(loading) return h(FullLoader,{text:'Fetching your channel data...'});
+  if(error) return h('div',{className:'err',style:{marginTop:40}},error);
+  if(!data) return null;
 
-  if(loading)return React.createElement(FullLoader,{text:'Generating your weekly plan with AI…'});
-  if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
-  if(!plan)return null;
-
-  const tasks=plan.tasks||[];
-  const trends=plan.trends||[];
-  const ideas=tasks.filter(t=>t.isIdea);
-  const doneCount=tasks.filter(t=>taskStates[t.id]).length;
-  const pct=tasks.length?Math.round((doneCount/tasks.length)*100):0;
-  const tagCol={video:'tag-red',short:'tag-blue',engage:'tag-green',seo:'tag-amber',community:'tag-blue'};
-
-  return React.createElement('div',{className:'fade-up'},
-    React.createElement('div',{className:'page-header'},
-      React.createElement('div',{style:{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}},
-        React.createElement('div',null,
-          React.createElement('h1',null,"This Week's Action Plan"),
-          React.createElement('p',null,plan.weekSummary||`Personalised for ${user.profile?.niche||'your niche'} · Updated every Monday`)),
-        React.createElement('span',{className:'tag tag-amber'},React.createElement(Icon,{d:ic.trend,size:12}),' Trends analysed'))),
-    React.createElement('div',{className:'action-plan'},
-      React.createElement('div',null,
-        React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}},
-          React.createElement('div',{className:'section-title',style:{margin:0}},`${doneCount}/${tasks.length} tasks complete`),
-          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,flex:1,maxWidth:180,marginLeft:16}},
-            React.createElement('div',{className:'progress-track',style:{flex:1}},React.createElement('div',{className:'progress-fill',style:{width:`${pct}%`}})),
-            React.createElement('span',{style:{fontSize:12,color:'var(--text2)',minWidth:30}},`${pct}%`))),
-        React.createElement('div',{className:'task-list'},
-          tasks.map(task=>React.createElement('div',{key:task.id,className:'task-item'+(taskStates[task.id]?' done':''),onClick:()=>toggleTask(task.id)},
-            React.createElement('div',{className:'task-checkbox'+(taskStates[task.id]?' checked':'')},
-              taskStates[task.id]&&React.createElement(Icon,{d:ic.check,size:12,stroke:'#fff',sw:2.5})),
-            React.createElement('div',{style:{flex:1}},
-              React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4}},
-                React.createElement('span',{className:`tag ${tagCol[task.type]||'tag-blue'}`,style:{fontSize:11,padding:'2px 8px'}},task.type||'task'),
-                task.isIdea&&React.createElement('span',{className:'tag',style:{fontSize:11,padding:'2px 8px',background:'rgba(245,158,11,.08)',color:'var(--amber)',border:'1px solid rgba(245,158,11,.15)'}},React.createElement(Icon,{d:ic.spark,size:10}),' idea')),
-              React.createElement('div',{className:'task-title'},task.title),
-              task.detail&&React.createElement('div',{className:'task-meta'},task.detail),
-              task.trendReason&&React.createElement('div',{style:{marginTop:6,fontSize:11,color:'#FCD34D',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.12)',borderRadius:6,padding:'4px 8px'}},'📈 ',task.trendReason))))),
-      React.createElement('div',null,
-        trends.length>0&&React.createElement('div',{className:'card',style:{marginBottom:14}},
-          React.createElement('div',{className:'section-title'},'Trending in your niche'),
-          trends.map(t=>React.createElement('div',{className:'trend-bar',key:t.name},
-            React.createElement('div',{className:'trend-name'},t.name),
-            React.createElement('div',{className:'trend-mini-bar'},React.createElement('div',{className:'trend-mini-fill',style:{width:`${t.score}%`}})),
-            React.createElement('div',{className:'trend-score'},t.score)))),
-        ideas.length>0&&React.createElement('div',{className:'card'},
-          React.createElement('div',{className:'section-title'},"This week's video ideas"),
-          React.createElement('p',{style:{fontSize:12,color:'var(--text3)',marginBottom:10}},'Already in your action plan above ↑'),
-          ideas.map((t,i)=>React.createElement('div',{className:'idea-chip',key:i},
-            React.createElement('div',{style:{fontWeight:500,color:'var(--text)',marginBottom:3}},t.title.replace(/^Post:\s*/,'')),
-            t.trendReason&&React.createElement('div',{style:{fontSize:12,color:'var(--text3)'}},t.trendReason)))))))
-  );
-}
-
-/* ══════════════ ANALYSIS TAB ══════════════ */
-function AnalysisTab(){
-  const [data,setData]=useState(null);
-  const [loading,setLoading]=useState(true);
-  const [error,setError]=useState('');
-  useEffect(()=>{api('/dashboard/analysis').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});},[]);
-  if(loading)return React.createElement(FullLoader,{text:'Fetching your channel data…'});
-  if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
-  if(!data)return null;
-  const {stats={},aiAnalysis={},videos=[]}=data;
-  const statCards=[
-    {label:'Subscribers',value:(stats.subscribers?.current||0).toLocaleString(),delta:stats.subscribers?.delta||0},
-    {label:'Total Views',value:(stats.totalViews?.current||0).toLocaleString(),delta:stats.totalViews?.delta||0},
-    {label:'Videos Posted',value:stats.videoCount?.current||0,delta:stats.videoCount?.delta||0},
+  var stats=data.stats||{};
+  var aiAnalysis=data.aiAnalysis||{};
+  var videos=data.videos||[];
+  var statCards=[
+    {label:'Subscribers',value:(stats.subscribers&&stats.subscribers.current||0).toLocaleString(),delta:stats.subscribers&&stats.subscribers.delta||0},
+    {label:'Total Views',value:(stats.totalViews&&stats.totalViews.current||0).toLocaleString(),delta:stats.totalViews&&stats.totalViews.delta||0},
+    {label:'Videos Posted',value:stats.videoCount&&stats.videoCount.current||0,delta:stats.videoCount&&stats.videoCount.delta||0}
   ];
-  const bars=videos.slice(0,7);
-  const maxV=Math.max(...bars.map(b=>b.views||0),1);
-  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const topIdx=bars.reduce((b,v,i,a)=>v.views>a[b].views?i:b,0);
-  return React.createElement('div',{className:'fade-up'},
-    React.createElement('div',{className:'page-header'},React.createElement('h1',null,'Weekly Analysis'),React.createElement('p',null,'Performance compared to last week · Auto-updated every Monday')),
-    React.createElement('div',{className:'stats-grid'},
-      statCards.map(s=>React.createElement('div',{key:s.label,className:'stat-card'},
-        React.createElement('div',{className:'stat-label'},s.label),
-        React.createElement('div',{className:'stat-value'},s.value),
-        React.createElement('div',{className:'stat-delta '+(s.delta>=0?'up':'down')},s.delta>=0?`↑ +${s.delta} this week`:`↓ ${s.delta} this week`)))),
-    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}},
-      bars.length>0&&React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'section-title'},'Recent video views'),
-        React.createElement('div',{className:'bar-chart'},
-          bars.map((v,i)=>React.createElement('div',{key:i,className:'bar-wrap'},
-            React.createElement('div',{className:'bar'+(i===topIdx?' highlight':''),style:{height:`${((v.views||0)/maxV)*72}px`}}),
-            React.createElement('span',{className:'bar-label'},days[i]||`V${i+1}`))))),
-      React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'section-title'},'AI insight'),
-        (aiAnalysis.insights||[]).map((ins,i)=>React.createElement('p',{key:i,style:{fontSize:13,color:'var(--text2)',lineHeight:1.8,marginBottom:10}},ins.emoji,' ',ins.text)),
-        aiAnalysis.bestDay&&React.createElement('div',{className:'tag tag-green',style:{width:'fit-content'}},`Best day to post: ${aiAnalysis.bestDay}`))),
-    videos.length>0&&React.createElement('div',{className:'card',style:{marginTop:14}},
-      React.createElement('div',{className:'section-title'},'Recent videos'),
-      videos.map((v,i)=>React.createElement('div',{key:i,style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid var(--border)'}},
-        React.createElement('div',{style:{fontSize:13,flex:1,marginRight:16}},v.title),
-        React.createElement('div',{style:{display:'flex',gap:16,fontSize:12,color:'var(--text3)',flexShrink:0}},
-          React.createElement('span',null,(v.views||0).toLocaleString(),' views'),
-          React.createElement('span',null,(v.likes||0).toLocaleString(),' likes'))))));
+  var maxV=Math.max.apply(null,videos.map(function(v){return v.views||0;}).concat([1]));
+  var days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var topIdx=videos.reduce(function(b,v,i,a){return(v.views||0)>(a[b].views||0)?i:b;},0);
+
+  return h('div',{className:'fade-up'},
+    h('div',{className:'ph'},h('h1',null,'Weekly Analysis'),h('p',null,'Performance compared to last week · Auto-updated every Monday')),
+    h('div',{className:'sgrid'},
+      statCards.map(function(s){
+        return h('div',{key:s.label,className:'sc'},
+          h('div',{className:'slabel'},s.label),
+          h('div',{className:'sval'},s.value),
+          h('div',{className:'sdelta '+(s.delta>=0?'up':'down')},s.delta>=0?'↑ +'+s.delta+' this week':'↓ '+s.delta+' this week'));
+      })),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}},
+      videos.length>0?h('div',{className:'card'},
+        h('div',{className:'sectitle'},'Recent video views'),
+        h('div',{className:'barchart'},
+          videos.slice(0,7).map(function(v,i){
+            return h('div',{key:i,className:'barwrap'},
+              h('div',{className:'bar'+(i===topIdx?' hi':''),style:{height:Math.round(((v.views||0)/maxV)*72)+'px'}}),
+              h('span',{className:'barlbl'},days[i]||'V'+(i+1)));
+          }))):null,
+      h('div',{className:'card'},
+        h('div',{className:'sectitle'},'AI insight'),
+        (aiAnalysis.insights||[]).map(function(ins,i){
+          return h('p',{key:i,style:{fontSize:13,color:'var(--text2)',lineHeight:1.8,marginBottom:10}},ins.emoji,' ',ins.text);
+        }),
+        aiAnalysis.bestDay?h('div',{className:'tag tag-green',style:{width:'fit-content',marginTop:4}},'Best day to post: '+aiAnalysis.bestDay):null)),
+    videos.length>0?h('div',{className:'card',style:{marginTop:14}},
+      h('div',{className:'sectitle'},'Recent videos'),
+      videos.map(function(v,i){
+        return h('div',{key:i,style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid var(--border)'}},
+          h('div',{style:{fontSize:13,flex:1,marginRight:16}},v.title),
+          h('div',{style:{display:'flex',gap:16,fontSize:12,color:'var(--text3)',flexShrink:0}},
+            h('span',null,(v.views||0).toLocaleString()+' views'),
+            h('span',null,(v.likes||0).toLocaleString()+' likes')));
+      })):null);
 }
 
-/* ══════════════ CHAT TAB ══════════════ */
-function ChatTab({user}){
-  const [msgs,setMsgs]=useState([{role:'ai',text:`Hi ${user.name?.split(' ')[0]||'there'}! 👋 I'm your TubeCoach AI. Ask me anything — video ideas, script help, thumbnail tips, or how to grow your ${user.profile?.niche||'channel'} faster.`}]);
-  const [input,setInput]=useState('');
-  const [loading,setLoading]=useState(false);
-  const endRef=useRef(null);
-  const inputRef=useRef(null);
-  useEffect(()=>endRef.current?.scrollIntoView({behavior:'smooth'}),[msgs,loading]);
+/* ══ CHAT TAB ══ */
+function ChatTab(props){
+  var user=props.user||{};
+  var firstName=(user.name||'there').split(' ')[0];
+  var niche=(user.profile&&user.profile.niche)||'content';
+  var initMsg='Hi '+firstName+'! I am your TubeCoach AI. Ask me anything — video ideas, script help, thumbnail tips, or how to grow your '+niche+' channel faster.';
 
-  async function send(){
-    if(!input.trim()||loading)return;
-    const q=input.trim();setInput('');
-    const newMsgs=[...msgs,{role:'user',text:q}];
-    setMsgs(newMsgs);setLoading(true);
-    try{
-      const res=await api('/dashboard/chat',{method:'POST',body:{messages:newMsgs}});
-      setMsgs(m=>[...m,{role:'ai',text:res.reply}]);
-    }catch(e){setMsgs(m=>[...m,{role:'ai',text:'Sorry, could not connect. Please try again.'}]);}
-    setLoading(false);
+  var msgsState=useState([{role:'ai',text:initMsg}]);
+  var msgs=msgsState[0]; var setMsgs=msgsState[1];
+  var inputState=useState('');
+  var input=inputState[0]; var setInput=inputState[1];
+  var loadState=useState(false);
+  var loading=loadState[0]; var setLoading=loadState[1];
+  var endRef=useRef(null);
+  var inputRef=useRef(null);
+
+  useEffect(function(){
+    if(endRef.current) endRef.current.scrollIntoView({behavior:'smooth'});
+  },[msgs,loading]);
+
+  function send(){
+    if(!input.trim()||loading) return;
+    var q=input.trim();
+    setInput('');
+    var newMsgs=msgs.concat([{role:'user',text:q}]);
+    setMsgs(newMsgs);
+    setLoading(true);
+    api('/dashboard/chat',{method:'POST',body:{messages:newMsgs}})
+      .then(function(res){ setMsgs(function(m){return m.concat([{role:'ai',text:res.reply}]);}); setLoading(false); })
+      .catch(function(){ setMsgs(function(m){return m.concat([{role:'ai',text:'Sorry, could not connect. Please try again.'}]);}); setLoading(false); });
   }
 
-  const suggestions=['Write me a video script','Best thumbnail tips','How to get my first 10K subs?','SEO tips for my niche'];
-  return React.createElement('div',{className:'fade-up'},
-    React.createElement('div',{className:'page-header'},React.createElement('h1',null,'AI Coach'),React.createElement('p',null,'Ask anything about growing your channel — powered by Claude AI')),
-    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 280px',gap:20}},
-      React.createElement('div',{className:'card',style:{display:'flex',flexDirection:'column',height:560}},
-        React.createElement('div',{style:{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:14,paddingBottom:8}},
-          msgs.map((m,i)=>React.createElement('div',{key:i,className:`msg msg-${m.role==='ai'?'ai':'user'}`},
-            React.createElement('div',{className:'msg-avatar'},m.role==='ai'?'TC':(user.name||'U')[0]),
-            React.createElement('div',{className:'msg-bubble'},m.text))),
-          loading&&React.createElement('div',{className:'msg msg-ai'},
-            React.createElement('div',{className:'msg-avatar'},'TC'),
-            React.createElement('div',{className:'msg-bubble',style:{display:'flex',gap:5,alignItems:'center',padding:14}},
-              React.createElement('div',{className:'typing-dot'}),React.createElement('div',{className:'typing-dot'}),React.createElement('div',{className:'typing-dot'}))),
-          React.createElement('div',{ref:endRef})),
-        React.createElement('div',{className:'chat-input-row'},
-          React.createElement('input',{ref:inputRef,placeholder:'Ask your AI coach anything…',value:input,onChange:e=>setInput(e.target.value),onKeyDown:e=>e.key==='Enter'&&send()}),
-          React.createElement('button',{className:'btn btn-primary',onClick:send,disabled:loading||!input.trim()},React.createElement(Icon,{d:ic.send,size:15,stroke:'#fff'})))),
-      React.createElement('div',null,
-        React.createElement('div',{className:'card',style:{marginBottom:14}},
-          React.createElement('div',{className:'section-title'},'Quick questions'),
-          suggestions.map(s=>React.createElement('button',{key:s,className:'btn btn-ghost',style:{width:'100%',justifyContent:'flex-start',fontSize:13,marginBottom:6,textAlign:'left'},onClick:()=>{setInput(s);inputRef.current?.focus()}},s))),
-        React.createElement('div',{className:'card'},
-          React.createElement('div',{className:'section-title'},'Your channel'),
-          [{l:'Niche',v:user.profile?.niche||'—'},{l:'Language',v:user.profile?.lang||'—'},{l:'Goal',v:user.profile?.goal||'—'},{l:'Subscribers',v:(user.channel?.subscribers||0).toLocaleString()}]
-          .map(r=>React.createElement('div',{key:r.l,style:{display:'flex',justifyContent:'space-between',fontSize:13,padding:'6px 0',borderBottom:'1px solid var(--border)'}},
-            React.createElement('span',{style:{color:'var(--text3)'}},r.l),
-            React.createElement('span',{style:{fontWeight:500}},r.v)))))));
+  var suggestions=['Write me a video script','Best thumbnail tips','How to get my first 10K subs?','SEO tips for my niche'];
+
+  return h('div',{className:'fade-up'},
+    h('div',{className:'ph'},h('h1',null,'AI Coach'),h('p',null,'Ask anything about growing your channel — powered by Claude AI')),
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 280px',gap:20}},
+      h('div',{className:'card',style:{display:'flex',flexDirection:'column',height:560}},
+        h('div',{style:{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:14,paddingBottom:8}},
+          msgs.map(function(m,i){
+            return h('div',{key:i,className:'msg '+(m.role==='ai'?'mai':'muser')},
+              h('div',{className:'mava'},m.role==='ai'?'TC':(user.name||'U')[0]),
+              h('div',{className:'mbub'},m.text));
+          }),
+          loading?h('div',{className:'msg mai'},
+            h('div',{className:'mava'},'TC'),
+            h('div',{className:'mbub',style:{display:'flex',gap:5,alignItems:'center',padding:14}},
+              h('div',{className:'td'}),h('div',{className:'td'}),h('div',{className:'td'}))):null,
+          h('div',{ref:endRef})),
+        h('div',{className:'cir'},
+          h('input',{ref:inputRef,placeholder:'Ask your AI coach anything...',value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==='Enter')send();}}),
+          h('button',{className:'btn btn-primary',onClick:send,disabled:loading||!input.trim()},h(Icon,{d:ic.send,size:15,stroke:'#fff'})))),
+      h('div',null,
+        h('div',{className:'card',style:{marginBottom:14}},
+          h('div',{className:'sectitle'},'Quick questions'),
+          suggestions.map(function(s){
+            return h('button',{key:s,className:'btn btn-ghost',style:{width:'100%',justifyContent:'flex-start',fontSize:13,marginBottom:6,textAlign:'left'},onClick:function(){setInput(s);if(inputRef.current)inputRef.current.focus();}},s);
+          })),
+        h('div',{className:'card'},
+          h('div',{className:'sectitle'},'Your channel'),
+          [{l:'Niche',v:(user.profile&&user.profile.niche)||'—'},{l:'Language',v:(user.profile&&user.profile.lang)||'—'},{l:'Goal',v:(user.profile&&user.profile.goal)||'—'},{l:'Subscribers',v:((user.channel&&user.channel.subscribers)||0).toLocaleString()}]
+          .map(function(r){
+            return h('div',{key:r.l,style:{display:'flex',justifyContent:'space-between',fontSize:13,padding:'6px 0',borderBottom:'1px solid var(--border)'}},
+              h('span',{style:{color:'var(--text3)'}},r.l),
+              h('span',{style:{fontWeight:500}},r.v));
+          })))));
 }
 
-/* ══════════════ GOAL TAB ══════════════ */
-function GoalTab(){
-  const [data,setData]=useState(null);
-  const [loading,setLoading]=useState(true);
-  const [error,setError]=useState('');
-  useEffect(()=>{api('/dashboard/goal').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});},[]);
-  if(loading)return React.createElement(FullLoader,{text:'Building your growth roadmap…'});
-  if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
-  if(!data)return null;
-  const current=data.current||0,goal=data.goal||10000;
-  const pct=Math.min(100,Math.round((current/goal)*100));
-  const C=2*Math.PI*48,offset=C-(pct/100)*C;
-  return React.createElement('div',{className:'fade-up'},
-    React.createElement('div',{className:'page-header'},React.createElement('h1',null,'Goal Tracker'),React.createElement('p',null,`Your roadmap to ${goal.toLocaleString()} subscribers`)),
-    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
-      React.createElement('div',{className:'card',style:{textAlign:'center'}},
-        React.createElement('div',{className:'goal-ring'},
-          React.createElement('svg',{width:120,height:120,viewBox:'0 0 120 120'},
-            React.createElement('circle',{cx:60,cy:60,r:48,fill:'none',stroke:'var(--bg3)',strokeWidth:8}),
-            React.createElement('circle',{cx:60,cy:60,r:48,fill:'none',stroke:'var(--red)',strokeWidth:8,strokeDasharray:C,strokeDashoffset:offset,strokeLinecap:'round'})),
-          React.createElement('div',{className:'goal-ring-label'},
-            React.createElement('div',{className:'goal-ring-pct'},`${pct}%`),
-            React.createElement('div',{className:'goal-ring-sub'},'to goal'))),
-        React.createElement('div',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:4}},`${current.toLocaleString()} / ${goal.toLocaleString()}`),
-        React.createElement('div',{style:{fontSize:13,color:'var(--text3)'}},'subscribers'),
-        React.createElement('div',{className:'divider'}),
-        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}},
-          [{l:'Remaining',v:(goal-current).toLocaleString()},{l:'Est. weeks',v:data.estimatedWeeks?`~${data.estimatedWeeks} wks`:'—'}]
-          .map(r=>React.createElement('div',{key:r.l,className:'card-sm',style:{textAlign:'center'}},
-            React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:4}},r.l),
-            React.createElement('div',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},r.v))))),
-      (data.milestones||[]).length>0&&React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'section-title'},'Milestones'),
-        data.milestones.map((m,i)=>React.createElement('div',{key:i,style:{display:'flex',alignItems:'center',gap:12,padding:'10px 0',borderBottom:'1px solid var(--border)'}},
-          React.createElement('div',{style:{width:32,height:32,borderRadius:'50%',background:m.done?'rgba(34,197,94,.1)':'var(--bg3)',border:`1px solid ${m.done?'rgba(34,197,94,.3)':'var(--border)'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:m.done?'var(--green)':'var(--text3)',flexShrink:0}},m.done?'✓':`${m.pct||0}%`),
-          React.createElement('div',null,
-            React.createElement('div',{style:{fontSize:13,fontWeight:500,color:m.done?'var(--text3)':'var(--text)',textDecoration:m.done?'line-through':'none'}},m.label),
-            m.done&&React.createElement('div',{style:{fontSize:11,color:'var(--green)'}},'Completed!')))))),
-    (data.roadmap||[]).length>0&&React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-title'},'4-week roadmap to close the gap'),
-      React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
-        data.roadmap.map((w,i)=>React.createElement('div',{key:i,className:'card-sm'},
-          React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},w.week),
-          React.createElement('div',{style:{fontSize:13,fontWeight:500,marginBottom:8,lineHeight:1.4}},w.focus),
-          React.createElement('div',{className:'tag tag-green',style:{fontSize:11}},w.impact))))));
-}
 
-/* ══════════════ PAYWALL ══════════════ */
-function Paywall({user,onContinue}){
-  const [loading,setLoading]=useState(false);
-  const features=['Weekly AI action plan with trend-based video ideas','Weekly channel analysis + AI insights','Unlimited AI coach chat','Goal tracker with milestone roadmap','Best time to post for your audience','Competitor channel tips'];
-  function go(){setLoading(true);setTimeout(()=>{setLoading(false);onContinue();},800);}
-  return React.createElement('div',{className:'landing'},
-    React.createElement('div',{className:'landing-glow'}),
-    React.createElement('div',{style:{maxWidth:500,width:'100%'}},
-      React.createElement('div',{className:'fade-up',style:{textAlign:'center',marginBottom:28}},
-        React.createElement('span',{className:'tag tag-green',style:{marginBottom:14}},React.createElement(Icon,{d:ic.spark,size:12}),' 7-day free trial'),
-        React.createElement('h1',{style:{fontFamily:'Syne',fontSize:32,fontWeight:800,letterSpacing:-1,marginBottom:8}},'Start your free trial'),
-        React.createElement('p',{style:{color:'var(--text2)',fontSize:15}},`Welcome, ${(user.name||'').split(' ')[0]}! Your plan is ready.`)),
-      React.createElement('div',{className:'card fade-up-d1'},
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}},
-          React.createElement('div',null,
-            React.createElement('div',{style:{fontFamily:'Syne',fontSize:28,fontWeight:800}},'₹499'),
-            React.createElement('div',{style:{fontSize:13,color:'var(--text3)'}},'per month · cancel anytime')),
-          React.createElement('span',{className:'tag tag-red'},'Most popular')),
-        features.map((f,i)=>React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:12,fontSize:14}},
-          React.createElement(Icon,{d:ic.check,size:15,stroke:'var(--green)',sw:2.5}),
-          React.createElement('span',{style:{color:'var(--text2)'}},f))),
-        React.createElement('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center',marginTop:8,padding:'14px',fontSize:15,animation:'glow 3s ease infinite'},onClick:go,disabled:loading},
-          loading?React.createElement('div',{className:'spinner'}):null,
-          loading?'Setting up…':'Start 7-day free trial →'),
-        React.createElement('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'No charge for 7 days · UPI, Cards, Net banking via Razorpay'))));
-}
-
-/* ══════════════ DASHBOARD ══════════════ */
-function Dashboard({user,onLogout}){
-  const [tab,setTab]=useState('plan');
-  const content={
-    plan:React.createElement(PlanTab,{user}),
-    analysis:React.createElement(AnalysisTab,{user}),
-    chat:React.createElement(ChatTab,{user}),
-    goal:React.createElement(GoalTab,{user}),
+/* ══ GOAL REACHED CELEBRATION ══ */
+function GoalReached(props){
+  var data=props.data; var onNext=props.onNext;
+  var settingState=useState(false);
+  var setting=settingState[0]; var setSetting=settingState[1];
+  var nextGoals={
+    1000:{label:'10,000 subscribers',n:10000,badge:'On your way to Silver Play Button!'},
+    10000:{label:'1,00,000 subscribers',n:100000,badge:'Silver Play Button unlocked!'},
+    100000:{label:'10,00,000 subscribers',n:1000000,badge:'Gold Play Button unlocked!'},
+    1000000:{label:'1 Crore subscribers',n:10000000,badge:'Diamond Play Button!'}
   };
-  return React.createElement('div',null,
-    React.createElement(Sidebar,{tab,setTab,user,onLogout}),
-    React.createElement('div',{className:'main'},content[tab]));
+  var goal=data.goal||10000;
+  var next=nextGoals[goal]||{label:'10x your subscribers',n:goal*10,badge:'Next big milestone!'};
+
+  function setNextGoal(){
+    setSetting(true);
+    api('/dashboard/update-goal',{method:'POST',body:{goalNumber:next.n,goal:next.label}})
+      .then(function(){ setSetting(false); onNext(next); })
+      .catch(function(){ setSetting(false); onNext(next); });
+  }
+
+  return h('div',{className:'fade-up',style:{textAlign:'center',padding:'40px 20px',maxWidth:560,margin:'0 auto'}},
+    h('div',{style:{fontSize:56,marginBottom:16}},'🎉'),
+    h('div',{className:'tag tag-green',style:{fontSize:14,padding:'8px 20px',marginBottom:20,display:'inline-flex'}},'Goal Achieved!'),
+    h('h1',{style:{fontFamily:'Syne',fontSize:30,fontWeight:800,letterSpacing:-1,marginBottom:10}},
+      'You reached ',h('span',{style:{color:'var(--green)'}},(goal||0).toLocaleString()),' subscribers!'),
+    h('p',{style:{fontSize:15,color:'var(--text2)',marginBottom:32,lineHeight:1.8}},
+      'Incredible work! You set a goal and crushed it. Your consistency paid off. Time to aim even higher and unlock the next milestone.'),
+
+    h('div',{className:'card',style:{textAlign:'left',marginBottom:24}},
+      h('div',{style:{display:'flex',alignItems:'flex-start',gap:16}},
+        h('div',{style:{fontSize:36,flexShrink:0}},'🎯'),
+        h('div',{style:{flex:1}},
+          h('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:4,textTransform:'uppercase',letterSpacing:1}},'Your next milestone'),
+          h('div',{style:{fontFamily:'Syne',fontSize:20,fontWeight:700,marginBottom:4}},next.label),
+          h('div',{style:{fontSize:13,color:'var(--text2)',marginBottom:16}},
+            'Unlock: ',h('span',{style:{color:'var(--amber)',fontWeight:500}},next.badge)),
+          h('button',{
+            className:'btn btn-primary',
+            style:{justifyContent:'center',width:'100%',padding:'12px',fontSize:14},
+            onClick:setNextGoal,disabled:setting
+          },
+            setting?h('div',{className:'spinner'}):null,
+            setting?'Setting new goal...':'Set as my next goal')))),
+
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:24}},
+      [{icon:'🏆',label:'Goal reached',sub:goal.toLocaleString()+' subs'},
+       {icon:'📅',label:'Keep going',sub:'New plan ready'},
+       {icon:'🚀',label:'Next target',sub:next.n.toLocaleString()+' subs'}]
+      .map(function(s,i){
+        return h('div',{key:i,className:'card-sm',style:{textAlign:'center'}},
+          h('div',{style:{fontSize:24,marginBottom:6}},s.icon),
+          h('div',{style:{fontSize:11,fontWeight:600,color:'var(--text)',marginBottom:2}},s.label),
+          h('div',{style:{fontSize:11,color:'var(--text3)'}},s.sub));
+      })),
+
+    h('p',{style:{fontSize:12,color:'var(--text3)'}},'Your weekly plan will automatically update to help you reach the new goal.'));
 }
 
-/* ══════════════ APP — handles auth state ══════════════ */
-function App(){
-  const [screen,setScreen]=useState('loading');
-  const [user,setUser]=useState(null);
+/* ══ GOAL TAB ══ */
+function GoalTab(props){
+  var user=props.user||{};
+  var dataState=useState(null);
+  var data=dataState[0]; var setData=dataState[1];
+  var loadState=useState(true);
+  var loading=loadState[0]; var setLoading=loadState[1];
+  var errState=useState('');
+  var error=errState[0]; var setError=errState[1];
+  var celebState=useState(false);
+  var showCelebration=celebState[0]; var setShowCelebration=celebState[1];
 
-  useEffect(()=>{
-    const params=new URLSearchParams(window.location.search);
-    if(params.get('error')){
-      window.history.replaceState({},'',window.location.pathname);
-      setScreen('landing');
-      return;
-    }
-    const token=params.get('token');
+  useEffect(function(){
+    // First try cached version, if milestones look wrong (all 0% or missing) force refresh
+    api('/dashboard/goal')
+      .then(function(d){
+        // Validate the data looks correct
+        var milestonesOk=d.milestones&&d.milestones.length>0;
+        var pctOk=d.current===0||(d.milestones&&d.milestones.some(function(m){return m.pct>0;}));
+        if(!milestonesOk||!pctOk){
+          // Data looks wrong — force regenerate with correct math
+          return api('/dashboard/goal?refresh=true');
+        }
+        return d;
+      })
+      .then(function(d){
+        setData(d);
+        setLoading(false);
+        if((d.current||0)>=(d.goal||10000) && !d.goalJustSet){
+          setShowCelebration(true);
+        }
+      })
+      .catch(function(e){ setError(e.message); setLoading(false); });
+  },[]);
+
+  if(loading) return h(FullLoader,{text:'Building your growth roadmap...'});
+  if(error) return h('div',{className:'err',style:{marginTop:40}},error);
+  if(!data) return null;
+
+  if(showCelebration){
+    return h(GoalReached,{data:data,onNext:function(next){
+      setShowCelebration(false);
+      setData(Object.assign({},data,{goal:next.n,goalJustSet:true}));
+    }});
+  }
+
+  var current=data.current||0;
+  var goal=data.goal||10000;
+  var pct=Math.min(100,Math.round((current/goal)*100));
+  var C=2*Math.PI*48;
+  var offset=C-(pct/100)*C;
+  var milestones=data.milestones||[];
+  var roadmap=data.roadmap||[];
+  var isReached=current>=goal;
+
+  return h('div',{className:'fade-up'},
+    h('div',{className:'ph'},
+      h('h1',null,'Goal Tracker'),
+      h('p',null,'Your roadmap to '+goal.toLocaleString()+' subscribers')),
+
+    isReached?h('div',{style:{background:'rgba(34,197,94,.08)',border:'1px solid rgba(34,197,94,.2)',borderRadius:'var(--radius)',padding:'14px 20px',marginBottom:20,display:'flex',alignItems:'center',gap:12}},
+      h('div',{style:{fontSize:24}},'🎉'),
+      h('div',{style:{flex:1}},
+        h('div',{style:{fontSize:14,fontWeight:600,color:'var(--green)'}},'Goal achieved!'),
+        h('div',{style:{fontSize:13,color:'var(--text2)'}},'You reached your goal. Set the next milestone to keep growing!')),
+      h('button',{className:'btn btn-primary',style:{fontSize:13,flexShrink:0},onClick:function(){setShowCelebration(true);}},
+        'View achievement')):null,
+
+    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
+      h('div',{className:'card',style:{textAlign:'center'}},
+        h('div',{className:'gring'},
+          h('svg',{width:120,height:120,viewBox:'0 0 120 120'},
+            h('circle',{cx:60,cy:60,r:48,fill:'none',stroke:'var(--bg3)',strokeWidth:8}),
+            h('circle',{cx:60,cy:60,r:48,fill:'none',stroke:isReached?'var(--green)':'var(--red)',strokeWidth:8,strokeDasharray:C,strokeDashoffset:isReached?0:offset,strokeLinecap:'round'})),
+          h('div',{className:'gringlabel'},
+            h('div',{className:'gringpct',style:{color:isReached?'var(--green)':'var(--text)'}},isReached?'🏆':pct+'%'),
+            h('div',{className:'gringsub'},isReached?'achieved!':'to goal'))),
+        h('div',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:4}},current.toLocaleString()+' / '+goal.toLocaleString()),
+        h('div',{style:{fontSize:13,color:'var(--text3)'}},'subscribers'),
+        h('div',{className:'divider'}),
+        h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}},
+          [{l:'Remaining',v:isReached?'Done!':Math.max(0,goal-current).toLocaleString()},
+           {l:'Est. weeks',v:isReached?'0 wks':data.estimatedWeeks?'~'+data.estimatedWeeks+' wks':'—'}]
+          .map(function(r){
+            return h('div',{key:r.l,className:'card-sm',style:{textAlign:'center'}},
+              h('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:4}},r.l),
+              h('div',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700,color:isReached?'var(--green)':'var(--text)'}},r.v));
+          }))),
+      milestones.length>0?h('div',{className:'card'},
+        h('div',{className:'sectitle'},'Milestones'),
+        milestones.map(function(m,i){
+          return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:12,padding:'10px 0',borderBottom:'1px solid var(--border)'}},
+            h('div',{style:{width:32,height:32,borderRadius:'50%',background:m.done?'rgba(34,197,94,.1)':'var(--bg3)',border:'1px solid '+(m.done?'rgba(34,197,94,.3)':'var(--border)'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:m.done?'var(--green)':'var(--text3)',flexShrink:0}},m.done?'✓':(m.pct||0)+'%'),
+            h('div',null,
+              h('div',{style:{fontSize:13,fontWeight:500,color:m.done?'var(--text3)':'var(--text)',textDecoration:m.done?'line-through':'none'}},m.label),
+              m.done?h('div',{style:{fontSize:11,color:'var(--green)'}},'Completed! 🎊'):null));
+        })):null),
+
+    roadmap.length>0?h('div',{className:'card'},
+      h('div',{className:'sectitle'},'4-week roadmap to close the gap'),
+      h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
+        roadmap.map(function(w,i){
+          return h('div',{key:i,className:'card-sm'},
+            h('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},w.week),
+            h('div',{style:{fontSize:13,fontWeight:500,marginBottom:8,lineHeight:1.4}},w.focus),
+            h('div',{className:'tag tag-green',style:{fontSize:11}},w.impact));
+        }))):null);
+}
+
+
+
+/* ══ PAYWALL ══ */
+function Paywall(props){
+  var loadState=useState(false);
+  var loading=loadState[0]; var setLoading=loadState[1];
+  var user=props.user||{};
+  var firstName=(user.name||'').split(' ')[0];
+  var features=[
+    'Weekly AI action plan with trend-based video ideas',
+    'Weekly channel analysis + AI insights',
+    'Unlimited AI coach chat (scripts, SEO, thumbnails)',
+    'Goal tracker with milestone roadmap',
+    'Best time to post for your audience',
+    'Competitor channel analysis tips'
+  ];
+  function go(){
+    setLoading(true);
+    setTimeout(function(){ setLoading(false); props.onContinue(); },800);
+  }
+  return h('div',{className:'land'},
+    h('div',{className:'lglow'}),
+    h('div',{style:{maxWidth:500,width:'100%'}},
+      h('div',{className:'fade-up',style:{textAlign:'center',marginBottom:28}},
+        h('span',{className:'tag tag-green',style:{marginBottom:14}},h(Icon,{d:ic.spark,size:12}),' 7-day free trial'),
+        h('h1',{style:{fontFamily:'Syne',fontSize:32,fontWeight:800,letterSpacing:-1,marginBottom:8}},'Start your free trial'),
+        h('p',{style:{color:'var(--text2)',fontSize:15}},'Welcome, '+firstName+'! Your plan is ready.')),
+      h('div',{className:'card fade-up-d1'},
+        h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}},
+          h('div',null,
+            h('div',{style:{fontFamily:'Syne',fontSize:28,fontWeight:800}},'Rs.499'),
+            h('div',{style:{fontSize:13,color:'var(--text3)'}},'per month · cancel anytime')),
+          h('span',{className:'tag tag-red'},'Most popular')),
+        features.map(function(f,i){
+          return h('div',{key:i,style:{display:'flex',gap:10,marginBottom:12,fontSize:14}},
+            h(Icon,{d:ic.check,size:15,stroke:'var(--green)',sw:2.5}),
+            h('span',{style:{color:'var(--text2)'}},f));
+        }),
+        h('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center',marginTop:8,padding:'14px',fontSize:15},onClick:go,disabled:loading},
+          loading?h('div',{className:'spinner'}):null,
+          loading?'Setting up...':'Start 7-day free trial'),
+        h('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'No charge for 7 days · UPI, Cards, Net banking via Razorpay'))));
+}
+
+/* ══ DASHBOARD ══ */
+function Dashboard(props){
+  var tabState=useState('plan');
+  var tab=tabState[0]; var setTab=tabState[1];
+  var user=props.user||{};
+  var content;
+  if(tab==='plan') content=h(PlanTab,{user:user});
+  else if(tab==='analysis') content=h(AnalysisTab,null);
+  else if(tab==='chat') content=h(ChatTab,{user:user});
+  else content=h(GoalTab,null);
+  return h('div',null,
+    h(Sidebar,{tab:tab,setTab:setTab,user:user,onLogout:props.onLogout}),
+    h('div',{className:'main'},content));
+}
+
+/* ══ APP ══ */
+function App(){
+  var screenState=useState('loading');
+  var screen=screenState[0]; var setScreen=screenState[1];
+  var userState=useState(null);
+  var user=userState[0]; var setUser=userState[1];
+
+  useEffect(function(){
+    var params=new URLSearchParams(window.location.search);
+    var token=params.get('token');
     if(token){
       setToken(token);
       window.history.replaceState({},'',window.location.pathname);
     }
-    const saved=getToken();
-    if(!saved){setScreen('landing');return;}
+    var saved=getToken();
+    if(!saved){ setScreen('landing'); return; }
     api('/auth/verify',{method:'POST',body:{token:saved}})
-      .then(u=>{
+      .then(function(u){
         setUser(u);
-        if(!u.onboarded)setScreen('onboard');
-        else if(!u.isPremium&&!u.trialActive)setScreen('paywall');
+        if(!u.onboarded) setScreen('onboard');
+        else if(!u.isPremium&&!u.trialActive) setScreen('paywall');
         else setScreen('dashboard');
       })
-      .catch(()=>{clearToken();setScreen('landing');});
+      .catch(function(){ clearToken(); setScreen('landing'); });
   },[]);
 
-  function handleLogin(){
-    // This redirects to backend → Google → back to this page with ?token=xxx
-    window.location.href=`${API}/auth/google`;
+  function handleLogin(){ window.location.href=API+'/auth/google'; }
+
+  function handleLogout(){ clearToken(); setUser(null); setScreen('landing'); }
+
+  function handleOnboardDone(){
+    api('/auth/verify',{method:'POST',body:{token:getToken()}})
+      .then(function(u){ setUser(u); setScreen('paywall'); });
   }
 
-  function handleLogout(){
-    clearToken();setUser(null);setScreen('landing');
-  }
-
-  async function handleOnboardDone(){
-    const u=await api('/auth/verify',{method:'POST',body:{token:getToken()}});
-    setUser(u);setScreen('paywall');
-  }
-
-  if(screen==='loading')   return React.createElement(FullLoader,{text:'Loading TubeCoach…'});
-  if(screen==='landing')   return React.createElement(Landing,{onLogin:handleLogin,onNewUser:()=>setScreen('guide')});
-  if(screen==='guide')     return React.createElement(GuidePage,{onBack:()=>setScreen('landing'),onLogin:handleLogin});
-  if(screen==='onboard')   return React.createElement(Onboarding,{user,onDone:handleOnboardDone});
-  if(screen==='paywall')   return React.createElement(Paywall,{user,onContinue:()=>setScreen('dashboard')});
-  if(screen==='dashboard') return React.createElement(Dashboard,{user,onLogout:handleLogout});
+  if(screen==='loading')    return h(FullLoader,{text:'Loading TubeCoach...'});
+  if(screen==='landing')    return h(Landing,{onLogin:handleLogin,onNewUser:function(){setScreen('guide');}});
+  if(screen==='guide')      return h(GuidePage,{onBack:function(){setScreen('landing');},onLogin:handleLogin});
+  if(screen==='onboard')    return h(Onboarding,{user:user,onDone:handleOnboardDone});
+  if(screen==='paywall')    return h(Paywall,{user:user,onContinue:function(){setScreen('dashboard');}});
+  if(screen==='dashboard')  return h(Dashboard,{user:user,onLogout:handleLogout});
   return null;
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+ReactDOM.createRoot(document.getElementById('root')).render(h(App,null));
 </script>
 </body>
 </html>
