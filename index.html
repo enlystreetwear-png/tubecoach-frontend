@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TubeCoach — Your YouTube Growth Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#FF3B3B;--red-dark:#CC2020;--red-glow:rgba(255,59,59,0.18);
+  --bg:#0A0A0A;--bg2:#111111;--bg3:#1A1A1A;--bg4:#222222;
+  --text:#F5F5F0;--text2:#A0A09A;--text3:#606058;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --green:#22C55E;--amber:#F59E0B;--blue:#3B82F6;
+  --radius:12px;--radius-lg:18px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden}
+#root{min-height:100vh}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:.5}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px var(--red-glow)}50%{box-shadow:0 0 40px var(--red-glow),0 0 80px rgba(255,59,59,0.08)}}
+.fade-up{animation:fadeUp .5s ease forwards}.fade-up-d1{animation:fadeUp .5s .1s ease both}.fade-up-d2{animation:fadeUp .5s .2s ease both}.fade-up-d3{animation:fadeUp .5s .3s ease both}.fade-up-d4{animation:fadeUp .5s .4s ease both}.fade-up-d5{animation:fadeUp .5s .5s ease both}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px}
+.card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:var(--radius);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;transition:all .18s ease}
+.btn-primary{background:var(--red);color:#fff}.btn-primary:hover{background:var(--red-dark);transform:translateY(-1px);box-shadow:0 8px 24px var(--red-glow)}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}.btn-secondary:hover{background:var(--bg4)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
+.tag-red{background:rgba(255,59,59,.12);color:#FF6B6B;border:1px solid rgba(255,59,59,.2)}
+.tag-green{background:rgba(34,197,94,.1);color:#4ADE80;border:1px solid rgba(34,197,94,.2)}
+.tag-amber{background:rgba(245,158,11,.1);color:#FCD34D;border:1px solid rgba(245,158,11,.2)}
+.tag-blue{background:rgba(59,130,246,.1);color:#60A5FA;border:1px solid rgba(59,130,246,.2)}
+.divider{height:1px;background:var(--border);margin:20px 0}
+input,textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;width:100%;outline:none;transition:border-color .18s}
+input:focus,textarea:focus{border-color:var(--red)}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
+.spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.progress-track{background:var(--bg3);border-radius:20px;height:6px;overflow:hidden}
+.progress-fill{height:100%;border-radius:20px;background:var(--red);transition:width .6s ease}
+.error-box{background:rgba(255,59,59,.08);border:1px solid rgba(255,59,59,.2);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:#FF6B6B;margin-bottom:16px}
+.sidebar{width:220px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:4px;position:fixed;left:0;top:0}
+.sidebar-logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:28px;padding:0 8px;display:flex;align-items:center;gap:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;font-size:14px;color:var(--text2);transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--bg3);color:var(--text)}.nav-item.active{background:rgba(255,59,59,.1);color:var(--red);font-weight:500}
+.sidebar-bottom{margin-top:auto}
+.avatar-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);background:var(--bg3)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.main{margin-left:220px;padding:32px;min-height:100vh;max-width:1100px}
+.page-header{margin-bottom:32px}.page-header h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:700}.page-header p{color:var(--text2);margin-top:4px;font-size:14px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.stat-label{font-size:12px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.stat-value{font-family:'Syne',sans-serif;font-size:24px;font-weight:700}.stat-delta{font-size:12px;margin-top:4px}
+.stat-delta.up{color:var(--green)}.stat-delta.down{color:var(--red)}
+.action-plan{display:grid;grid-template-columns:1fr 320px;gap:20px}
+.task-list{display:flex;flex-direction:column;gap:10px}
+.task-item{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s}
+.task-item:hover{border-color:var(--border2)}.task-item.done{opacity:.5}.task-item.done .task-title{text-decoration:line-through}
+.task-checkbox{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.task-checkbox.checked{background:var(--red);border-color:var(--red)}
+.task-title{font-size:14px;font-weight:500;color:var(--text);line-height:1.4}.task-meta{font-size:12px;color:var(--text3);margin-top:3px}
+.msg{display:flex;gap:10px;max-width:100%}
+.msg-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.msg-ai .msg-avatar{background:var(--red);color:#fff}.msg-user .msg-avatar{background:var(--bg4);color:var(--text2)}
+.msg-bubble{padding:10px 14px;border-radius:12px;font-size:13.5px;line-height:1.6;max-width:calc(100% - 40px)}
+.msg-ai .msg-bubble{background:var(--bg3);border:1px solid var(--border)}.msg-user .msg-bubble{background:rgba(255,59,59,.12);border:1px solid rgba(255,59,59,.2);margin-left:auto}
+.msg-user{flex-direction:row-reverse}
+.chat-input-row{display:flex;gap:10px;margin-top:16px}.chat-input-row input{flex:1}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:pulse 1s ease infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+.onboard-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.onboard-card{width:100%;max-width:540px}
+.step-pills{display:flex;gap:6px;margin-bottom:32px}
+.step-pill{height:4px;border-radius:4px;flex:1;background:var(--bg3);transition:background .3s}
+.step-pill.done{background:var(--red)}.step-pill.active{background:var(--red);opacity:.5}
+.landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;position:relative;overflow:hidden}
+.landing-glow{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(255,59,59,.12) 0%,transparent 70%);pointer-events:none}
+.landing h1{font-family:'Syne',sans-serif;font-size:clamp(36px,6vw,72px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:20px}
+.landing h1 em{font-style:normal;color:var(--red)}
+.landing-sub{font-size:16px;color:var(--text2);max-width:460px;margin:0 auto 36px;line-height:1.7}
+.login-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:32px;width:100%;max-width:400px;margin:0 auto}
+.google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:13px 20px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--text);transition:all .18s}
+.google-btn:hover{background:var(--bg4);transform:translateY(-1px)}
+.guide-step{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}.guide-step:last-child{border-bottom:none}
+.step-num{width:28px;height:28px;border-radius:50%;background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--red);flex-shrink:0}
+.section-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.idea-chip{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:13px;margin-bottom:8px}
+.trend-bar{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}.trend-bar:last-child{border-bottom:none}
+.trend-name{font-size:13px;color:var(--text);flex:1}.trend-score{font-size:12px;color:var(--text3);width:32px;text-align:right}
+.trend-mini-bar{flex:1;max-width:80px;height:4px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.trend-mini-fill{height:100%;background:var(--red);border-radius:4px}
+.goal-ring{position:relative;width:120px;height:120px;margin:0 auto 20px}
+.goal-ring svg{transform:rotate(-90deg)}
+.goal-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.goal-ring-pct{font-family:'Syne',sans-serif;font-size:22px;font-weight:700}.goal-ring-sub{font-size:10px;color:var(--text3)}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:8px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;background:var(--bg4)}.bar.highlight{background:var(--red)}
+.bar-label{font-size:10px;color:var(--text3)}
+.full-loader{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.full-loader p{color:var(--text2);font-size:14px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+const {useState,useEffect,useRef}=React;
+
+/* ══════════════════════════════════════════════
+   CHANGE THIS if your backend URL is different
+   ══════════════════════════════════════════════ */
+const API='https://tubecoach-backend-production.up.railway.app';
+
+/* ── Token helpers ── */
+const getToken=()=>localStorage.getItem('tc_token');
+const setToken=t=>localStorage.setItem('tc_token',t);
+const clearToken=()=>localStorage.removeItem('tc_token');
+
+/* ── API helper — adds auth header automatically ── */
+async function api(path,opts={}){
+  const token=getToken();
+  const res=await fetch(API+path,{
+    headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},
+    ...opts,
+    body:opts.body?JSON.stringify(opts.body):undefined,
+  });
+  const data=await res.json();
+  if(!res.ok)throw new Error(data.error||'Something went wrong');
+  return data;
+}
+
+/* ── Icons ── */
+const Icon=({d,size=16,stroke='currentColor',fill='none',sw=1.5})=>
+  React.createElement('svg',{width:size,height:size,viewBox:'0 0 24 24',fill,stroke,strokeWidth:sw,strokeLinecap:'round',strokeLinejoin:'round'},
+    React.createElement('path',{d}));
+const ic={
+  plan:'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+  chat:'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z',
+  chart:'M18 20V10M12 20V4M6 20v-6',
+  goal:'M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM12 8v4l3 3',
+  check:'M20 6L9 17l-5-5',
+  yt:'M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58zM9.75 15.02V8.98l5.75 3.02z',
+  spark:'M13 2L3 14h9l-1 8 10-12h-9l1-8',
+  trend:'M23 6l-9.5 9.5-5-5L1 18',
+  logout:'M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9',
+  send:'M22 2L11 13M22 2l-7 20-4-9-9-4 20-7',
+};
+
+function FullLoader({text='Loading…'}){
+  return React.createElement('div',{className:'full-loader'},
+    React.createElement('div',{className:'spinner',style:{width:32,height:32,borderWidth:3}}),
+    React.createElement('p',null,text));
+}
+
+/* ══════════════ LANDING ══════════════ */
+function Landing({onLogin,onNewUser}){
+  return React.createElement('div',{className:'landing'},
+    React.createElement('div',{className:'landing-glow'}),
+    React.createElement('div',{className:'fade-up',style:{marginBottom:12}},
+      React.createElement('span',{className:'tag tag-red'},React.createElement(Icon,{d:ic.spark,size:12}),' AI-Powered Growth')),
+    React.createElement('h1',{className:'fade-up-d1'},'Grow your YouTube\n',React.createElement('em',null,'10x faster'),'\nwith AI'),
+    React.createElement('p',{className:'landing-sub fade-up-d2'},"India's smartest YouTube growth assistant. Weekly action plan, trend-based video ideas, and an AI coach — all for ₹499/month."),
+    React.createElement('div',{className:'login-card fade-up-d3'},
+      React.createElement('h2',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700,marginBottom:4}},'Get started'),
+      React.createElement('p',{style:{fontSize:13,color:'var(--text2)',marginBottom:20}},'Login with your Google / YouTube account'),
+      React.createElement('button',{className:'google-btn',onClick:onLogin,style:{marginBottom:12}},
+        React.createElement('svg',{width:18,height:18,viewBox:'0 0 24 24'},
+          React.createElement('path',{d:'M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z',fill:'#4285F4'}),
+          React.createElement('path',{d:'M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z',fill:'#34A853'}),
+          React.createElement('path',{d:'M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z',fill:'#FBBC05'}),
+          React.createElement('path',{d:'M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z',fill:'#EA4335'})
+        ),'Continue with Google'),
+      React.createElement('div',{style:{height:1,background:'var(--border)',margin:'16px 0'}}),
+      React.createElement('p',{style:{fontSize:12,color:'var(--text3)',textAlign:'center',marginBottom:12}},"Don't have a YouTube channel yet?"),
+      React.createElement('button',{className:'btn btn-ghost',style:{width:'100%',justifyContent:'center'},onClick:onNewUser},'See how to create one →')),
+    React.createElement('p',{className:'fade-up-d5',style:{marginTop:24,fontSize:12,color:'var(--text3)'}},'7-day free trial · Cancel anytime · Made for Indian creators'));
+}
+
+/* ══════════════ GUIDE ══════════════ */
+function GuidePage({onBack,onLogin}){
+  const steps=[
+    {title:'Go to youtube.com and sign in',desc:'Use your Google account to sign in to YouTube.'},
+    {title:'Click your profile icon → "Create a channel"',desc:"You'll see an option to create a personal or custom-name channel."},
+    {title:'Enter your channel name',desc:'Choose a name that matches your niche. You can change it later.'},
+    {title:'Add a profile picture and banner',desc:'Use Canva (free) to create a professional banner in minutes.'},
+    {title:'Write your channel description',desc:'Tell viewers what you make, in which language, and how often you post.'},
+    {title:'Come back and login with Google',desc:'Once your channel is ready, return here to get your AI growth plan!'},
+  ];
+  return React.createElement('div',{className:'onboard-wrap'},
+    React.createElement('div',{className:'onboard-card'},
+      React.createElement('button',{className:'btn btn-ghost',style:{marginBottom:24,fontSize:13},onClick:onBack},'← Back'),
+      React.createElement('span',{className:'tag tag-blue',style:{marginBottom:16}},React.createElement(Icon,{d:ic.yt,size:12}),' Channel Setup Guide'),
+      React.createElement('h2',{style:{fontFamily:'Syne',fontSize:24,fontWeight:700,marginBottom:8}},'Create your YouTube channel'),
+      React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'Follow these steps then come back to login.'),
+      React.createElement('div',{className:'card',style:{padding:'8px 20px',marginBottom:20}},
+        steps.map((s,i)=>React.createElement('div',{className:'guide-step',key:i},
+          React.createElement('div',{className:'step-num'},i+1),
+          React.createElement('div',null,
+            React.createElement('div',{style:{fontSize:14,fontWeight:500,marginBottom:2}},s.title),
+            React.createElement('div',{style:{fontSize:13,color:'var(--text3)'}},s.desc))))),
+      React.createElement('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center'},onClick:onLogin},
+        React.createElement(Icon,{d:ic.yt,size:16,stroke:'#fff'})," I've created my channel — Login now")));
+}
+
+/* ══════════════ ONBOARDING ══════════════ */
+function Onboarding({onDone}){
+  const [step,setStep]=useState(0);
+  const [form,setForm]=useState({niche:'',lang:'',goal:'',freq:'',goalNumber:10000});
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState('');
+  const niches=['Tech Reviews','Gaming','Cooking','Fitness','Finance','Education','Comedy','Vlogs','Beauty','Other'];
+  const langs=['Tamil','Telugu','Hindi','Kannada','Malayalam','English','Bengali'];
+  const goals=[{l:'1,000 subscribers',n:1000},{l:'10,000 subscribers',n:10000},{l:'1,00,000 subscribers',n:100000},{l:'Monetization (4K hrs + 1K subs)',n:1000},{l:'Brand deals',n:10000}];
+  const freqs=['1 video/week','2 videos/week','3-4 videos/week','Daily'];
+  const canNext=(step===0&&form.niche&&form.lang)||(step===1&&form.goal)||(step===2&&form.freq);
+
+  async function finish(){
+    setLoading(true);setError('');
+    try{
+      await api('/dashboard/onboard',{method:'POST',body:{niche:form.niche,lang:form.lang,goal:form.goal,freq:form.freq,goalNumber:form.goalNumber}});
+      onDone();
+    }catch(e){setError(e.message);setLoading(false);}
+  }
+
+  return React.createElement('div',{className:'onboard-wrap'},
+    React.createElement('div',{className:'onboard-card'},
+      React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:28}},
+        React.createElement(Icon,{d:ic.yt,size:22,stroke:'var(--red)',sw:2}),
+        React.createElement('span',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},'Tube',React.createElement('span',{style:{color:'var(--red)'}},'C'),'oach')),
+      React.createElement('div',{className:'step-pills'},[0,1,2].map(i=>React.createElement('div',{key:i,className:'step-pill'+(i<step?' done':i===step?' active':'')}))),
+      error&&React.createElement('div',{className:'error-box'},error),
+      step===0&&React.createElement('div',{className:'fade-up'},
+        React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},'What content will you make?'),
+        React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'This helps us find the best trends for you.'),
+        React.createElement('label',null,'Your niche'),
+        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:8,marginBottom:20}},
+          niches.map(n=>React.createElement('button',{key:n,className:'btn'+(form.niche===n?' btn-primary':' btn-secondary'),style:{justifyContent:'flex-start',fontSize:13},onClick:()=>setForm({...form,niche:n})},n))),
+        React.createElement('label',null,'Language'),
+        React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:8}},
+          langs.map(l=>React.createElement('button',{key:l,className:'btn'+(form.lang===l?' btn-primary':' btn-ghost'),style:{fontSize:13},onClick:()=>setForm({...form,lang:l})},l)))),
+      step===1&&React.createElement('div',{className:'fade-up'},
+        React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},"What's your goal?"),
+        React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},"We'll build your roadmap around this."),
+        React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+          goals.map(g=>React.createElement('button',{key:g.l,className:'btn'+(form.goal===g.l?' btn-primary':' btn-secondary'),style:{justifyContent:'flex-start',fontSize:14,padding:'13px 16px'},onClick:()=>setForm({...form,goal:g.l,goalNumber:g.n})},
+            React.createElement(Icon,{d:ic.goal,size:15,stroke:form.goal===g.l?'#fff':'var(--text3)'}),g.l)))),
+      step===2&&React.createElement('div',{className:'fade-up'},
+        React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},'How often can you post?'),
+        React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'Be realistic — consistency beats frequency.'),
+        React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+          freqs.map(f=>React.createElement('button',{key:f,className:'btn'+(form.freq===f?' btn-primary':' btn-secondary'),style:{justifyContent:'flex-start',fontSize:14,padding:'13px 16px'},onClick:()=>setForm({...form,freq:f})},
+            React.createElement(Icon,{d:ic.chart,size:15,stroke:form.freq===f?'#fff':'var(--text3)'}),f)))),
+      React.createElement('div',{style:{display:'flex',gap:10,marginTop:28}},
+        step>0&&React.createElement('button',{className:'btn btn-ghost',onClick:()=>setStep(s=>s-1)},'← Back'),
+        React.createElement('button',{className:'btn btn-primary',style:{flex:1,justifyContent:'center',opacity:canNext?1:0.4},disabled:!canNext||loading,onClick:step<2?()=>setStep(s=>s+1):finish},
+          loading?React.createElement('div',{className:'spinner'}):null,
+          loading?'Saving…':step<2?'Continue →':'Launch my dashboard 🚀'))));
+}
+
+/* ══════════════ SIDEBAR ══════════════ */
+function Sidebar({tab,setTab,user,onLogout}){
+  const navs=[{id:'plan',icon:ic.plan,label:'Weekly Plan'},{id:'analysis',icon:ic.chart,label:'Analysis'},{id:'chat',icon:ic.chat,label:'AI Coach'},{id:'goal',icon:ic.goal,label:'Goal Tracker'}];
+  return React.createElement('div',{className:'sidebar'},
+    React.createElement('div',{className:'sidebar-logo'},React.createElement(Icon,{d:ic.yt,size:20,stroke:'var(--red)',sw:2}),'Tube',React.createElement('span',{style:{color:'var(--red)'}},'C'),'oach'),
+    navs.map(n=>React.createElement('button',{key:n.id,className:'nav-item'+(tab===n.id?' active':''),onClick:()=>setTab(n.id)},React.createElement(Icon,{d:n.icon,size:16}),n.label)),
+    React.createElement('div',{className:'sidebar-bottom'},
+      React.createElement('div',{className:'avatar-row'},
+        React.createElement('div',{className:'avatar'},user.avatar?React.createElement('img',{src:user.avatar,alt:'',onError:e=>e.target.style.display='none'}):(user.name||'U')[0]),
+        React.createElement('div',{style:{flex:1,overflow:'hidden'}},
+          React.createElement('div',{style:{fontSize:13,fontWeight:500,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},user.name),
+          React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},user.channel?.title||'Your Channel')),
+        React.createElement('button',{style:{background:'none',border:'none',cursor:'pointer',color:'var(--text3)',padding:4},onClick:onLogout},React.createElement(Icon,{d:ic.logout,size:15})))));
+}
+
+/* ══════════════ WEEKLY PLAN TAB ══════════════ */
+function PlanTab({user}){
+  const [plan,setPlan]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState('');
+  const [taskStates,setTaskStates]=useState({});
+
+  useEffect(()=>{
+    api('/dashboard/plan')
+      .then(d=>{setPlan(d);setTaskStates(d.taskStates||{});setLoading(false);})
+      .catch(e=>{setError(e.message);setLoading(false);});
+  },[]);
+
+  async function toggleTask(id){
+    const newDone=!taskStates[id];
+    setTaskStates(s=>({...s,[id]:newDone}));
+    try{await api('/dashboard/plan/task',{method:'PATCH',body:{taskId:id,done:newDone}});}
+    catch{setTaskStates(s=>({...s,[id]:!newDone}));}
+  }
+
+  if(loading)return React.createElement(FullLoader,{text:'Generating your weekly plan with AI…'});
+  if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
+  if(!plan)return null;
+
+  const tasks=plan.tasks||[];
+  const trends=plan.trends||[];
+  const ideas=tasks.filter(t=>t.isIdea);
+  const doneCount=tasks.filter(t=>taskStates[t.id]).length;
+  const pct=tasks.length?Math.round((doneCount/tasks.length)*100):0;
+  const tagCol={video:'tag-red',short:'tag-blue',engage:'tag-green',seo:'tag-amber',community:'tag-blue'};
+
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'page-header'},
+      React.createElement('div',{style:{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}},
+        React.createElement('div',null,
+          React.createElement('h1',null,"This Week's Action Plan"),
+          React.createElement('p',null,plan.weekSummary||`Personalised for ${user.profile?.niche||'your niche'} · Updated every Monday`)),
+        React.createElement('span',{className:'tag tag-amber'},React.createElement(Icon,{d:ic.trend,size:12}),' Trends analysed'))),
+    React.createElement('div',{className:'action-plan'},
+      React.createElement('div',null,
+        React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}},
+          React.createElement('div',{className:'section-title',style:{margin:0}},`${doneCount}/${tasks.length} tasks complete`),
+          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,flex:1,maxWidth:180,marginLeft:16}},
+            React.createElement('div',{className:'progress-track',style:{flex:1}},React.createElement('div',{className:'progress-fill',style:{width:`${pct}%`}})),
+            React.createElement('span',{style:{fontSize:12,color:'var(--text2)',minWidth:30}},`${pct}%`))),
+        React.createElement('div',{className:'task-list'},
+          tasks.map(task=>React.createElement('div',{key:task.id,className:'task-item'+(taskStates[task.id]?' done':''),onClick:()=>toggleTask(task.id)},
+            React.createElement('div',{className:'task-checkbox'+(taskStates[task.id]?' checked':'')},
+              taskStates[task.id]&&React.createElement(Icon,{d:ic.check,size:12,stroke:'#fff',sw:2.5})),
+            React.createElement('div',{style:{flex:1}},
+              React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4}},
+                React.createElement('span',{className:`tag ${tagCol[task.type]||'tag-blue'}`,style:{fontSize:11,padding:'2px 8px'}},task.type||'task'),
+                task.isIdea&&React.createElement('span',{className:'tag',style:{fontSize:11,padding:'2px 8px',background:'rgba(245,158,11,.08)',color:'var(--amber)',border:'1px solid rgba(245,158,11,.15)'}},React.createElement(Icon,{d:ic.spark,size:10}),' idea')),
+              React.createElement('div',{className:'task-title'},task.title),
+              task.detail&&React.createElement('div',{className:'task-meta'},task.detail),
+              task.trendReason&&React.createElement('div',{style:{marginTop:6,fontSize:11,color:'#FCD34D',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.12)',borderRadius:6,padding:'4px 8px'}},'📈 ',task.trendReason))))),
+      React.createElement('div',null,
+        trends.length>0&&React.createElement('div',{className:'card',style:{marginBottom:14}},
+          React.createElement('div',{className:'section-title'},'Trending in your niche'),
+          trends.map(t=>React.createElement('div',{className:'trend-bar',key:t.name},
+            React.createElement('div',{className:'trend-name'},t.name),
+            React.createElement('div',{className:'trend-mini-bar'},React.createElement('div',{className:'trend-mini-fill',style:{width:`${t.score}%`}})),
+            React.createElement('div',{className:'trend-score'},t.score)))),
+        ideas.length>0&&React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'section-title'},"This week's video ideas"),
+          React.createElement('p',{style:{fontSize:12,color:'var(--text3)',marginBottom:10}},'Already in your action plan above ↑'),
+          ideas.map((t,i)=>React.createElement('div',{className:'idea-chip',key:i},
+            React.createElement('div',{style:{fontWeight:500,color:'var(--text)',marginBottom:3}},t.title.replace(/^Post:\s*/,'')),
+            t.trendReason&&React.createElement('div',{style:{fontSize:12,color:'var(--text3)'}},t.trendReason)))))));
+}
+
+/* ══════════════ ANALYSIS TAB ══════════════ */
+function AnalysisTab(){
+  const [data,setData]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState('');
+  useEffect(()=>{api('/dashboard/analysis').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});},[]);
+  if(loading)return React.createElement(FullLoader,{text:'Fetching your channel data…'});
+  if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
+  if(!data)return null;
+  const {stats={},aiAnalysis={},videos=[]}=data;
+  const statCards=[
+    {label:'Subscribers',value:(stats.subscribers?.current||0).toLocaleString(),delta:stats.subscribers?.delta||0},
+    {label:'Total Views',value:(stats.totalViews?.current||0).toLocaleString(),delta:stats.totalViews?.delta||0},
+    {label:'Videos Posted',value:stats.videoCount?.current||0,delta:stats.videoCount?.delta||0},
+  ];
+  const bars=videos.slice(0,7);
+  const maxV=Math.max(...bars.map(b=>b.views||0),1);
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const topIdx=bars.reduce((b,v,i,a)=>v.views>a[b].views?i:b,0);
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'page-header'},React.createElement('h1',null,'Weekly Analysis'),React.createElement('p',null,'Performance compared to last week · Auto-updated every Monday')),
+    React.createElement('div',{className:'stats-grid'},
+      statCards.map(s=>React.createElement('div',{key:s.label,className:'stat-card'},
+        React.createElement('div',{className:'stat-label'},s.label),
+        React.createElement('div',{className:'stat-value'},s.value),
+        React.createElement('div',{className:'stat-delta '+(s.delta>=0?'up':'down')},s.delta>=0?`↑ +${s.delta} this week`:`↓ ${s.delta} this week`)))),
+    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}},
+      bars.length>0&&React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'section-title'},'Recent video views'),
+        React.createElement('div',{className:'bar-chart'},
+          bars.map((v,i)=>React.createElement('div',{key:i,className:'bar-wrap'},
+            React.createElement('div',{className:'bar'+(i===topIdx?' highlight':''),style:{height:`${((v.views||0)/maxV)*72}px`}}),
+            React.createElement('span',{className:'bar-label'},days[i]||`V${i+1}`))))),
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'section-title'},'AI insight'),
+        (aiAnalysis.insights||[]).map((ins,i)=>React.createElement('p',{key:i,style:{fontSize:13,color:'var(--text2)',lineHeight:1.8,marginBottom:10}},ins.emoji,' ',ins.text)),
+        aiAnalysis.bestDay&&React.createElement('div',{className:'tag tag-green',style:{width:'fit-content'}},`Best day to post: ${aiAnalysis.bestDay}`))),
+    videos.length>0&&React.createElement('div',{className:'card',style:{marginTop:14}},
+      React.createElement('div',{className:'section-title'},'Recent videos'),
+      videos.map((v,i)=>React.createElement('div',{key:i,style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid var(--border)'}},
+        React.createElement('div',{style:{fontSize:13,flex:1,marginRight:16}},v.title),
+        React.createElement('div',{style:{display:'flex',gap:16,fontSize:12,color:'var(--text3)',flexShrink:0}},
+          React.createElement('span',null,(v.views||0).toLocaleString(),' views'),
+          React.createElement('span',null,(v.likes||0).toLocaleString(),' likes'))))));
+}
+
+/* ══════════════ CHAT TAB ══════════════ */
+function ChatTab({user}){
+  const [msgs,setMsgs]=useState([{role:'ai',text:`Hi ${user.name?.split(' ')[0]||'there'}! 👋 I'm your TubeCoach AI. Ask me anything — video ideas, script help, thumbnail tips, or how to grow your ${user.profile?.niche||'channel'} faster.`}]);
+  const [input,setInput]=useState('');
+  const [loading,setLoading]=useState(false);
+  const endRef=useRef(null);
+  const inputRef=useRef(null);
+  useEffect(()=>endRef.current?.scrollIntoView({behavior:'smooth'}),[msgs,loading]);
+
+  async function send(){
+    if(!input.trim()||loading)return;
+    const q=input.trim();setInput('');
+    const newMsgs=[...msgs,{role:'user',text:q}];
+    setMsgs(newMsgs);setLoading(true);
+    try{
+      const res=await api('/dashboard/chat',{method:'POST',body:{messages:newMsgs}});
+      setMsgs(m=>[...m,{role:'ai',text:res.reply}]);
+    }catch(e){setMsgs(m=>[...m,{role:'ai',text:'Sorry, could not connect. Please try again.'}]);}
+    setLoading(false);
+  }
+
+  const suggestions=['Write me a video script','Best thumbnail tips','How to get my first 10K subs?','SEO tips for my niche'];
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'page-header'},React.createElement('h1',null,'AI Coach'),React.createElement('p',null,'Ask anything about growing your channel — powered by Claude AI')),
+    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 280px',gap:20}},
+      React.createElement('div',{className:'card',style:{display:'flex',flexDirection:'column',height:560}},
+        React.createElement('div',{style:{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:14,paddingBottom:8}},
+          msgs.map((m,i)=>React.createElement('div',{key:i,className:`msg msg-${m.role==='ai'?'ai':'user'}`},
+            React.createElement('div',{className:'msg-avatar'},m.role==='ai'?'TC':(user.name||'U')[0]),
+            React.createElement('div',{className:'msg-bubble'},m.text))),
+          loading&&React.createElement('div',{className:'msg msg-ai'},
+            React.createElement('div',{className:'msg-avatar'},'TC'),
+            React.createElement('div',{className:'msg-bubble',style:{display:'flex',gap:5,alignItems:'center',padding:14}},
+              React.createElement('div',{className:'typing-dot'}),React.createElement('div',{className:'typing-dot'}),React.createElement('div',{className:'typing-dot'}))),
+          React.createElement('div',{ref:endRef})),
+        React.createElement('div',{className:'chat-input-row'},
+          React.createElement('input',{ref:inputRef,placeholder:'Ask your AI coach anything…',value:input,onChange:e=>setInput(e.target.value),onKeyDown:e=>e.key==='Enter'&&send()}),
+          React.createElement('button',{className:'btn btn-primary',onClick:send,disabled:loading||!input.trim()},React.createElement(Icon,{d:ic.send,size:15,stroke:'#fff'})))),
+      React.createElement('div',null,
+        React.createElement('div',{className:'card',style:{marginBottom:14}},
+          React.createElement('div',{className:'section-title'},'Quick questions'),
+          suggestions.map(s=>React.createElement('button',{key:s,className:'btn btn-ghost',style:{width:'100%',justifyContent:'flex-start',fontSize:13,marginBottom:6,textAlign:'left'},onClick:()=>{setInput(s);inputRef.current?.focus()}},s))),
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'section-title'},'Your channel'),
+          [{l:'Niche',v:user.profile?.niche||'—'},{l:'Language',v:user.profile?.lang||'—'},{l:'Goal',v:user.profile?.goal||'—'},{l:'Subscribers',v:(user.channel?.subscribers||0).toLocaleString()}]
+          .map(r=>React.createElement('div',{key:r.l,style:{display:'flex',justifyContent:'space-between',fontSize:13,padding:'6px 0',borderBottom:'1px solid var(--border)'}},
+            React.createElement('span',{style:{color:'var(--text3)'}},r.l),
+            React.createElement('span',{style:{fontWeight:500}},r.v)))))));
+}
+
+/* ══════════════ GOAL TAB ══════════════ */
+function GoalTab(){
+  const [data,setData]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState('');
+  useEffect(()=>{api('/dashboard/goal').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});},[]);
+  if(loading)return React.createElement(FullLoader,{text:'Building your growth roadmap…'});
+  if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
+  if(!data)return null;
+  const current=data.current||0,goal=data.goal||10000;
+  const pct=Math.min(100,Math.round((current/goal)*100));
+  const C=2*Math.PI*48,offset=C-(pct/100)*C;
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'page-header'},React.createElement('h1',null,'Goal Tracker'),React.createElement('p',null,`Your roadmap to ${goal.toLocaleString()} subscribers`)),
+    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
+      React.createElement('div',{className:'card',style:{textAlign:'center'}},
+        React.createElement('div',{className:'goal-ring'},
+          React.createElement('svg',{width:120,height:120,viewBox:'0 0 120 120'},
+            React.createElement('circle',{cx:60,cy:60,r:48,fill:'none',stroke:'var(--bg3)',strokeWidth:8}),
+            React.createElement('circle',{cx:60,cy:60,r:48,fill:'none',stroke:'var(--red)',strokeWidth:8,strokeDasharray:C,strokeDashoffset:offset,strokeLinecap:'round'})),
+          React.createElement('div',{className:'goal-ring-label'},
+            React.createElement('div',{className:'goal-ring-pct'},`${pct}%`),
+            React.createElement('div',{className:'goal-ring-sub'},'to goal'))),
+        React.createElement('div',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:4}},`${current.toLocaleString()} / ${goal.toLocaleString()}`),
+        React.createElement('div',{style:{fontSize:13,color:'var(--text3)'}},'subscribers'),
+        React.createElement('div',{className:'divider'}),
+        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}},
+          [{l:'Remaining',v:(goal-current).toLocaleString()},{l:'Est. weeks',v:data.estimatedWeeks?`~${data.estimatedWeeks} wks`:'—'}]
+          .map(r=>React.createElement('div',{key:r.l,className:'card-sm',style:{textAlign:'center'}},
+            React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:4}},r.l),
+            React.createElement('div',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},r.v))))),
+      (data.milestones||[]).length>0&&React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'section-title'},'Milestones'),
+        data.milestones.map((m,i)=>React.createElement('div',{key:i,style:{display:'flex',alignItems:'center',gap:12,padding:'10px 0',borderBottom:'1px solid var(--border)'}},
+          React.createElement('div',{style:{width:32,height:32,borderRadius:'50%',background:m.done?'rgba(34,197,94,.1)':'var(--bg3)',border:`1px solid ${m.done?'rgba(34,197,94,.3)':'var(--border)'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:m.done?'var(--green)':'var(--text3)',flexShrink:0}},m.done?'✓':`${m.pct||0}%`),
+          React.createElement('div',null,
+            React.createElement('div',{style:{fontSize:13,fontWeight:500,color:m.done?'var(--text3)':'var(--text)',textDecoration:m.done?'line-through':'none'}},m.label),
+            m.done&&React.createElement('div',{style:{fontSize:11,color:'var(--green)'}},'Completed!')))))),
+    (data.roadmap||[]).length>0&&React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'section-title'},'4-week roadmap to close the gap'),
+      React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
+        data.roadmap.map((w,i)=>React.createElement('div',{key:i,className:'card-sm'},
+          React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},w.week),
+          React.createElement('div',{style:{fontSize:13,fontWeight:500,marginBottom:8,lineHeight:1.4}},w.focus),
+          React.createElement('div',{className:'tag tag-green',style:{fontSize:11}},w.impact))))));
+}
+
+/* ══════════════ PAYWALL ══════════════ */
+function Paywall({user,onContinue}){
+  const [loading,setLoading]=useState(false);
+  const features=['Weekly AI action plan with trend-based video ideas','Weekly channel analysis + AI insights','Unlimited AI coach chat','Goal tracker with milestone roadmap','Best time to post for your audience','Competitor channel tips'];
+  function go(){setLoading(true);setTimeout(()=>{setLoading(false);onContinue();},800);}
+  return React.createElement('div',{className:'landing'},
+    React.createElement('div',{className:'landing-glow'}),
+    React.createElement('div',{style:{maxWidth:500,width:'100%'}},
+      React.createElement('div',{className:'fade-up',style:{textAlign:'center',marginBottom:28}},
+        React.createElement('span',{className:'tag tag-green',style:{marginBottom:14}},React.createElement(Icon,{d:ic.spark,size:12}),' 7-day free trial'),
+        React.createElement('h1',{style:{fontFamily:'Syne',fontSize:32,fontWeight:800,letterSpacing:-1,marginBottom:8}},'Start your free trial'),
+        React.createElement('p',{style:{color:'var(--text2)',fontSize:15}},`Welcome, ${(user.name||'').split(' ')[0]}! Your plan is ready.`)),
+      React.createElement('div',{className:'card fade-up-d1'},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}},
+          React.createElement('div',null,
+            React.createElement('div',{style:{fontFamily:'Syne',fontSize:28,fontWeight:800}},'₹499'),
+            React.createElement('div',{style:{fontSize:13,color:'var(--text3)'}},'per month · cancel anytime')),
+          React.createElement('span',{className:'tag tag-red'},'Most popular')),
+        features.map((f,i)=>React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:12,fontSize:14}},
+          React.createElement(Icon,{d:ic.check,size:15,stroke:'var(--green)',sw:2.5}),
+          React.createElement('span',{style:{color:'var(--text2)'}},f))),
+        React.createElement('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center',marginTop:8,padding:'14px',fontSize:15,animation:'glow 3s ease infinite'},onClick:go,disabled:loading},
+          loading?React.createElement('div',{className:'spinner'}):null,
+          loading?'Setting up…':'Start 7-day free trial →'),
+        React.createElement('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'No charge for 7 days · UPI, Cards, Net banking via Razorpay'))));
+}
+
+/* ══════════════ DASHBOARD ══════════════ */
+function Dashboard({user,onLogout}){
+  const [tab,setTab]=useState('plan');
+  const content={
+    plan:React.createElement(PlanTab,{user}),
+    analysis:React.createElement(AnalysisTab,{user}),
+    chat:React.createElement(ChatTab,{user}),
+    goal:React.createElement(GoalTab,{user}),
+  };
+  return React.createElement('div',null,
+    React.createElement(Sidebar,{tab,setTab,user,onLogout}),
+    React.createElement('div',{className:'main'},content[tab]));
+}
+
+/* ══════════════ APP — handles auth state ══════════════ */
+function App(){
+  const [screen,setScreen]=useState('loading');
+  const [user,setUser]=useState(null);
+
+  useEffect(()=>{
+    // Check if Google OAuth just redirected back with a token
+    const params=new URLSearchParams(window.location.search);
+    const token=params.get('token');
+    if(token){
+      setToken(token);
+      window.history.replaceState({},'',window.location.pathname);
+    }
+
+    const saved=getToken();
+    if(!saved){setScreen('landing');return;}
+
+    // Verify token with backend and get user data
+    api('/auth/verify',{method:'POST',body:{token:saved}})
+      .then(u=>{
+        setUser(u);
+        if(!u.onboarded)setScreen('onboard');
+        else if(!u.isPremium&&!u.trialActive)setScreen('paywall');
+        else setScreen('dashboard');
+      })
+      .catch(()=>{clearToken();setScreen('landing');});
+  },[]);
+
+  function handleLogin(){
+    // This redirects to backend → Google → back to this page with ?token=xxx
+    window.location.href=`${API}/auth/google`;
+  }
+
+  function handleLogout(){
+    clearToken();setUser(null);setScreen('landing');
+  }
+
+  async function handleOnboardDone(){
+    const u=await api('/auth/verify',{method:'POST',body:{token:getToken()}});
+    setUser(u);setScreen('paywall');
+  }
+
+  if(screen==='loading')   return React.createElement(FullLoader,{text:'Loading TubeCoach…'});
+  if(screen==='landing')   return React.createElement(Landing,{onLogin:handleLogin,onNewUser:()=>setScreen('guide')});
+  if(screen==='guide')     return React.createElement(GuidePage,{onBack:()=>setScreen('landing'),onLogin:handleLogin});
+  if(screen==='onboard')   return React.createElement(Onboarding,{user,onDone:handleOnboardDone});
+  if(screen==='paywall')   return React.createElement(Paywall,{user,onContinue:()=>setScreen('dashboard')});
+  if(screen==='dashboard') return React.createElement(Dashboard,{user,onLogout:handleLogout});
+  return null;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>
