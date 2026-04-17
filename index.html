@@ -350,7 +350,8 @@ function PlanTab({user}){
           React.createElement('p',{style:{fontSize:12,color:'var(--text3)',marginBottom:10}},'Already in your action plan above ↑'),
           ideas.map((t,i)=>React.createElement('div',{className:'idea-chip',key:i},
             React.createElement('div',{style:{fontWeight:500,color:'var(--text)',marginBottom:3}},t.title.replace(/^Post:\s*/,'')),
-            t.trendReason&&React.createElement('div',{style:{fontSize:12,color:'var(--text3)'}},t.trendReason)))))));
+            t.trendReason&&React.createElement('div',{style:{fontSize:12,color:'var(--text3)'}},t.trendReason)))))))
+  );
 }
 
 /* ══════════════ ANALYSIS TAB ══════════════ */
