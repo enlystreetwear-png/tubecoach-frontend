@@ -236,9 +236,9 @@ function Onboarding({onDone}){
     React.createElement('div',{className:'onboard-card'},
       React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:28}},
         React.createElement(Icon,{d:ic.yt,size:22,stroke:'var(--red)',sw:2}),
-        React.createElement('span',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},'Tube',React.createElement('span',{style:{color:'var(--red)'}},'C'),'oach')),
+        React.createElement('span',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},'TubeCoach')),
       React.createElement('div',{className:'step-pills'},[0,1,2].map(i=>React.createElement('div',{key:i,className:'step-pill'+(i<step?' done':i===step?' active':'')}))),
-      error&&React.createElement('div',{className:'error-box'},error),
+      error&&React.createElement('div',{className:'err'},error),
       step===0&&React.createElement('div',{className:'fade-up'},
         React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},'What content will you make?'),
         React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'This helps us find the best trends for you.'),
@@ -271,7 +271,7 @@ function Onboarding({onDone}){
 function Sidebar({tab,setTab,user,onLogout}){
   const navs=[{id:'plan',icon:ic.plan,label:'Weekly Plan'},{id:'analysis',icon:ic.chart,label:'Analysis'},{id:'chat',icon:ic.chat,label:'AI Coach'},{id:'goal',icon:ic.goal,label:'Goal Tracker'}];
   return React.createElement('div',{className:'sidebar'},
-    React.createElement('div',{className:'sidebar-logo'},React.createElement(Icon,{d:ic.yt,size:20,stroke:'var(--red)',sw:2}),'Tube',React.createElement('span',{style:{color:'var(--red)'}},'C'),'oach'),
+    React.createElement('div',{className:'sidebar-logo'},React.createElement(Icon,{d:ic.yt,size:20,stroke:'var(--red)',sw:2}),React.createElement('span',{style:{color:'var(--red)'}},'Tube'),'Coach'),
     navs.map(n=>React.createElement('button',{key:n.id,className:'nav-item'+(tab===n.id?' active':''),onClick:()=>setTab(n.id)},React.createElement(Icon,{d:n.icon,size:16}),n.label)),
     React.createElement('div',{className:'sidebar-bottom'},
       React.createElement('div',{className:'avatar-row'},
@@ -303,7 +303,7 @@ function PlanTab({user}){
   }
 
   if(loading)return React.createElement(FullLoader,{text:'Generating your weekly plan with AI…'});
-  if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
+  if(error)return React.createElement('div',{className:'err',style:{marginTop:40}},error);
   if(!plan)return null;
 
   const tasks=plan.tasks||[];
@@ -314,7 +314,7 @@ function PlanTab({user}){
   const tagCol={video:'tag-red',short:'tag-blue',engage:'tag-green',seo:'tag-amber',community:'tag-blue'};
 
   return React.createElement('div',{className:'fade-up'},
-    React.createElement('div',{className:'page-header'},
+    React.createElement('div',{className:'ph'},
       React.createElement('div',{style:{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}},
         React.createElement('div',null,
           React.createElement('h1',null,"This Week's Action Plan"),
@@ -323,32 +323,32 @@ function PlanTab({user}){
     React.createElement('div',{className:'action-plan'},
       React.createElement('div',null,
         React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}},
-          React.createElement('div',{className:'section-title',style:{margin:0}},`${doneCount}/${tasks.length} tasks complete`),
+          React.createElement('div',{className:'sectitle',style:{margin:0}},`${doneCount}/${tasks.length} tasks complete`),
           React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,flex:1,maxWidth:180,marginLeft:16}},
             React.createElement('div',{className:'progress-track',style:{flex:1}},React.createElement('div',{className:'progress-fill',style:{width:`${pct}%`}})),
             React.createElement('span',{style:{fontSize:12,color:'var(--text2)',minWidth:30}},`${pct}%`))),
-        React.createElement('div',{className:'task-list'},
-          tasks.map(task=>React.createElement('div',{key:task.id,className:'task-item'+(taskStates[task.id]?' done':''),onClick:()=>toggleTask(task.id)},
-            React.createElement('div',{className:'task-checkbox'+(taskStates[task.id]?' checked':'')},
+        React.createElement('div',{className:'tlist'},
+          tasks.map(task=>React.createElement('div',{key:task.id,className:'titem'+(taskStates[task.id]?' done':''),onClick:()=>toggleTask(task.id)},
+            React.createElement('div',{className:'tcheck'+(taskStates[task.id]?' checked':'')},
               taskStates[task.id]&&React.createElement(Icon,{d:ic.check,size:12,stroke:'#fff',sw:2.5})),
             React.createElement('div',{style:{flex:1}},
               React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4}},
-                React.createElement('span',{className:`tag ${tagCol[task.type]||'tag-blue'}`,style:{fontSize:11,padding:'2px 8px'}},task.type||'task'),
+                React.createElement('span',{className:'tag '+(tagCol[task.type]||'tag-blue'),style:{fontSize:11,padding:'2px 8px'}},task.type||'task'),
                 task.isIdea&&React.createElement('span',{className:'tag',style:{fontSize:11,padding:'2px 8px',background:'rgba(245,158,11,.08)',color:'var(--amber)',border:'1px solid rgba(245,158,11,.15)'}},React.createElement(Icon,{d:ic.spark,size:10}),' idea')),
-              React.createElement('div',{className:'task-title'},task.title),
-              task.detail&&React.createElement('div',{className:'task-meta'},task.detail),
+              React.createElement('div',{className:'ttitle'},task.title),
+              task.detail&&React.createElement('div',{className:'tmeta'},task.detail),
               task.trendReason&&React.createElement('div',{style:{marginTop:6,fontSize:11,color:'#FCD34D',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.12)',borderRadius:6,padding:'4px 8px'}},'📈 ',task.trendReason))))),
       React.createElement('div',null,
         trends.length>0&&React.createElement('div',{className:'card',style:{marginBottom:14}},
-          React.createElement('div',{className:'section-title'},'Trending in your niche'),
-          trends.map(t=>React.createElement('div',{className:'trend-bar',key:t.name},
-            React.createElement('div',{className:'trend-name'},t.name),
-            React.createElement('div',{className:'trend-mini-bar'},React.createElement('div',{className:'trend-mini-fill',style:{width:`${t.score}%`}})),
-            React.createElement('div',{className:'trend-score'},t.score)))),
+          React.createElement('div',{className:'sectitle'},'Trending in your niche'),
+          trends.map(t=>React.createElement('div',{className:'tbar',key:t.name},
+            React.createElement('div',{className:'tbarname'},t.name),
+            React.createElement('div',{className:'tbartrack'},React.createElement('div',{className:'tbarfill',style:{width:`${t.score}%`}})),
+            React.createElement('div',{className:'tbarscore'},t.score)))),
         ideas.length>0&&React.createElement('div',{className:'card'},
-          React.createElement('div',{className:'section-title'},"This week's video ideas"),
+          React.createElement('div',{className:'sectitle'},"This week's video ideas"),
           React.createElement('p',{style:{fontSize:12,color:'var(--text3)',marginBottom:10}},'Already in your action plan above ↑'),
-          ideas.map((t,i)=>React.createElement('div',{className:'idea-chip',key:i},
+          ideas.map((t,i)=>React.createElement('div',{className:'ichip',key:i},
             React.createElement('div',{style:{fontWeight:500,color:'var(--text)',marginBottom:3}},t.title.replace(/^Post:\s*/,'')),
             t.trendReason&&React.createElement('div',{style:{fontSize:12,color:'var(--text3)'}},t.trendReason)))))))
   );
@@ -361,7 +361,7 @@ function AnalysisTab(){
   const [error,setError]=useState('');
   useEffect(()=>{api('/dashboard/analysis').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});},[]);
   if(loading)return React.createElement(FullLoader,{text:'Fetching your channel data…'});
-  if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
+  if(error)return React.createElement('div',{className:'err',style:{marginTop:40}},error);
   if(!data)return null;
   const {stats={},aiAnalysis={},videos=[]}=data;
   const statCards=[
@@ -374,25 +374,25 @@ function AnalysisTab(){
   const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const topIdx=bars.reduce((b,v,i,a)=>v.views>a[b].views?i:b,0);
   return React.createElement('div',{className:'fade-up'},
-    React.createElement('div',{className:'page-header'},React.createElement('h1',null,'Weekly Analysis'),React.createElement('p',null,'Performance compared to last week · Auto-updated every Monday')),
-    React.createElement('div',{className:'stats-grid'},
-      statCards.map(s=>React.createElement('div',{key:s.label,className:'stat-card'},
-        React.createElement('div',{className:'stat-label'},s.label),
-        React.createElement('div',{className:'stat-value'},s.value),
+    React.createElement('div',{className:'ph'},React.createElement('h1',null,'Weekly Analysis'),React.createElement('p',null,'Performance compared to last week · Auto-updated every Monday')),
+    React.createElement('div',{className:'sgrid'},
+      statCards.map(s=>React.createElement('div',{key:s.label,className:'sc'},
+        React.createElement('div',{className:'slabel'},s.label),
+        React.createElement('div',{className:'sval'},s.value),
         React.createElement('div',{className:'stat-delta '+(s.delta>=0?'up':'down')},s.delta>=0?`↑ +${s.delta} this week`:`↓ ${s.delta} this week`)))),
     React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}},
       bars.length>0&&React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'section-title'},'Recent video views'),
+        React.createElement('div',{className:'sectitle'},'Recent video views'),
         React.createElement('div',{className:'bar-chart'},
           bars.map((v,i)=>React.createElement('div',{key:i,className:'bar-wrap'},
             React.createElement('div',{className:'bar'+(i===topIdx?' highlight':''),style:{height:`${((v.views||0)/maxV)*72}px`}}),
             React.createElement('span',{className:'bar-label'},days[i]||`V${i+1}`))))),
       React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'section-title'},'AI insight'),
+        React.createElement('div',{className:'sectitle'},'AI insight'),
         (aiAnalysis.insights||[]).map((ins,i)=>React.createElement('p',{key:i,style:{fontSize:13,color:'var(--text2)',lineHeight:1.8,marginBottom:10}},ins.emoji,' ',ins.text)),
         aiAnalysis.bestDay&&React.createElement('div',{className:'tag tag-green',style:{width:'fit-content'}},`Best day to post: ${aiAnalysis.bestDay}`))),
     videos.length>0&&React.createElement('div',{className:'card',style:{marginTop:14}},
-      React.createElement('div',{className:'section-title'},'Recent videos'),
+      React.createElement('div',{className:'sectitle'},'Recent videos'),
       videos.map((v,i)=>React.createElement('div',{key:i,style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid var(--border)'}},
         React.createElement('div',{style:{fontSize:13,flex:1,marginRight:16}},v.title),
         React.createElement('div',{style:{display:'flex',gap:16,fontSize:12,color:'var(--text3)',flexShrink:0}},
@@ -423,7 +423,7 @@ function ChatTab({user}){
 
   const suggestions=['Write me a video script','Best thumbnail tips','How to get my first 10K subs?','SEO tips for my niche'];
   return React.createElement('div',{className:'fade-up'},
-    React.createElement('div',{className:'page-header'},React.createElement('h1',null,'AI Coach'),React.createElement('p',null,'Ask anything about growing your channel — powered by Claude AI')),
+    React.createElement('div',{className:'ph'},React.createElement('h1',null,'AI Coach'),React.createElement('p',null,'Ask anything about growing your channel — powered by Claude AI')),
     React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 280px',gap:20}},
       React.createElement('div',{className:'card',style:{display:'flex',flexDirection:'column',height:560}},
         React.createElement('div',{style:{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:14,paddingBottom:8}},
@@ -440,10 +440,10 @@ function ChatTab({user}){
           React.createElement('button',{className:'btn btn-primary',onClick:send,disabled:loading||!input.trim()},React.createElement(Icon,{d:ic.send,size:15,stroke:'#fff'})))),
       React.createElement('div',null,
         React.createElement('div',{className:'card',style:{marginBottom:14}},
-          React.createElement('div',{className:'section-title'},'Quick questions'),
+          React.createElement('div',{className:'sectitle'},'Quick questions'),
           suggestions.map(s=>React.createElement('button',{key:s,className:'btn btn-ghost',style:{width:'100%',justifyContent:'flex-start',fontSize:13,marginBottom:6,textAlign:'left'},onClick:()=>{setInput(s);inputRef.current?.focus()}},s))),
         React.createElement('div',{className:'card'},
-          React.createElement('div',{className:'section-title'},'Your channel'),
+          React.createElement('div',{className:'sectitle'},'Your channel'),
           [{l:'Niche',v:user.profile?.niche||'—'},{l:'Language',v:user.profile?.lang||'—'},{l:'Goal',v:user.profile?.goal||'—'},{l:'Subscribers',v:(user.channel?.subscribers||0).toLocaleString()}]
           .map(r=>React.createElement('div',{key:r.l,style:{display:'flex',justifyContent:'space-between',fontSize:13,padding:'6px 0',borderBottom:'1px solid var(--border)'}},
             React.createElement('span',{style:{color:'var(--text3)'}},r.l),
@@ -457,13 +457,13 @@ function GoalTab(){
   const [error,setError]=useState('');
   useEffect(()=>{api('/dashboard/goal').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});},[]);
   if(loading)return React.createElement(FullLoader,{text:'Building your growth roadmap…'});
-  if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
+  if(error)return React.createElement('div',{className:'err',style:{marginTop:40}},error);
   if(!data)return null;
   const current=data.current||0,goal=data.goal||10000;
   const pct=Math.min(100,Math.round((current/goal)*100));
   const C=2*Math.PI*48,offset=C-(pct/100)*C;
   return React.createElement('div',{className:'fade-up'},
-    React.createElement('div',{className:'page-header'},React.createElement('h1',null,'Goal Tracker'),React.createElement('p',null,`Your roadmap to ${goal.toLocaleString()} subscribers`)),
+    React.createElement('div',{className:'ph'},React.createElement('h1',null,'Goal Tracker'),React.createElement('p',null,`Your roadmap to ${goal.toLocaleString()} subscribers`)),
     React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
       React.createElement('div',{className:'card',style:{textAlign:'center'}},
         React.createElement('div',{className:'goal-ring'},
@@ -482,14 +482,14 @@ function GoalTab(){
             React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:4}},r.l),
             React.createElement('div',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},r.v))))),
       (data.milestones||[]).length>0&&React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'section-title'},'Milestones'),
+        React.createElement('div',{className:'sectitle'},'Milestones'),
         data.milestones.map((m,i)=>React.createElement('div',{key:i,style:{display:'flex',alignItems:'center',gap:12,padding:'10px 0',borderBottom:'1px solid var(--border)'}},
           React.createElement('div',{style:{width:32,height:32,borderRadius:'50%',background:m.done?'rgba(34,197,94,.1)':'var(--bg3)',border:`1px solid ${m.done?'rgba(34,197,94,.3)':'var(--border)'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:m.done?'var(--green)':'var(--text3)',flexShrink:0}},m.done?'✓':`${m.pct||0}%`),
           React.createElement('div',null,
             React.createElement('div',{style:{fontSize:13,fontWeight:500,color:m.done?'var(--text3)':'var(--text)',textDecoration:m.done?'line-through':'none'}},m.label),
             m.done&&React.createElement('div',{style:{fontSize:11,color:'var(--green)'}},'Completed!')))))),
     (data.roadmap||[]).length>0&&React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-title'},'4-week roadmap to close the gap'),
+      React.createElement('div',{className:'sectitle'},'4-week roadmap to close the gap'),
       React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
         data.roadmap.map((w,i)=>React.createElement('div',{key:i,className:'card-sm'},
           React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},w.week),
@@ -544,18 +544,22 @@ function App(){
   const [user,setUser]=useState(null);
 
   useEffect(()=>{
-    // Check if Google OAuth just redirected back with a token
     const params=new URLSearchParams(window.location.search);
+    // Show exact error if auth failed
+    if(params.get('error')){
+      var detail=params.get('detail')||'Check Railway logs for details';
+      window.history.replaceState({},'',window.location.pathname);
+      alert('Login failed: '+detail);
+      setScreen('landing');
+      return;
+    }
     const token=params.get('token');
     if(token){
       setToken(token);
       window.history.replaceState({},'',window.location.pathname);
     }
-
     const saved=getToken();
     if(!saved){setScreen('landing');return;}
-
-    // Verify token with backend and get user data
     api('/auth/verify',{method:'POST',body:{token:saved}})
       .then(u=>{
         setUser(u);
