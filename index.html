@@ -495,7 +495,7 @@ function Sidebar(props){
   var u=props.user||{};
   return h('div',{className:'sidebar'},
     h('div',{className:'sidebar-logo'},
-      h(Icon,{d:ic.yt,size:20,stroke:'var(--red)',sw:2}),
+      h(Icon,{d:ic.yt,size:18,stroke:'var(--red)',sw:2}),
       h('span',null,'Tube'),h('span',{style:{color:'var(--red)'}},'Coach')),
     navs.map(function(n){
       return h('button',{key:n.id,className:'nav-item'+(props.tab===n.id?' active':''),onClick:function(){props.setTab(n.id);}},
