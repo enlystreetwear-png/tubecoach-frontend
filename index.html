@@ -107,6 +107,71 @@ label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
 .bar-label{font-size:10px;color:var(--text3)}
 .full-loader{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
 .full-loader p{color:var(--text2);font-size:14px}
+
+/* ══ MOBILE RESPONSIVE ══ */
+@media(max-width:768px){
+  /* Hide sidebar, show bottom nav */
+  .sidebar{display:none}
+  .mobile-nav{display:flex!important}
+  .main{margin-left:0;padding:16px;padding-bottom:70px;max-width:100%}
+
+  /* Landing */
+  .landing h1{font-size:clamp(28px,8vw,42px);letter-spacing:-1px}
+  .landing-sub{font-size:14px}
+  .login-card{padding:20px}
+
+  /* Onboarding */
+  .onboard-card{padding:0 4px}
+
+  /* Dashboard grids → single column */
+  .action-plan{grid-template-columns:1fr!important}
+  .stats-grid{grid-template-columns:1fr 1fr!important}
+
+  /* Cards */
+  .card{padding:16px;border-radius:12px}
+  .card-sm{padding:12px}
+
+  /* Page header */
+  .page-header h1{font-size:20px}
+  .page-header{margin-bottom:20px}
+
+  /* Goal tracker grid */
+  .goal-grid{grid-template-columns:1fr!important}
+
+  /* Chat */
+  .chat-grid{grid-template-columns:1fr!important}
+  .chat-suggestions{display:none}
+
+  /* Task items */
+  .task-item{padding:12px}
+
+  /* Trend bar on mobile goes below tasks */
+  .trend-panel{margin-top:16px}
+
+  /* Roadmap grid */
+  .roadmap-grid{grid-template-columns:1fr 1fr!important}
+
+  /* Paywall */
+  .paywall-tiers{grid-template-columns:1fr!important;gap:8px}
+}
+
+/* Mobile bottom navigation */
+.mobile-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:8px 0 env(safe-area-inset-bottom,8px);
+  z-index:100;
+  justify-content:space-around;align-items:center;
+}
+.mobile-nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 16px;border:none;background:none;cursor:pointer;
+  color:var(--text3);font-family:'DM Sans',sans-serif;font-size:10px;
+  transition:color .15s;
+}
+.mobile-nav-item.active{color:var(--red)}
+.mobile-nav-item svg{width:20px;height:20px}
 </style>
 </head>
 <body>
@@ -119,7 +184,7 @@ const {useState,useEffect,useRef}=React;
 /* ══════════════════════════════════════════════
    CHANGE THIS if your backend URL is different
    ══════════════════════════════════════════════ */
-const API='http://localhost:4000';
+const API='https://tubecoach-backend-production.up.railway.app';
 
 /* ── Token helpers ── */
 const getToken=()=>localStorage.getItem('tc_token');
@@ -354,314 +419,7 @@ function PlanTab({user}){
   );
 }
 
-<<<<<<< HEAD
-/* ══ SIDEBAR ══ */
-function Sidebar(props){
-  var navs=[
-    {id:'plan',icon:ic.plan,label:'Weekly Plan'},
-    {id:'analysis',icon:ic.chart,label:'Analysis'},
-    {id:'chat',icon:ic.chat,label:'AI Coach'},
-    {id:'goal',icon:ic.goal,label:'Goal Tracker'}
-  ];
-  var u=props.user||{};
-  return h('div',{className:'sidebar'},
-    h('div',{className:'sidebar-logo'},
-      h(Icon,{d:ic.yt,size:20,stroke:'var(--red)',sw:2}),
-      h('span',null,'AI'),h('span',{style:{color:'var(--red)'}},'Tube')),
-    navs.map(function(n){
-      return h('button',{key:n.id,className:'nav-item'+(props.tab===n.id?' active':''),onClick:function(){props.setTab(n.id);}},
-        h(Icon,{d:n.icon,size:16}),n.label);
-    }),
-    h('div',{className:'sidebar-bottom'},
-      h('div',{className:'avatar-row'},
-        h('div',{className:'ava',style:{background:u.avatar?'transparent':'var(--red)'}},
-          u.avatar
-            ?h('img',{
-                src:API+'/auth/avatar?url='+encodeURIComponent(u.avatar),
-                alt:'',
-                style:{width:'100%',height:'100%',objectFit:'cover',borderRadius:'50%'},
-                onError:function(e){
-                  e.target.style.display='none';
-                  e.target.parentNode.style.background='var(--red)';
-                  e.target.parentNode.textContent=(u.name||'U')[0].toUpperCase();
-                }
-              })
-            :(u.name||'U')[0].toUpperCase()),
-        h('div',{style:{flex:1,overflow:'hidden'}},
-          h('div',{style:{fontSize:13,fontWeight:500,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},u.name||''),
-          h('div',{style:{fontSize:11,color:'var(--text3)'}},u.channel&&u.channel.title||'Your Channel')),
-        h('button',{style:{background:'none',border:'none',cursor:'pointer',color:'var(--text3)',padding:4},onClick:props.onLogout},
-          h(Icon,{d:ic.logout,size:15})))));
-}
-
-/* ══ COPY BUTTON — standalone component outside TaskGuide ══ */
-function CopyBtn(props){
-  var copiedState=useState(false);
-  var copied=copiedState[0]; var setCopied=copiedState[1];
-  function doCopy(e){
-    e.stopPropagation();
-    if(!props.text) return;
-    navigator.clipboard.writeText(String(props.text)).then(function(){
-      setCopied(true);
-      setTimeout(function(){ setCopied(false); },2000);
-    }).catch(function(){
-      // fallback for older browsers
-      var ta=document.createElement('textarea');
-      ta.value=String(props.text);
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      setCopied(true);
-      setTimeout(function(){ setCopied(false); },2000);
-    });
-  }
-  return h('button',{
-    onClick:doCopy,
-    style:{background:copied?'rgba(34,197,94,.15)':'var(--bg4)',border:'1px solid '+(copied?'rgba(34,197,94,.3)':'var(--border2)'),borderRadius:6,padding:'3px 10px',fontSize:11,color:copied?'var(--green)':'var(--text3)',cursor:'pointer',flexShrink:0,whiteSpace:'nowrap',transition:'all .15s'}
-  },copied?'✓ Copied':'Copy');
-}
-
-/* ══ TASK GUIDE — step-by-step guide via backend, cached permanently ══ */
-function TaskGuide(props){
-  var task=props.task;
-  var cachedGuide=props.cachedGuide||null;
-  var onGuideLoaded=props.onGuideLoaded||function(){};
-
-  // ALL hooks must be at the top — never after conditional returns
-  var guideState=useState(cachedGuide);
-  var guide=guideState[0]; var setGuide=guideState[1];
-  var loadState=useState(!cachedGuide);
-  var loading=loadState[0]; var setLoading=loadState[1];
-  var errState=useState('');
-  var err=errState[0]; var setErr=errState[1];
-
-  useEffect(function(){
-    if(!task) return;
-    if(cachedGuide){ setGuide(cachedGuide); setLoading(false); return; }
-    setLoading(true); setErr('');
-    api('/dashboard/task-guide',{method:'POST',body:{task:task}})
-      .then(function(d){
-        setGuide(d);
-        setLoading(false);
-        onGuideLoaded(task.id, d);
-      })
-      .catch(function(e){
-        setErr('Could not generate guide. '+e.message);
-        setLoading(false);
-      });
-  },[task&&task.id]);
-
-  if(loading) return h('div',{style:{padding:'20px 16px',display:'flex',alignItems:'center',gap:10,color:'var(--text3)',fontSize:13,borderTop:'1px solid var(--border)'}},
-    h('div',{className:'spinner',style:{width:16,height:16,borderWidth:2}}),
-    'Generating guide — this takes about 15 seconds...');
-
-  if(err) return h('div',{style:{padding:'12px 16px',fontSize:12,color:'#FF6B6B',borderTop:'1px solid var(--border)'}},err);
-
-  // Safe access — make sure guide and steps exist and are the right type
-  if(!guide||!guide.steps||!Array.isArray(guide.steps)||guide.steps.length===0){
-    return h('div',{style:{padding:'12px 16px',fontSize:12,color:'var(--text3)',borderTop:'1px solid var(--border)'}},'Guide not available. Try again later.');
-  }
-
-  var steps=guide.steps;
-  var seo=guide.seoContent&&typeof guide.seoContent==='object'?guide.seoContent:null;
-  var isVideoTask=task.type==='video'||task.type==='short';
-
-  return h('div',{style:{borderTop:'1px solid var(--border)',padding:'16px'}},
-    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}},
-      h('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},'Step-by-step guide'),
-      guide.totalTime?h('div',{className:'tag tag-blue',style:{fontSize:11}},String(guide.totalTime)):null),
-
-    steps.map(function(step,i){
-      if(!step||typeof step!=='object') return null;
-      var scriptText=step.script&&step.script!=='null'?String(step.script):null;
-      var onScreenText=step.onScreen&&step.onScreen!=='null'?String(step.onScreen):null;
-      var tipText=step.tip&&step.tip!=='null'?String(step.tip):null;
-      var titleText=step.title?String(step.title):'Step '+(i+1);
-      var whatText=step.what?String(step.what):'';
-      var tsText=step.timestamp&&step.timestamp!=='null'?String(step.timestamp):null;
-      var durText=step.duration&&step.duration!=='null'?String(step.duration):null;
-      return h('div',{key:i,style:{display:'flex',gap:12,marginBottom:16}},
-        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0}},
-          h('div',{style:{width:28,height:28,borderRadius:'50%',background:i===0?'var(--red)':'var(--bg4)',border:'2px solid '+(i===0?'var(--red)':'var(--border2)'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:i===0?'#fff':'var(--text2)'}},step.stepNum||i+1),
-          i<steps.length-1?h('div',{style:{width:2,flex:1,background:'var(--border)',margin:'4px 0',minHeight:20}}):null),
-        h('div',{style:{flex:1,paddingBottom:i<steps.length-1?8:0}},
-          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6,flexWrap:'wrap'}},
-            h('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},titleText),
-            tsText?h('div',{className:'tag tag-amber',style:{fontSize:10,padding:'1px 7px'}},tsText):
-            durText?h('div',{className:'tag tag-amber',style:{fontSize:10,padding:'1px 7px'}},durText):null),
-          whatText?h('div',{style:{fontSize:13,color:'var(--text2)',lineHeight:1.7,marginBottom:scriptText||onScreenText||tipText?10:0}},whatText):null,
-          scriptText?h('div',{style:{background:'rgba(59,130,246,.06)',border:'1px solid rgba(59,130,246,.15)',borderRadius:8,padding:'10px 14px',marginBottom:8}},
-            h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}},
-              h('div',{style:{fontSize:9,fontWeight:700,color:'var(--blue)',textTransform:'uppercase',letterSpacing:1}},'Script — say this on camera'),
-              h(CopyBtn,{text:scriptText})),
-            h('div',{style:{fontSize:12.5,color:'var(--text)',lineHeight:1.8,fontStyle:'italic',whiteSpace:'pre-wrap'}},scriptText)):null,
-          onScreenText?h('div',{style:{background:'rgba(34,197,94,.05)',border:'1px solid rgba(34,197,94,.18)',borderRadius:8,padding:'10px 14px',marginBottom:8}},
-            h('div',{style:{fontSize:9,fontWeight:700,color:'var(--green)',textTransform:'uppercase',letterSpacing:1,marginBottom:6}},'On Screen — show this'),
-            h('div',{style:{fontSize:12.5,color:'var(--text2)',lineHeight:1.7}},onScreenText)):null,
-          tipText?h('div',{style:{display:'flex',gap:8,alignItems:'flex-start',background:'var(--bg3)',borderRadius:7,padding:'8px 10px'}},
-            h('span',{style:{fontSize:13,flexShrink:0}},'💡'),
-            h('div',{style:{fontSize:12,color:'var(--text3)',lineHeight:1.6}},tipText)):null));
-    }),
-
-    isVideoTask&&seo?h('div',{style:{marginTop:20,borderTop:'1px solid var(--border)',paddingTop:16}},
-      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:16}},
-        h('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},'Ready-to-upload SEO package'),
-        h('div',{className:'tag tag-green',style:{fontSize:11}},'Copy & paste directly')),
-
-      seo.title&&typeof seo.title==='object'?h('div',{style:{marginBottom:14}},
-        h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1,marginBottom:8}},'Video Titles (pick one)'),
-        ['option1','option2','option3'].map(function(opt,i){
-          var t=seo.title[opt];
-          if(!t||typeof t!=='string') return null;
-          return h('div',{key:i,style:{display:'flex',alignItems:'flex-start',gap:8,marginBottom:6,background:'var(--bg3)',borderRadius:8,padding:'8px 12px'}},
-            h('div',{style:{flex:1,fontSize:13,color:'var(--text)',lineHeight:1.5}},t),
-            h(CopyBtn,{text:t}));
-        })):null,
-
-      seo.description&&typeof seo.description==='string'?h('div',{style:{marginBottom:14}},
-        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
-          h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Description'),
-          h(CopyBtn,{text:seo.description})),
-        h('div',{style:{background:'var(--bg3)',borderRadius:8,padding:'12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.8,whiteSpace:'pre-wrap',maxHeight:200,overflowY:'auto'}},seo.description)):null,
-
-      seo.tags&&Array.isArray(seo.tags)&&seo.tags.length>0?h('div',{style:{marginBottom:14}},
-        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
-          h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Tags ('+seo.tags.length+')'),
-          h(CopyBtn,{text:seo.tags.filter(function(t){return typeof t==='string';}).join(', ')})),
-        h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}},
-          seo.tags.map(function(tag,i){
-            if(typeof tag!=='string') return null;
-            return h('div',{key:i,style:{background:'var(--bg3)',border:'1px solid var(--border2)',borderRadius:6,padding:'3px 9px',fontSize:12,color:'var(--text2)'}},tag);
-          }))):null,
-
-      seo.thumbnailConcept&&typeof seo.thumbnailConcept==='string'?h('div',{style:{marginBottom:14}},
-        h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1,marginBottom:8}},'Thumbnail Concept'),
-        h('div',{style:{background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.15)',borderRadius:8,padding:'10px 12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.7}},seo.thumbnailConcept)):null,
-
-      seo.firstComment&&typeof seo.firstComment==='string'?h('div',null,
-        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
-          h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Pinned First Comment'),
-          h(CopyBtn,{text:seo.firstComment})),
-        h('div',{style:{background:'var(--bg3)',borderRadius:8,padding:'10px 12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.7,fontStyle:'italic'}},seo.firstComment)):null):null);
-}
-
-/* ══ WEEKLY PLAN TAB ══ */
-function PlanTab(props){
-  var planState=useState(null);
-  var plan=planState[0]; var setPlan=planState[1];
-  var loadState=useState(true);
-  var loading=loadState[0]; var setLoading=loadState[1];
-  var errState=useState('');
-  var error=errState[0]; var setError=errState[1];
-  var tsState=useState({});
-  var taskStates=tsState[0]; var setTaskStates=tsState[1];
-  var expandedState=useState(null);
-  var expandedId=expandedState[0]; var setExpandedId=expandedState[1];
-  var guideCacheState=useState({});
-  var guideCache=guideCacheState[0]; var setGuideCache=guideCacheState[1];
-
-  function saveGuideToCache(taskId, guide){
-    setGuideCache(function(prev){ var next=Object.assign({},prev); next[taskId]=guide; return next; });
-  }
-
-  function loadPlan(refresh){
-    setLoading(true); setError('');
-    var url='/dashboard/plan'+(refresh?'?refresh=true':'');
-    api(url)
-      .then(function(d){ setPlan(d); setTaskStates(d.taskStates||{}); setLoading(false); })
-      .catch(function(e){ setError(e.message); setLoading(false); });
-  }
-
-  useEffect(function(){ loadPlan(false); },[]);
-
-  function toggleTask(id){
-    var newDone=!taskStates[id];
-    var ns=Object.assign({},taskStates); ns[id]=newDone;
-    setTaskStates(ns);
-    api('/dashboard/plan/task',{method:'PATCH',body:{taskId:id,done:newDone}}).catch(function(){
-      var revert=Object.assign({},taskStates); revert[id]=!newDone;
-      setTaskStates(revert);
-    });
-  }
-
-  function toggleExpand(id){
-    setExpandedId(function(prev){ return prev===id?null:id; });
-  }
-
-  if(loading) return h(FullLoader,{text:'Generating your weekly plan with AI...'});
-  if(error) return h('div',{className:'err',style:{marginTop:40}},error);
-  if(!plan) return null;
-
-  var tasks=plan.tasks||[];
-  var trends=plan.trends||[];
-  var ideas=tasks.filter(function(t){return t.isIdea;});
-  var doneCount=tasks.filter(function(t){return taskStates[t.id];}).length;
-  var pct=tasks.length?Math.round((doneCount/tasks.length)*100):0;
-  var tagCol={video:'tag-red',short:'tag-blue',engage:'tag-green',seo:'tag-amber',community:'tag-blue'};
-  var user=props.user||{};
-
-  var taskNodes=tasks.map(function(task){
-    var isDone=!!taskStates[task.id];
-    var isExpanded=expandedId===task.id;
-    return h('div',{key:task.id,style:{background:'var(--bg2)',border:'1px solid '+(isExpanded?'var(--border2)':'var(--border)'),borderRadius:'var(--radius)',overflow:'hidden',transition:'border-color .15s',opacity:isDone?0.55:1}},
-      h('div',{style:{display:'flex',alignItems:'flex-start',gap:12,padding:'14px 16px',cursor:'pointer'},onClick:function(e){e.stopPropagation();toggleExpand(task.id);}},
-        h('div',{className:'tcheck'+(isDone?' on':''),style:{cursor:'pointer',flexShrink:0,marginTop:2},onClick:function(e){e.stopPropagation();toggleTask(task.id);}},
-          isDone?h(Icon,{d:ic.check,size:12,stroke:'#fff',sw:2.5}):null),
-        h('div',{style:{flex:1,minWidth:0}},
-          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4,flexWrap:'wrap'}},
-            h('span',{className:'tag '+(tagCol[task.type]||'tag-blue'),style:{fontSize:11,padding:'2px 8px'}},task.type||'task'),
-            task.isIdea?h('span',{className:'tag',style:{fontSize:11,padding:'2px 8px',background:'rgba(245,158,11,.08)',color:'var(--amber)',border:'1px solid rgba(245,158,11,.15)'}},h(Icon,{d:ic.spark,size:10}),' idea'):null),
-          h('div',{style:{fontSize:14,fontWeight:500,color:isDone?'var(--text3)':'var(--text)',lineHeight:1.4,textDecoration:isDone?'line-through':'none'}},task.title),
-          task.detail?h('div',{style:{fontSize:12,color:'var(--text3)',marginTop:3}},task.detail):null,
-          task.trendReason?h('div',{style:{marginTop:6,fontSize:11,color:'#FCD34D',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.12)',borderRadius:6,padding:'4px 8px'}},'📈 ',task.trendReason):null),
-        h('div',{style:{display:'flex',alignItems:'center',gap:8,flexShrink:0,marginTop:2}},
-          h('div',{style:{fontSize:11,color:'var(--text3)'}},isExpanded?'Hide guide':'See guide'),
-          h('div',{style:{fontSize:14,color:'var(--text3)',transform:isExpanded?'rotate(180deg)':'none',transition:'transform .2s'}},'▾'))),
-      isExpanded?h('div',{style:{padding:'0 16px 16px 16px'}},
-        h(TaskGuide,{task:task,user:user,cachedGuide:guideCache[task.id]||null,onGuideLoaded:saveGuideToCache})):null);
-  });
-
-  var trendNodes=trends.length>0?h('div',{className:'card',style:{marginBottom:14}},
-    h('div',{className:'sectitle'},'Trending in your niche'),
-    trends.map(function(t){
-      return h('div',{className:'tbar',key:t.name},
-        h('div',{className:'tbarname'},t.name),
-        h('div',{className:'tbartrack'},h('div',{className:'tbarfill',style:{width:t.score+'%'}})),
-        h('div',{className:'tbarscore'},t.score));
-    })):null;
-
-  var ideaNodes=ideas.length>0?h('div',{className:'card'},
-    h('div',{className:'sectitle'},"This week's video ideas"),
-    h('p',{style:{fontSize:12,color:'var(--text3)',marginBottom:10}},'Already included in your action plan above'),
-    ideas.map(function(t,i){
-      return h('div',{className:'ichip',key:i},
-        h('div',{style:{fontWeight:500,color:'var(--text)',marginBottom:3}},t.title.replace(/^Post:\s*/,'')),
-        t.trendReason?h('div',{style:{fontSize:12,color:'var(--text3)'}},t.trendReason):null);
-    })):null;
-
-  return h('div',{className:'fade-up'},
-    h('div',{className:'ph'},
-      h('div',{style:{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}},
-        h('div',null,
-          h('h1',null,"This Week's Action Plan"),
-          h('p',null,plan.weekSummary||('Personalised for '+(user.profile&&user.profile.niche||'your niche')+' · Updated every Monday'))),
-        h('span',{className:'tag tag-amber'},h(Icon,{d:ic.trend,size:12}),' Trends analysed'))),
-    h('div',{className:'aplan'},
-      h('div',null,
-        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}},
-          h('div',{className:'sectitle',style:{margin:0}},doneCount+'/'+tasks.length+' tasks complete'),
-          h('div',{style:{display:'flex',alignItems:'center',gap:8,flex:1,maxWidth:180,marginLeft:16}},
-            h('div',{className:'progress-track',style:{flex:1}},h('div',{className:'progress-fill',style:{width:pct+'%'}})),
-            h('span',{style:{fontSize:12,color:'var(--text2)',minWidth:30}},pct+'%'))),
-        h('div',{className:'tlist',style:{gap:10}},taskNodes)),
-      h('div',null,trendNodes,ideaNodes)));
-}
-
-/* ══ ANALYSIS TAB ══ */
-=======
 /* ══════════════ ANALYSIS TAB ══════════════ */
->>>>>>> 3604371 (New paywall)
 function AnalysisTab(){
   const [data,setData]=useState(null);
   const [loading,setLoading]=useState(true);
@@ -731,7 +489,7 @@ function ChatTab({user}){
   const suggestions=['Write me a video script','Best thumbnail tips','How to get my first 10K subs?','SEO tips for my niche'];
   return React.createElement('div',{className:'fade-up'},
     React.createElement('div',{className:'page-header'},React.createElement('h1',null,'AI Coach'),React.createElement('p',null,'Ask anything about growing your channel — powered by Claude AI')),
-    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 280px',gap:20}},
+    React.createElement('div',{className:'chat-grid',style:{display:'grid',gridTemplateColumns:'1fr 280px',gap:20}},
       React.createElement('div',{className:'card',style:{display:'flex',flexDirection:'column',height:560}},
         React.createElement('div',{style:{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:14,paddingBottom:8}},
           msgs.map((m,i)=>React.createElement('div',{key:i,className:`msg msg-${m.role==='ai'?'ai':'user'}`},
@@ -771,7 +529,7 @@ function GoalTab(){
   const C=2*Math.PI*48,offset=C-(pct/100)*C;
   return React.createElement('div',{className:'fade-up'},
     React.createElement('div',{className:'page-header'},React.createElement('h1',null,'Goal Tracker'),React.createElement('p',null,`Your roadmap to ${goal.toLocaleString()} subscribers`)),
-    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
+    React.createElement('div',{className:'goal-grid',style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
       React.createElement('div',{className:'card',style:{textAlign:'center'}},
         React.createElement('div',{className:'goal-ring'},
           React.createElement('svg',{width:120,height:120,viewBox:'0 0 120 120'},
@@ -797,7 +555,7 @@ function GoalTab(){
             m.done&&React.createElement('div',{style:{fontSize:11,color:'var(--green)'}},'Completed!')))))),
     (data.roadmap||[]).length>0&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title'},'4-week roadmap to close the gap'),
-      React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
+      React.createElement('div',{className:'roadmap-grid',style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}},
         data.roadmap.map((w,i)=>React.createElement('div',{key:i,className:'card-sm'},
           React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},w.week),
           React.createElement('div',{style:{fontSize:13,fontWeight:500,marginBottom:8,lineHeight:1.4}},w.focus),
@@ -805,88 +563,50 @@ function GoalTab(){
 }
 
 /* ══════════════ PAYWALL ══════════════ */
-function Paywall(props){
-  var user=props.user||{}; var onContinue=props.onContinue;
-  var firstName=(user.name||'').split(' ')[0];
-  var pricingState=useState(null); var pricing=pricingState[0]; var setPricing=pricingState[1];
-  var loadState=useState(false); var loading=loadState[0]; var setLoading=loadState[1];
-  var errState=useState(''); var err=errState[0]; var setErr=errState[1];
+function Paywall({user,onContinue}){
+  const [loading,setLoading]=useState(false);
+  const features=['Weekly AI action plan with trend-based video ideas','Weekly channel analysis + AI insights','Unlimited AI coach chat','Goal tracker with milestone roadmap','Best time to post for your audience','Competitor channel tips'];
+  function go(){setLoading(true);setTimeout(()=>{setLoading(false);onContinue();},800);}
+  return React.createElement('div',{className:'landing'},
+    React.createElement('div',{className:'landing-glow'}),
+    React.createElement('div',{style:{maxWidth:500,width:'100%'}},
+      React.createElement('div',{className:'fade-up',style:{textAlign:'center',marginBottom:28}},
+        React.createElement('span',{className:'tag tag-green',style:{marginBottom:14}},React.createElement(Icon,{d:ic.spark,size:12}),' 7-day free trial'),
+        React.createElement('h1',{style:{fontFamily:'Syne',fontSize:32,fontWeight:800,letterSpacing:-1,marginBottom:8}},'Start your free trial'),
+        React.createElement('p',{style:{color:'var(--text2)',fontSize:15}},`Welcome, ${(user.name||'').split(' ')[0]}! Your plan is ready.`)),
+      React.createElement('div',{className:'card fade-up-d1'},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}},
+          React.createElement('div',null,
+            React.createElement('div',{style:{fontFamily:'Syne',fontSize:28,fontWeight:800}},'₹499'),
+            React.createElement('div',{style:{fontSize:13,color:'var(--text3)'}},'per month · cancel anytime')),
+          React.createElement('span',{className:'tag tag-red'},'Most popular')),
+        features.map((f,i)=>React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:12,fontSize:14}},
+          React.createElement(Icon,{d:ic.check,size:15,stroke:'var(--green)',sw:2.5}),
+          React.createElement('span',{style:{color:'var(--text2)'}},f))),
+        React.createElement('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center',marginTop:8,padding:'14px',fontSize:15,animation:'glow 3s ease infinite'},onClick:go,disabled:loading},
+          loading?React.createElement('div',{className:'spinner'}):null,
+          loading?'Setting up…':'Start 7-day free trial →'),
+        React.createElement('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'No charge for 7 days · UPI, Cards, Net banking via Razorpay'))));
+}
 
-  useEffect(function(){
-    api('/payment/pricing')
-      .then(function(d){ setPricing(d); })
-      .catch(function(){ setPricing({plan:'intro',amount:49,label:'Rs.49/month',trialActive:true,trialDaysLeft:30}); });
-  },[]);
-
-  var features=['Weekly AI action plan with trend-based video ideas','Weekly channel analysis + AI insights','Unlimited AI coach chat (scripts, SEO, thumbnails)','Goal tracker with milestone roadmap','Step-by-step video production guide','SEO package - titles, tags, description'];
-  var tiers=[
-    {month:'Month 1',price:'FREE',tag:'Start free',color:'var(--green)',cls:'tag-green'},
-    {month:'Months 2-4',price:'Rs.49',tag:'Intro offer',color:'var(--amber)',cls:'tag-amber'},
-    {month:'Month 5+',price:'Rs.499',tag:'Full access',color:'var(--red)',cls:'tag-red'}
+/* ══════════════ MOBILE NAV ══════════════ */
+function MobileNav({tab,setTab}){
+  const navs=[
+    {id:'plan',icon:ic.plan,label:'Plan'},
+    {id:'analysis',icon:ic.chart,label:'Analysis'},
+    {id:'chat',icon:ic.chat,label:'AI Coach'},
+    {id:'goal',icon:ic.goal,label:'Goal'},
   ];
-  var inTrial=pricing&&pricing.trialActive;
-
-  function pay(){
-    setLoading(true); setErr('');
-    api('/payment/create-order',{method:'POST'})
-      .then(function(order){
-        var options={
-          key:order.keyId,amount:order.amount,currency:order.currency,
-          name:'TubeCoach',description:'TubeCoach Pro - '+(order.planLabel||''),
-          order_id:order.orderId,
-          prefill:{name:user.name||'',email:user.email||''},
-          theme:{color:'#FF3B3B'},
-          handler:function(response){
-            api('/payment/verify',{method:'POST',body:{
-              razorpay_order_id:response.razorpay_order_id,
-              razorpay_payment_id:response.razorpay_payment_id,
-              razorpay_signature:response.razorpay_signature,
-              amount:order.amount/100,plan:order.plan
-            }}).then(function(){ setLoading(false); onContinue(); })
-            .catch(function(e){ setErr('Verification failed: '+e.message); setLoading(false); });
-          },
-          modal:{ondismiss:function(){ setLoading(false); }}
-        };
-        var load=function(){ new window.Razorpay(options).open(); };
-        if(!window.Razorpay){ var s=document.createElement('script'); s.src='https://checkout.razorpay.com/v1/checkout.js'; s.onload=load; document.body.appendChild(s); }
-        else { load(); }
-      }).catch(function(e){ setErr(e.message); setLoading(false); });
-  }
-
-  return h('div',{className:'land'},
-    h('div',{className:'lglow'}),
-    h('div',{style:{maxWidth:520,width:'100%'}},
-      h('div',{className:'fade-up',style:{textAlign:'center',marginBottom:24}},
-        h('span',{className:'tag tag-green',style:{marginBottom:12}},h(Icon,{d:ic.spark,size:12}),' Special Launch Offer'),
-        h('h1',{style:{fontFamily:'Syne',fontSize:28,fontWeight:800,letterSpacing:-1,marginBottom:6}},'Welcome, '+firstName+'!'),
-        h('p',{style:{color:'var(--text2)',fontSize:14,lineHeight:1.7}},'Start free. Pay only when you love it.')),
-      h('div',{className:'fade-up-d1',style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:16}},
-        tiers.map(function(t,i){
-          return h('div',{key:i,style:{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--radius)',padding:'14px 10px',textAlign:'center'}},
-            h('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},t.month),
-            h('div',{style:{fontFamily:'Syne',fontSize:20,fontWeight:800,color:t.color,marginBottom:6}},t.price),
-            h('span',{className:'tag '+t.cls,style:{fontSize:10}},t.tag));
-        })),
-      pricing?h('div',{className:'fade-up-d1',style:{background:'rgba(34,197,94,.06)',border:'1px solid rgba(34,197,94,.15)',borderRadius:'var(--radius)',padding:'10px 14px',marginBottom:14,display:'flex',alignItems:'center',gap:8}},
-        h('span',{style:{fontSize:16}},'Your plan: '),
-        h('span',{style:{fontSize:13,fontWeight:600,color:'var(--green)'}},
-          inTrial?'Month 1 FREE - '+(pricing.trialDaysLeft||30)+' days left':'Next: '+(pricing.label||'Rs.49/month'))):null,
-      h('div',{className:'card fade-up-d2'},
-        h('div',{className:'sectitle',style:{marginBottom:14}},'Everything included'),
-        features.map(function(f,i){
-          return h('div',{key:i,style:{display:'flex',gap:10,marginBottom:10,fontSize:13}},
-            h(Icon,{d:ic.check,size:14,stroke:'var(--green)',sw:2.5}),
-            h('span',{style:{color:'var(--text2)'}},f));
-        }),
-        h('div',{className:'divider'}),
-        err?h('div',{className:'err'},err):null,
-        inTrial
-          ?h('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center',padding:'13px',fontSize:14},onClick:onContinue},
-              h(Icon,{d:ic.spark,size:14,stroke:'#fff'}),' Enter dashboard - free for '+(pricing?pricing.trialDaysLeft:30)+' days')
-          :h('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center',padding:'13px',fontSize:14},onClick:pay,disabled:loading||!pricing},
-              loading?h('div',{className:'spinner'}):null,
-              loading?'Processing...':(pricing?'Pay '+(pricing.label||'Rs.49')+' - Get full access':'Loading...')),
-        h('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'UPI - Cards - Net banking - Cancel anytime'))));
+  return React.createElement('nav',{className:'mobile-nav'},
+    navs.map(n=>React.createElement('button',{
+      key:n.id,
+      className:'mobile-nav-item'+(tab===n.id?' active':''),
+      onClick:()=>setTab(n.id)
+    },
+      React.createElement(Icon,{d:n.icon,size:20,stroke:tab===n.id?'var(--red)':'var(--text3)'}),
+      n.label
+    ))
+  );
 }
 
 /* ══════════════ DASHBOARD ══════════════ */
@@ -900,7 +620,8 @@ function Dashboard({user,onLogout}){
   };
   return React.createElement('div',null,
     React.createElement(Sidebar,{tab,setTab,user,onLogout}),
-    React.createElement('div',{className:'main'},content[tab]));
+    React.createElement('div',{className:'main'},content[tab]),
+    React.createElement(MobileNav,{tab,setTab}));
 }
 
 /* ══════════════ APP — handles auth state ══════════════ */
