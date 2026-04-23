@@ -15,7 +15,8 @@
   --green:#22C55E;--amber:#F59E0B;--blue:#3B82F6;
   --radius:12px;--radius-lg:18px;
 }
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden;overflow-y:hidden;position:fixed;width:100%}
+#root{height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #root{min-height:100vh}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:.5}
@@ -105,7 +106,7 @@ label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
 .bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
 .bar{width:100%;border-radius:4px 4px 0 0;background:var(--bg4)}.bar.highlight{background:var(--red)}
 .bar-label{font-size:10px;color:var(--text3)}
-.full-loader{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.full-loader{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;overflow:hidden}
 .full-loader p{color:var(--text2);font-size:14px}
 
 /* ══ AITUBE — YouTube-inspired mobile UI ══ */
@@ -192,6 +193,18 @@ label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
 
   /* Paywall tiers */
   .paywall-tiers{grid-template-columns:1fr!important;gap:8px}
+
+  /* Analysis — AI insight full width on mobile */
+  .analysis-grid{grid-template-columns:1fr!important}
+
+  /* Plan right panel spacing on mobile */
+  .plan-right-panel{margin-top:14px}
+
+  /* Hide scrollbar on mobile */
+  #root::-webkit-scrollbar{display:none}
+  #root{-ms-overflow-style:none;scrollbar-width:none}
+  *::-webkit-scrollbar{display:none}
+  *{-ms-overflow-style:none;scrollbar-width:none}
 
   /* Section titles smaller */
   .section-title{font-size:12px;margin-bottom:10px}
@@ -462,7 +475,7 @@ function PlanTab({user}){
               React.createElement('div',{className:'task-title'},task.title),
               task.detail&&React.createElement('div',{className:'task-meta'},task.detail),
               task.trendReason&&React.createElement('div',{style:{marginTop:6,fontSize:11,color:'#FCD34D',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.12)',borderRadius:6,padding:'4px 8px'}},'📈 ',task.trendReason))))),
-      React.createElement('div',{style:{marginTop:14}},
+      React.createElement('div',{className:'plan-right-panel'},
         trends.length>0&&React.createElement('div',{className:'card',style:{marginBottom:14}},
           React.createElement('div',{className:'section-title'},'Trending in your niche'),
           trends.map(t=>React.createElement('div',{className:'trend-bar',key:t.name},
@@ -504,7 +517,7 @@ function AnalysisTab(){
         React.createElement('div',{className:'stat-label'},s.label),
         React.createElement('div',{className:'stat-value'},s.value),
         React.createElement('div',{className:'stat-delta '+(s.delta>=0?'up':'down')},s.delta>=0?`↑ +${s.delta} this week`:`↓ ${s.delta} this week`)))),
-    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}},
+    React.createElement('div',{className:'analysis-grid',style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}},
       bars.length>0&&React.createElement('div',{className:'card'},
         React.createElement('div',{className:'section-title'},'Recent video views'),
         React.createElement('div',{className:'bar-chart'},
@@ -649,7 +662,7 @@ function Paywall({user,onContinue}){
 }
 
 /* ══════════════ MOBILE NAV ══════════════ */
-function MobileNav({tab,setTab}){
+function MobileNav({tab,setTab,user,onSettings}){
   const navs=[
     {id:'plan',icon:ic.plan,label:'Plan'},
     {id:'analysis',icon:ic.chart,label:'Analysis'},
@@ -664,7 +677,24 @@ function MobileNav({tab,setTab}){
     },
       React.createElement(Icon,{d:n.icon,size:20,stroke:tab===n.id?'var(--red)':'var(--text3)'}),
       n.label
-    ))
+    )),
+    React.createElement('button',{
+      className:'mobile-nav-item',
+      onClick:onSettings,
+      style:{position:'relative'}
+    },
+      React.createElement('div',{style:{
+        width:24,height:24,borderRadius:'50%',
+        background:'var(--red)',overflow:'hidden',
+        display:'flex',alignItems:'center',justifyContent:'center',
+        fontSize:11,fontWeight:700,color:'#fff',flexShrink:0
+      }},
+        user&&user.avatar
+          ? React.createElement('img',{src:API+'/auth/avatar?url='+encodeURIComponent(user.avatar),alt:'',style:{width:'100%',height:'100%',objectFit:'cover'},onError:function(e){e.target.style.display='none';}})
+          : (user&&user.name||'U')[0].toUpperCase()
+      ),
+      'Profile'
+    )
   );
 }
 
@@ -816,22 +846,12 @@ function SettingsTab({user,onLogout,onClose}){
 }
 
 /* ══════════════ DASHBOARD ══════════════ */
-function MobileHeader({user,onSettings}){
+function MobileHeader(){
   return React.createElement('header',{className:'mobile-header'},
     React.createElement('div',{className:'mobile-header-logo'},
+      React.createElement(Icon,{d:ic.yt,size:22,stroke:'#FF0000',fill:'none',sw:2}),
       React.createElement('span',{className:'ai'},'AI'),
       React.createElement('span',{className:'tube'},'Tube')
-    ),
-    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:12}},
-      React.createElement('button',{
-        className:'mobile-avatar-btn',
-        onClick:onSettings,
-        title:'Account & Settings'
-      },
-        user.avatar
-          ? React.createElement('img',{src:API+'/auth/avatar?url='+encodeURIComponent(user.avatar),alt:'',onError:function(e){e.target.style.display='none';}})
-          : (user.name||'U')[0].toUpperCase()
-      )
     )
   );
 }
@@ -847,9 +867,9 @@ function Dashboard({user,onLogout}){
   };
   return React.createElement('div',null,
     React.createElement(Sidebar,{tab,setTab,user,onLogout,onSettings:()=>setShowSettings(true)}),
-    React.createElement(MobileHeader,{user,onSettings:()=>setShowSettings(true)}),
+    React.createElement(MobileHeader),
     React.createElement('div',{className:'main'},content[tab]),
-    React.createElement(MobileNav,{tab,setTab}),
+    React.createElement(MobileNav,{tab,setTab,user,onSettings:()=>setShowSettings(true)}),
     showSettings&&React.createElement(SettingsTab,{user,onLogout,onClose:()=>setShowSettings(false)}));
 }
 
