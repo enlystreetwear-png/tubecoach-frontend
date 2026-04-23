@@ -462,7 +462,7 @@ function PlanTab({user}){
               React.createElement('div',{className:'task-title'},task.title),
               task.detail&&React.createElement('div',{className:'task-meta'},task.detail),
               task.trendReason&&React.createElement('div',{style:{marginTop:6,fontSize:11,color:'#FCD34D',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.12)',borderRadius:6,padding:'4px 8px'}},'📈 ',task.trendReason))))),
-      React.createElement('div',null,
+      React.createElement('div',{style:{marginTop:14}},
         trends.length>0&&React.createElement('div',{className:'card',style:{marginBottom:14}},
           React.createElement('div',{className:'section-title'},'Trending in your niche'),
           trends.map(t=>React.createElement('div',{className:'trend-bar',key:t.name},
@@ -824,13 +824,9 @@ function MobileHeader({user,onSettings}){
     ),
     React.createElement('div',{style:{display:'flex',alignItems:'center',gap:12}},
       React.createElement('button',{
-        onClick:onSettings,
-        style:{background:'none',border:'none',cursor:'pointer',color:'var(--text2)',padding:4,display:'flex',alignItems:'center'}
-      }, React.createElement(Icon,{d:ic.settings,size:22,stroke:'var(--text2)'})),
-      React.createElement('button',{
         className:'mobile-avatar-btn',
         onClick:onSettings,
-        title:'Account'
+        title:'Account & Settings'
       },
         user.avatar
           ? React.createElement('img',{src:API+'/auth/avatar?url='+encodeURIComponent(user.avatar),alt:'',onError:function(e){e.target.style.display='none';}})
