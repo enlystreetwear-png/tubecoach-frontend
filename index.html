@@ -384,18 +384,26 @@ function Onboarding({onDone}){
 }
 
 /* ══════════════ SIDEBAR ══════════════ */
-function Sidebar({tab,setTab,user,onLogout}){
+function Sidebar({tab,setTab,user,onLogout,onSettings}){
   const navs=[{id:'plan',icon:ic.plan,label:'Weekly Plan'},{id:'analysis',icon:ic.chart,label:'Analysis'},{id:'chat',icon:ic.chat,label:'AI Coach'},{id:'goal',icon:ic.goal,label:'Goal Tracker'}];
   return React.createElement('div',{className:'sidebar'},
     React.createElement('div',{className:'sidebar-logo'},React.createElement(Icon,{d:ic.yt,size:20,stroke:'var(--red)',sw:2}),React.createElement('span',null,'AI'),React.createElement('span',{style:{color:'var(--red)'}},'Tube')),
     navs.map(n=>React.createElement('button',{key:n.id,className:'nav-item'+(tab===n.id?' active':''),onClick:()=>setTab(n.id)},React.createElement(Icon,{d:n.icon,size:16}),n.label)),
     React.createElement('div',{className:'sidebar-bottom'},
-      React.createElement('div',{className:'avatar-row'},
-        React.createElement('div',{className:'avatar'},user.avatar?React.createElement('img',{src:user.avatar,alt:'',onError:e=>e.target.style.display='none'}):(user.name||'U')[0]),
+      React.createElement('div',{
+        className:'avatar-row',
+        style:{cursor:'pointer'},
+        onClick:onSettings,
+        title:'Account & Settings'
+      },
+        React.createElement('div',{className:'avatar',style:{flexShrink:0}},
+          user.avatar
+            ?React.createElement('img',{src:API+'/auth/avatar?url='+encodeURIComponent(user.avatar),alt:'',style:{width:'100%',height:'100%',objectFit:'cover'},onError:function(e){e.target.style.display='none';}})
+            :(user.name||'U')[0].toUpperCase()),
         React.createElement('div',{style:{flex:1,overflow:'hidden'}},
           React.createElement('div',{style:{fontSize:13,fontWeight:500,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},user.name),
           React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},user.channel?.title||'Your Channel')),
-        React.createElement('button',{style:{background:'none',border:'none',cursor:'pointer',color:'var(--text3)',padding:4},onClick:onLogout},React.createElement(Icon,{d:ic.logout,size:15})))));
+        React.createElement('div',{style:{fontSize:11,color:'var(--text3)',flexShrink:0}},'⚙'))));
 }
 
 /* ══════════════ WEEKLY PLAN TAB ══════════════ */
@@ -695,14 +703,14 @@ function SettingsTab({user,onLogout,onClose}){
     : 'var(--red)'
     : 'var(--text3)';
 
-  return React.createElement('div',{style:{position:'fixed',inset:0,background:'var(--bg)',zIndex:200,overflowY:'auto',paddingBottom:40}},
+  return React.createElement('div',{style:{position:'fixed',top:0,right:0,bottom:0,left:0,background:'var(--bg)',zIndex:200,overflowY:'auto',paddingBottom:40}},
     // Header
-    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:12,padding:'16px',borderBottom:'1px solid var(--border)',position:'sticky',top:0,background:'var(--bg)',zIndex:1}},
+    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:12,padding:'16px 24px',borderBottom:'1px solid var(--border)',position:'sticky',top:0,background:'var(--bg)',zIndex:1}},
       React.createElement('button',{onClick:onClose,style:{background:'none',border:'none',cursor:'pointer',color:'var(--text)',fontSize:22,lineHeight:1,padding:4}},'←'),
-      React.createElement('h2',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},'Settings')
+      React.createElement('h2',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},'Account & Settings')
     ),
 
-    React.createElement('div',{style:{padding:'20px 16px',display:'flex',flexDirection:'column',gap:16}},
+    React.createElement('div',{style:{padding:'24px',maxWidth:600,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}},
 
       // Profile card
       React.createElement('div',{className:'card',style:{display:'flex',alignItems:'center',gap:14}},
@@ -842,7 +850,7 @@ function Dashboard({user,onLogout}){
     goal:React.createElement(GoalTab,{user}),
   };
   return React.createElement('div',null,
-    React.createElement(Sidebar,{tab,setTab,user,onLogout}),
+    React.createElement(Sidebar,{tab,setTab,user,onLogout,onSettings:()=>setShowSettings(true)}),
     React.createElement(MobileHeader,{user,onSettings:()=>setShowSettings(true)}),
     React.createElement('div',{className:'main'},content[tab]),
     React.createElement(MobileNav,{tab,setTab}),
