@@ -268,6 +268,8 @@ const ic={
   trend:'M23 6l-9.5 9.5-5-5L1 18',
   logout:'M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9',
   send:'M22 2L11 13M22 2l-7 20-4-9-9-4 20-7',
+  settings:'M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z',
+  card:'M1 4h22v16H1zM1 10h22',
 };
 
 function FullLoader({text='Loading…'}){
@@ -658,18 +660,169 @@ function MobileNav({tab,setTab}){
   );
 }
 
+/* ══════════════ SETTINGS TAB ══════════════ */
+function SettingsTab({user,onLogout,onClose}){
+  const [billing,setBilling]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [cancelling,setCancelling]=useState(false);
+  const [cancelDone,setCancelDone]=useState(false);
+
+  useEffect(()=>{
+    api('/payment/status')
+      .then(d=>{setBilling(d);setLoading(false);})
+      .catch(()=>setLoading(false));
+  },[]);
+
+  function cancelSub(){
+    if(!window.confirm('Cancel your subscription? You will keep access until the end of your billing period.')) return;
+    setCancelling(true);
+    api('/payment/cancel',{method:'POST'})
+      .then(()=>{setCancelDone(true);setCancelling(false);setBilling(b=>({...b,cancelScheduled:true}));})
+      .catch(()=>setCancelling(false));
+  }
+
+  const planLabel = billing
+    ? billing.cancelScheduled ? 'Cancelling at period end'
+    : billing.trialActive ? `Free Trial (${billing.trialDaysLeft} days left)`
+    : billing.isPremium ? billing.currentPlan||'Active'
+    : 'No active plan'
+    : '—';
+
+  const planColor = billing
+    ? billing.cancelScheduled ? 'var(--amber)'
+    : billing.trialActive ? 'var(--green)'
+    : billing.isPremium ? 'var(--green)'
+    : 'var(--red)'
+    : 'var(--text3)';
+
+  return React.createElement('div',{style:{position:'fixed',inset:0,background:'var(--bg)',zIndex:200,overflowY:'auto',paddingBottom:40}},
+    // Header
+    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:12,padding:'16px',borderBottom:'1px solid var(--border)',position:'sticky',top:0,background:'var(--bg)',zIndex:1}},
+      React.createElement('button',{onClick:onClose,style:{background:'none',border:'none',cursor:'pointer',color:'var(--text)',fontSize:22,lineHeight:1,padding:4}},'←'),
+      React.createElement('h2',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},'Settings')
+    ),
+
+    React.createElement('div',{style:{padding:'20px 16px',display:'flex',flexDirection:'column',gap:16}},
+
+      // Profile card
+      React.createElement('div',{className:'card',style:{display:'flex',alignItems:'center',gap:14}},
+        React.createElement('div',{style:{width:56,height:56,borderRadius:'50%',background:'var(--red)',overflow:'hidden',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,fontWeight:700,color:'#fff'}},
+          user.avatar
+            ? React.createElement('img',{src:API+'/auth/avatar?url='+encodeURIComponent(user.avatar),alt:'',style:{width:'100%',height:'100%',objectFit:'cover'},onError:function(e){e.target.style.display='none';}})
+            : (user.name||'U')[0].toUpperCase()
+        ),
+        React.createElement('div',null,
+          React.createElement('div',{style:{fontFamily:'Syne',fontSize:16,fontWeight:700}},user.name||''),
+          React.createElement('div',{style:{fontSize:13,color:'var(--text3)',marginTop:2}},user.email||''),
+          user.channel&&React.createElement('div',{style:{fontSize:12,color:'var(--text2)',marginTop:2}},
+            React.createElement('span',{style:{color:'var(--red)'}},'▶ '),user.channel.title)
+        )
+      ),
+
+      // Billing card
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'section-title',style:{marginBottom:16}},'Billing & Subscription'),
+        loading
+          ? React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,color:'var(--text3)',fontSize:13}},React.createElement('div',{className:'spinner',style:{width:14,height:14,borderWidth:2}}),'Loading...')
+          : React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:12}},
+
+            // Status row
+            React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'12px',background:'var(--bg3)',borderRadius:10}},
+              React.createElement('div',null,
+                React.createElement('div',{style:{fontSize:12,color:'var(--text3)',marginBottom:2}},'Plan Status'),
+                React.createElement('div',{style:{fontSize:14,fontWeight:600,color:planColor}},planLabel)
+              ),
+              React.createElement('div',{style:{width:8,height:8,borderRadius:'50%',background:planColor}})
+            ),
+
+            // Billing info rows
+            billing&&billing.nextBillingDate&&!billing.cancelScheduled&&React.createElement('div',{style:{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}},
+              React.createElement('span',{style:{fontSize:13,color:'var(--text3)'}},'Next billing date'),
+              React.createElement('span',{style:{fontSize:13,fontWeight:500}},new Date(billing.nextBillingDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}))
+            ),
+
+            billing&&React.createElement('div',{style:{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}},
+              React.createElement('span',{style:{fontSize:13,color:'var(--text3)'}},'Current plan price'),
+              React.createElement('span',{style:{fontSize:13,fontWeight:500}},
+                billing.trialActive?'FREE':
+                billing.currentPlan||'₹499/month')
+            ),
+
+            billing&&billing.paymentCount>0&&React.createElement('div',{style:{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:'1px solid var(--border)'}},
+              React.createElement('span',{style:{fontSize:13,color:'var(--text3)'}},'Total payments made'),
+              React.createElement('span',{style:{fontSize:13,fontWeight:500}},billing.paymentCount||0)
+            ),
+
+            // Pricing breakdown
+            React.createElement('div',{style:{background:'rgba(255,59,59,.04)',border:'1px solid rgba(255,59,59,.1)',borderRadius:10,padding:12,marginTop:4}},
+              React.createElement('div',{style:{fontSize:12,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1,marginBottom:8}},'Pricing Plan'),
+              [
+                {month:'Month 1',price:'FREE',done:true},
+                {month:'Months 2-4',price:'₹49/month',done:(billing&&billing.paymentCount>=1)},
+                {month:'Month 5+',price:'₹499/month',done:(billing&&billing.paymentCount>=4)},
+              ].map((r,i)=>React.createElement('div',{key:i,style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 0',borderBottom:i<2?'1px solid var(--border)':'none'}},
+                React.createElement('span',{style:{fontSize:12,color:'var(--text2)'}},r.month),
+                React.createElement('span',{style:{fontSize:12,fontWeight:600,color:r.done?'var(--green)':'var(--text3)'}},r.price)
+              ))
+            ),
+
+            // Cancel button
+            billing&&billing.isPremium&&!billing.cancelScheduled&&!billing.trialActive&&
+            React.createElement('button',{
+              className:'btn btn-ghost',
+              style:{width:'100%',justifyContent:'center',marginTop:4,color:'#FF6B6B',borderColor:'rgba(255,59,59,.3)'},
+              onClick:cancelSub,
+              disabled:cancelling
+            },cancelling?React.createElement('div',{className:'spinner'}):null,
+              cancelling?'Cancelling...':'Cancel Subscription'),
+
+            cancelDone&&React.createElement('div',{style:{background:'rgba(245,158,11,.08)',border:'1px solid rgba(245,158,11,.2)',borderRadius:10,padding:12,fontSize:13,color:'var(--amber)',textAlign:'center'}},
+              '✓ Cancellation scheduled. Access continues until billing period ends.')
+          )
+      ),
+
+      // Channel info
+      user.channel&&React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Your Channel'),
+        [
+          {l:'Channel name',v:user.channel.title||'—'},
+          {l:'Subscribers',v:(user.channel.subscribers||0).toLocaleString()},
+          {l:'Total views',v:(user.channel.totalViews||0).toLocaleString()},
+          {l:'Videos',v:(user.channel.videoCount||0).toLocaleString()},
+        ].map(r=>React.createElement('div',{key:r.l,style:{display:'flex',justifyContent:'space-between',fontSize:13,padding:'8px 0',borderBottom:'1px solid var(--border)'}},
+          React.createElement('span',{style:{color:'var(--text3)'}},r.l),
+          React.createElement('span',{style:{fontWeight:500}},r.v)
+        ))
+      ),
+
+      // Logout
+      React.createElement('button',{
+        className:'btn btn-ghost',
+        style:{width:'100%',justifyContent:'center',color:'#FF6B6B',borderColor:'rgba(255,59,59,.2)'},
+        onClick:onLogout
+      },React.createElement(Icon,{d:ic.logout,size:16,stroke:'#FF6B6B'}),' Logout'),
+
+      React.createElement('p',{style:{textAlign:'center',fontSize:11,color:'var(--text3)'}},'AITube v1.0 · Made for Indian creators')
+    )
+  );
+}
+
 /* ══════════════ DASHBOARD ══════════════ */
-function MobileHeader({user,onLogout}){
+function MobileHeader({user,onSettings}){
   return React.createElement('header',{className:'mobile-header'},
     React.createElement('div',{className:'mobile-header-logo'},
       React.createElement('span',{className:'ai'},'AI'),
       React.createElement('span',{className:'tube'},'Tube')
     ),
-    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10}},
+    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:12}},
+      React.createElement('button',{
+        onClick:onSettings,
+        style:{background:'none',border:'none',cursor:'pointer',color:'var(--text2)',padding:4,display:'flex',alignItems:'center'}
+      }, React.createElement(Icon,{d:ic.settings,size:22,stroke:'var(--text2)'})),
       React.createElement('button',{
         className:'mobile-avatar-btn',
-        onClick:onLogout,
-        title:'Logout'
+        onClick:onSettings,
+        title:'Account'
       },
         user.avatar
           ? React.createElement('img',{src:API+'/auth/avatar?url='+encodeURIComponent(user.avatar),alt:'',onError:function(e){e.target.style.display='none';}})
@@ -681,6 +834,7 @@ function MobileHeader({user,onLogout}){
 
 function Dashboard({user,onLogout}){
   const [tab,setTab]=useState('plan');
+  const [showSettings,setShowSettings]=useState(false);
   const content={
     plan:React.createElement(PlanTab,{user}),
     analysis:React.createElement(AnalysisTab,{user}),
@@ -689,9 +843,10 @@ function Dashboard({user,onLogout}){
   };
   return React.createElement('div',null,
     React.createElement(Sidebar,{tab,setTab,user,onLogout}),
-    React.createElement(MobileHeader,{user,onLogout}),
+    React.createElement(MobileHeader,{user,onSettings:()=>setShowSettings(true)}),
     React.createElement('div',{className:'main'},content[tab]),
-    React.createElement(MobileNav,{tab,setTab}));
+    React.createElement(MobileNav,{tab,setTab}),
+    showSettings&&React.createElement(SettingsTab,{user,onLogout,onClose:()=>setShowSettings(false)}));
 }
 
 /* ══════════════ APP — handles auth state ══════════════ */
