@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TubeCoach — Your YouTube Growth Assistant</title>
+<title>AITube — AI-Powered YouTube Growth</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -108,51 +108,100 @@ label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
 .full-loader{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
 .full-loader p{color:var(--text2);font-size:14px}
 
+/* ══ AITUBE — YouTube-inspired mobile UI ══ */
+/* Mobile header - like YouTube */
+.mobile-header{
+  display:none;
+  position:fixed;top:0;left:0;right:0;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  padding:12px 16px;z-index:100;
+  align-items:center;justify-content:space-between;
+  height:56px;
+}
+.mobile-header-logo{
+  font-family:'Syne',sans-serif;font-size:20px;font-weight:800;
+  display:flex;align-items:center;gap:6px;
+}
+.mobile-header-logo span.ai{color:var(--text)}
+.mobile-header-logo span.tube{color:var(--red)}
+.mobile-avatar-btn{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--red);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;overflow:hidden;
+}
+.mobile-avatar-btn img{width:100%;height:100%;object-fit:cover}
+
 /* ══ MOBILE RESPONSIVE ══ */
 @media(max-width:768px){
-  /* Hide sidebar, show bottom nav */
+  /* Show mobile header, hide sidebar */
   .sidebar{display:none}
+  .mobile-header{display:flex!important}
   .mobile-nav{display:flex!important}
-  .main{margin-left:0;padding:16px;padding-bottom:70px;max-width:100%}
 
-  /* Landing */
-  .landing h1{font-size:clamp(28px,8vw,42px);letter-spacing:-1px}
-  .landing-sub{font-size:14px}
-  .login-card{padding:20px}
+  /* Main content with header + bottom nav spacing */
+  .main{margin-left:0;padding:72px 12px 76px;max-width:100%}
+
+  /* Landing page */
+  .landing{padding:24px 16px}
+  .landing h1{font-size:clamp(26px,8vw,40px);letter-spacing:-1px;margin-bottom:14px}
+  .landing-sub{font-size:13px;margin-bottom:24px}
+  .login-card{padding:20px;border-radius:16px}
+  .google-btn{padding:13px 16px;font-size:14px}
 
   /* Onboarding */
-  .onboard-card{padding:0 4px}
+  .onboard-wrap{padding:72px 16px 16px;align-items:flex-start}
+  .onboard-card{padding:0}
 
-  /* Dashboard grids → single column */
-  .action-plan{grid-template-columns:1fr!important}
-  .stats-grid{grid-template-columns:1fr 1fr!important}
+  /* Stats grid - 2 columns on mobile */
+  .stats-grid{grid-template-columns:1fr 1fr!important;gap:10px;margin-bottom:16px}
+  .stat-card{padding:12px}
+  .stat-value{font-size:20px}
+
+  /* Action plan - single column */
+  .action-plan{grid-template-columns:1fr!important;gap:12px}
+
+  /* Task items - YouTube-like row cards */
+  .task-item{
+    padding:12px;border-radius:12px;
+    background:var(--bg2);
+    box-shadow:0 1px 3px rgba(0,0,0,.3);
+  }
+  .task-title{font-size:13px}
+  .task-meta{font-size:11px}
 
   /* Cards */
-  .card{padding:16px;border-radius:12px}
-  .card-sm{padding:12px}
+  .card{padding:14px;border-radius:14px;margin-bottom:12px}
+  .card-sm{padding:12px;border-radius:10px}
 
-  /* Page header */
-  .page-header h1{font-size:20px}
-  .page-header{margin-bottom:20px}
+  /* Page header - compact */
+  .page-header{margin-bottom:16px}
+  .page-header h1{font-size:18px;font-weight:700}
+  .page-header p{font-size:12px}
 
-  /* Goal tracker grid */
-  .goal-grid{grid-template-columns:1fr!important}
+  /* Goal tracker */
+  .goal-grid{grid-template-columns:1fr!important;gap:12px}
 
   /* Chat */
   .chat-grid{grid-template-columns:1fr!important}
   .chat-suggestions{display:none}
+  .card[style*='height:560']{height:calc(100vh - 200px)!important}
 
-  /* Task items */
-  .task-item{padding:12px}
+  /* Roadmap - 2 cols on mobile */
+  .roadmap-grid{grid-template-columns:1fr 1fr!important;gap:8px}
 
-  /* Trend bar on mobile goes below tasks */
-  .trend-panel{margin-top:16px}
-
-  /* Roadmap grid */
-  .roadmap-grid{grid-template-columns:1fr 1fr!important}
-
-  /* Paywall */
+  /* Paywall tiers */
   .paywall-tiers{grid-template-columns:1fr!important;gap:8px}
+
+  /* Section titles smaller */
+  .section-title{font-size:12px;margin-bottom:10px}
+
+  /* Tags smaller */
+  .tag{font-size:11px;padding:2px 8px}
+
+  /* Trend bars */
+  .trend-bar{padding:8px 0}
+  .trend-name{font-size:12px}
 }
 
 /* Mobile bottom navigation */
@@ -233,8 +282,8 @@ function Landing({onLogin,onNewUser}){
     React.createElement('div',{className:'landing-glow'}),
     React.createElement('div',{className:'fade-up',style:{marginBottom:12}},
       React.createElement('span',{className:'tag tag-red'},React.createElement(Icon,{d:ic.spark,size:12}),' AI-Powered Growth')),
-    React.createElement('h1',{className:'fade-up-d1'},'Grow your YouTube\n',React.createElement('em',null,'10x faster'),'\nwith AI'),
-    React.createElement('p',{className:'landing-sub fade-up-d2'},"India's smartest YouTube growth assistant. Weekly action plan, trend-based video ideas, and an AI coach — all for ₹499/month."),
+    React.createElement('h1',{className:'fade-up-d1'},'Grow your YouTube ',React.createElement('em',null,'10x faster'),' with AI'),
+    React.createElement('p',{className:'landing-sub fade-up-d2'},'India\'s #1 AI-powered YouTube growth app. Weekly action plan, trend analysis, AI coach — all for ₹499/month.'),
     React.createElement('div',{className:'login-card fade-up-d3'},
       React.createElement('h2',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700,marginBottom:4}},'Get started'),
       React.createElement('p',{style:{fontSize:13,color:'var(--text2)',marginBottom:20}},'Login with your Google / YouTube account'),
@@ -301,7 +350,7 @@ function Onboarding({onDone}){
     React.createElement('div',{className:'onboard-card'},
       React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:28}},
         React.createElement(Icon,{d:ic.yt,size:22,stroke:'var(--red)',sw:2}),
-        React.createElement('span',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},'Tube',React.createElement('span',{style:{color:'var(--red)'}},'C'),'oach')),
+        React.createElement('span',{style:{fontFamily:'Syne',fontSize:18,fontWeight:700}},React.createElement('span',null,'AI'),React.createElement('span',{style:{color:'var(--red)'}},'Tube'))),
       React.createElement('div',{className:'step-pills'},[0,1,2].map(i=>React.createElement('div',{key:i,className:'step-pill'+(i<step?' done':i===step?' active':'')}))),
       error&&React.createElement('div',{className:'error-box'},error),
       step===0&&React.createElement('div',{className:'fade-up'},
@@ -336,7 +385,7 @@ function Onboarding({onDone}){
 function Sidebar({tab,setTab,user,onLogout}){
   const navs=[{id:'plan',icon:ic.plan,label:'Weekly Plan'},{id:'analysis',icon:ic.chart,label:'Analysis'},{id:'chat',icon:ic.chat,label:'AI Coach'},{id:'goal',icon:ic.goal,label:'Goal Tracker'}];
   return React.createElement('div',{className:'sidebar'},
-    React.createElement('div',{className:'sidebar-logo'},React.createElement(Icon,{d:ic.yt,size:20,stroke:'var(--red)',sw:2}),'Tube',React.createElement('span',{style:{color:'var(--red)'}},'C'),'oach'),
+    React.createElement('div',{className:'sidebar-logo'},React.createElement(Icon,{d:ic.yt,size:20,stroke:'var(--red)',sw:2}),React.createElement('span',null,'AI'),React.createElement('span',{style:{color:'var(--red)'}},'Tube')),
     navs.map(n=>React.createElement('button',{key:n.id,className:'nav-item'+(tab===n.id?' active':''),onClick:()=>setTab(n.id)},React.createElement(Icon,{d:n.icon,size:16}),n.label)),
     React.createElement('div',{className:'sidebar-bottom'},
       React.createElement('div',{className:'avatar-row'},
@@ -467,7 +516,7 @@ function AnalysisTab(){
 
 /* ══════════════ CHAT TAB ══════════════ */
 function ChatTab({user}){
-  const [msgs,setMsgs]=useState([{role:'ai',text:`Hi ${user.name?.split(' ')[0]||'there'}! 👋 I'm your TubeCoach AI. Ask me anything — video ideas, script help, thumbnail tips, or how to grow your ${user.profile?.niche||'channel'} faster.`}]);
+  const [msgs,setMsgs]=useState([{role:'ai',text:`Hi ${user.name?.split(' ')[0]||'there'}! 👋 I'm your AITube AI coach. Ask me anything — video ideas, script help, thumbnail tips, or how to grow your ${user.profile?.niche||'channel'} faster.`}]);
   const [input,setInput]=useState('');
   const [loading,setLoading]=useState(false);
   const endRef=useRef(null);
@@ -610,6 +659,26 @@ function MobileNav({tab,setTab}){
 }
 
 /* ══════════════ DASHBOARD ══════════════ */
+function MobileHeader({user,onLogout}){
+  return React.createElement('header',{className:'mobile-header'},
+    React.createElement('div',{className:'mobile-header-logo'},
+      React.createElement('span',{className:'ai'},'AI'),
+      React.createElement('span',{className:'tube'},'Tube')
+    ),
+    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10}},
+      React.createElement('button',{
+        className:'mobile-avatar-btn',
+        onClick:onLogout,
+        title:'Logout'
+      },
+        user.avatar
+          ? React.createElement('img',{src:API+'/auth/avatar?url='+encodeURIComponent(user.avatar),alt:'',onError:function(e){e.target.style.display='none';}})
+          : (user.name||'U')[0].toUpperCase()
+      )
+    )
+  );
+}
+
 function Dashboard({user,onLogout}){
   const [tab,setTab]=useState('plan');
   const content={
@@ -620,6 +689,7 @@ function Dashboard({user,onLogout}){
   };
   return React.createElement('div',null,
     React.createElement(Sidebar,{tab,setTab,user,onLogout}),
+    React.createElement(MobileHeader,{user,onLogout}),
     React.createElement('div',{className:'main'},content[tab]),
     React.createElement(MobileNav,{tab,setTab}));
 }
