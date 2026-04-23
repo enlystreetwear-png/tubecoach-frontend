@@ -629,32 +629,106 @@ function App(){
   const [screen,setScreen]=useState('loading');
   const [user,setUser]=useState(null);
 
-  useEffect(()=>{
-    // Check if Google OAuth just redirected back with a token
-    const params=new URLSearchParams(window.location.search);
-    const token=params.get('token');
-    if(token){
-      setToken(token);
-      window.history.replaceState({},'',window.location.pathname);
-    }
-
-    const saved=getToken();
-    if(!saved){setScreen('landing');return;}
-
-    // Verify token with backend and get user data
-    api('/auth/verify',{method:'POST',body:{token:saved}})
-      .then(u=>{
+  function verifyAndLogin(tok){
+    setToken(tok);
+    api('/auth/verify',{method:'POST',body:{token:tok}})
+      .then(function(u){
         setUser(u);
-        if(!u.onboarded)setScreen('onboard');
-        else if(!u.isPremium&&!u.trialActive)setScreen('paywall');
+        if(!u.onboarded) setScreen('onboard');
+        else if(!u.isPremium&&!u.trialActive) setScreen('paywall');
         else setScreen('dashboard');
       })
-      .catch(()=>{clearToken();setScreen('landing');});
+      .catch(function(){ clearToken(); setScreen('landing'); });
+  }
+
+  function extractToken(url){
+    if(!url) return null;
+    // Handle both tubecoach://callback?token=xxx and https://...?token=xxx
+    try {
+      var qs=(url.split('?')[1])||'';
+      var tok=new URLSearchParams(qs).get('token');
+      if(tok) return tok;
+      // Try decoding if URL encoded
+      var decoded=decodeURIComponent(url);
+      qs=(decoded.split('?')[1])||'';
+      return new URLSearchParams(qs).get('token');
+    } catch(e){ return null; }
+  }
+
+  useEffect(()=>{
+    var isApp=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform();
+
+    function bootNormal(){
+      var params=new URLSearchParams(window.location.search);
+      var t=params.get('token');
+      if(t){ window.history.replaceState({},'',window.location.pathname); verifyAndLogin(t); return; }
+      var saved=getToken();
+      if(!saved){ setScreen('landing'); return; }
+      api('/auth/verify',{method:'POST',body:{token:saved}})
+        .then(function(u){ setUser(u); if(!u.onboarded)setScreen('onboard'); else if(!u.isPremium&&!u.trialActive)setScreen('paywall'); else setScreen('dashboard'); })
+        .catch(function(){ clearToken(); setScreen('landing'); });
+    }
+
+    function handleDeepLink(url){
+      if(!url) return false;
+      // Log for debugging
+      console.log('[TubeCoach] Deep link received:', url);
+      var tok=extractToken(url);
+      console.log('[TubeCoach] Token extracted:', tok?'YES':'NO');
+      if(tok){
+        if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Browser){
+          window.Capacitor.Plugins.Browser.close();
+        }
+        verifyAndLogin(tok);
+        return true;
+      }
+      return false;
+    }
+
+    if(isApp&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App){
+      var CapApp=window.Capacitor.Plugins.App;
+
+      // Listener for when app is ALREADY RUNNING (foreground/background)
+      CapApp.addListener('appUrlOpen',function(event){
+        console.log('[TubeCoach] appUrlOpen:', event.url);
+        handleDeepLink(event.url||'');
+      });
+
+      // Check if app was COLD STARTED via deep link
+      CapApp.getLaunchUrl().then(function(result){
+        console.log('[TubeCoach] getLaunchUrl:', JSON.stringify(result));
+        var launchUrl=result&&result.url?result.url:'';
+        if(launchUrl&&!handleDeepLink(launchUrl)){
+          bootNormal();
+        } else if(!launchUrl){
+          bootNormal();
+        }
+      }).catch(function(e){
+        console.log('[TubeCoach] getLaunchUrl error:', e);
+        bootNormal();
+      });
+
+    } else {
+      bootNormal();
+    }
   },[]);
 
   function handleLogin(){
-    // This redirects to backend → Google → back to this page with ?token=xxx
-    window.location.href=`${API}/auth/google`;
+    var isApp=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform();
+    if(isApp){
+      var loginUrl=API+'/auth/google?state=app';
+      if(window.Capacitor.Plugins&&window.Capacitor.Plugins.Browser){
+        window.Capacitor.Plugins.Browser.open({
+          url:loginUrl,
+          presentationStyle:'fullscreen',
+          toolbarColor:'#0A0A0A'
+        });
+      } else {
+        window.open(loginUrl,'_blank');
+      }
+    } else {
+      window.location.href=API+'/auth/google';
+    }
   }
 
   function handleLogout(){
