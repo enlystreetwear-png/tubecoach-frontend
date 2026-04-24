@@ -247,7 +247,7 @@ const {useState,useEffect,useRef}=React;
 /* ══════════════════════════════════════════════
    CHANGE THIS if your backend URL is different
    ══════════════════════════════════════════════ */
-const API=window.location.hostname==='localhost'?'http://localhost:4000':window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()?'https://tubecoach-backend-production.up.railway.app':'https://tubecoach-frontend.vercel.app/api';
+const API=(function(){var h=window.location.hostname;if(h==='localhost'&&!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()))return 'http://localhost:4000';if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())return 'https://tubecoach-backend-production.up.railway.app';return 'https://tubecoach-frontend.vercel.app/api';})();
 
 /* ── Token helpers ── */
 const getToken=()=>localStorage.getItem('tc_token');
@@ -639,7 +639,7 @@ function GoalTab(){
 }
 
 /* ══════════════ PAYWALL ══════════════ */
-function Paywall({user,onContinue}){
+function Paywall({user,onContinue,onLogout}){
   const [loading,setLoading]=useState(false);
   const [pricing,setPricing]=useState(null);
   const [err,setErr]=useState('');
@@ -739,7 +739,12 @@ function Paywall({user,onContinue}){
           loading?React.createElement('div',{className:'spinner'}):null,
           loading?'Processing…':pricing?'Pay '+(pricing.label||'₹49')+' → Get full access':'Loading…'),
         err?React.createElement('div',{style:{marginTop:10,fontSize:12,color:'#FF6B6B',textAlign:'center',wordBreak:'break-all'}},err):null,
-        React.createElement('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'UPI · Cards · Net banking · Cancel anytime'))));
+        React.createElement('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'UPI · Cards · Net banking · Cancel anytime'),
+        React.createElement('div',{style:{textAlign:'center',marginTop:16}},
+          React.createElement('button',{
+            onClick:onLogout,
+            style:{background:'none',border:'none',cursor:'pointer',fontSize:13,color:'var(--text3)',textDecoration:'underline'}
+          },'← Logout & switch account')))));
 }
 
 /* ══════════════ MOBILE NAV ══════════════ */
@@ -1074,7 +1079,7 @@ function App(){
   if(screen==='landing')   return React.createElement(Landing,{onLogin:handleLogin,onNewUser:()=>setScreen('guide')});
   if(screen==='guide')     return React.createElement(GuidePage,{onBack:()=>setScreen('landing'),onLogin:handleLogin});
   if(screen==='onboard')   return React.createElement(Onboarding,{user,onDone:handleOnboardDone});
-  if(screen==='paywall')   return React.createElement(Paywall,{user,onContinue:()=>setScreen('dashboard')});
+  if(screen==='paywall')   return React.createElement(Paywall,{user,onContinue:()=>setScreen('dashboard'),onLogout:handleLogout});
   if(screen==='dashboard') return React.createElement(Dashboard,{user,onLogout:handleLogout});
   return null;
 }
