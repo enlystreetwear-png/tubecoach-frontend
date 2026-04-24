@@ -718,6 +718,7 @@ function Paywall({user,onContinue}){
         },
           loading?React.createElement('div',{className:'spinner'}):null,
           loading?'Processing…':pricing?'Pay '+(pricing.label||'₹49')+' → Get full access':'Loading…'),
+        err?React.createElement('div',{style:{marginTop:10,fontSize:12,color:'#FF6B6B',textAlign:'center',wordBreak:'break-all'}},err):null,
         React.createElement('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'UPI · Cards · Net banking · Cancel anytime'))));
 }
 
