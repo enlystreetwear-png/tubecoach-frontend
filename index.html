@@ -638,28 +638,87 @@ function GoalTab(){
 /* ══════════════ PAYWALL ══════════════ */
 function Paywall({user,onContinue}){
   const [loading,setLoading]=useState(false);
+  const [pricing,setPricing]=useState(null);
+  const [err,setErr]=useState('');
   const features=['Weekly AI action plan with trend-based video ideas','Weekly channel analysis + AI insights','Unlimited AI coach chat','Goal tracker with milestone roadmap','Best time to post for your audience','Competitor channel tips'];
-  function go(){setLoading(true);setTimeout(()=>{setLoading(false);onContinue();},800);}
+
+  useEffect(()=>{
+    api('/payment/pricing').then(d=>setPricing(d)).catch(()=>setPricing({plan:'intro',amount:49,label:'₹49/month',trialActive:false}));
+  },[]);
+
+  function loadRazorpay(cb){
+    if(window.Razorpay){cb();return;}
+    var s=document.createElement('script');
+    s.src='https://checkout.razorpay.com/v1/checkout.js';
+    s.onload=cb;
+    document.body.appendChild(s);
+  }
+
+  function pay(){
+    setLoading(true);setErr('');
+    api('/payment/create-order',{method:'POST'})
+      .then(function(order){
+        loadRazorpay(function(){
+          var options={
+            key:order.keyId,
+            amount:order.amount,
+            currency:order.currency||'INR',
+            name:'AITube',
+            description:'AITube Pro — '+(order.planLabel||''),
+            order_id:order.orderId,
+            prefill:{name:user.name||'',email:user.email||''},
+            theme:{color:'#FF3B3B'},
+            handler:function(response){
+              api('/payment/verify',{method:'POST',body:{
+                razorpay_order_id:response.razorpay_order_id,
+                razorpay_payment_id:response.razorpay_payment_id,
+                razorpay_signature:response.razorpay_signature,
+                amount:order.amount/100,
+                plan:order.plan
+              }}).then(function(){setLoading(false);onContinue();})
+              .catch(function(e){setErr('Payment verification failed: '+e.message);setLoading(false);});
+            },
+            modal:{ondismiss:function(){setLoading(false);}}
+          };
+          new window.Razorpay(options).open();
+        });
+      }).catch(function(e){setErr(e.message);setLoading(false);});
+  }
+
+  var tiers=[
+    {month:'Month 1',price:'FREE',color:'var(--green)'},
+    {month:'Months 2–4',price:'₹49/mo',color:'var(--amber)'},
+    {month:'Month 5+',price:'₹499/mo',color:'var(--red)'},
+  ];
+
   return React.createElement('div',{className:'landing'},
     React.createElement('div',{className:'landing-glow'}),
     React.createElement('div',{style:{maxWidth:500,width:'100%'}},
-      React.createElement('div',{className:'fade-up',style:{textAlign:'center',marginBottom:28}},
-        React.createElement('span',{className:'tag tag-green',style:{marginBottom:14}},React.createElement(Icon,{d:ic.spark,size:12}),' 7-day free trial'),
-        React.createElement('h1',{style:{fontFamily:'Syne',fontSize:32,fontWeight:800,letterSpacing:-1,marginBottom:8}},'Start your free trial'),
-        React.createElement('p',{style:{color:'var(--text2)',fontSize:15}},`Welcome, ${(user.name||'').split(' ')[0]}! Your plan is ready.`)),
-      React.createElement('div',{className:'card fade-up-d1'},
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}},
-          React.createElement('div',null,
-            React.createElement('div',{style:{fontFamily:'Syne',fontSize:28,fontWeight:800}},'₹499'),
-            React.createElement('div',{style:{fontSize:13,color:'var(--text3)'}},'per month · cancel anytime')),
-          React.createElement('span',{className:'tag tag-red'},'Most popular')),
-        features.map((f,i)=>React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:12,fontSize:14}},
-          React.createElement(Icon,{d:ic.check,size:15,stroke:'var(--green)',sw:2.5}),
-          React.createElement('span',{style:{color:'var(--text2)'}},f))),
-        React.createElement('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center',marginTop:8,padding:'14px',fontSize:15,animation:'glow 3s ease infinite'},onClick:go,disabled:loading},
+      React.createElement('div',{className:'fade-up',style:{textAlign:'center',marginBottom:24}},
+        React.createElement('span',{className:'tag tag-red',style:{marginBottom:14}},React.createElement(Icon,{d:ic.spark,size:12}),' Special Launch Offer'),
+        React.createElement('h1',{style:{fontFamily:'Syne',fontSize:28,fontWeight:800,letterSpacing:-1,marginBottom:6}},'Unlock AITube Pro'),
+        React.createElement('p',{style:{color:'var(--text2)',fontSize:14}},`Your free trial has ended, ${(user.name||'').split(' ')[0]}. Continue growing your channel!`)),
+      React.createElement('div',{className:'fade-up-d1',style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:16}},
+        tiers.map(function(t,i){
+          return React.createElement('div',{key:i,style:{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:12,padding:'12px 8px',textAlign:'center'}},
+            React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:4}},t.month),
+            React.createElement('div',{style:{fontFamily:'Syne',fontSize:16,fontWeight:800,color:t.color}},t.price));
+        })),
+      React.createElement('div',{className:'card fade-up-d2'},
+        features.map(function(f,i){return React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:10,fontSize:13}},
+          React.createElement(Icon,{d:ic.check,size:14,stroke:'var(--green)',sw:2.5}),
+          React.createElement('span',{style:{color:'var(--text2)'}},f));}),
+        React.createElement('div',{className:'divider'}),
+        err?React.createElement('div',{className:'error-box',style:{marginBottom:12}},err):null,
+        React.createElement('button',{
+          className:'btn btn-primary',
+          style:{width:'100%',justifyContent:'center',padding:'14px',fontSize:15,animation:'glow 3s ease infinite'},
+          onClick:pay,
+          disabled:loading||!pricing
+        },
           loading?React.createElement('div',{className:'spinner'}):null,
-          loading?'Setting up…':'Start 7-day free trial →'),
-        React.createElement('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'No charge for 7 days · UPI, Cards, Net banking via Razorpay'))));
+          loading?'Processing…':pricing?'Pay '+(pricing.label||'₹49')+' → Get full access':'Loading…'),
+        React.createElement('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'UPI · Cards · Net banking · Cancel anytime'))));
 }
 
 /* ══════════════ MOBILE NAV ══════════════ */
