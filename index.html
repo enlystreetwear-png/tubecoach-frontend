@@ -643,7 +643,18 @@ function Paywall({user,onContinue}){
   const features=['Weekly AI action plan with trend-based video ideas','Weekly channel analysis + AI insights','Unlimited AI coach chat','Goal tracker with milestone roadmap','Best time to post for your audience','Competitor channel tips'];
 
   useEffect(()=>{
-    api('/payment/pricing').then(d=>setPricing(d)).catch(()=>setPricing({plan:'intro',amount:49,label:'₹49/month',trialActive:false}));
+    console.log('[PAY] API base:', API);
+    console.log('[PAY] Fetching pricing...');
+    api('/payment/pricing')
+      .then(function(d){
+        console.log('[PAY] Pricing response:', JSON.stringify(d));
+        setPricing(d);
+      })
+      .catch(function(e){
+        console.log('[PAY] Pricing error:', e.message);
+        setErr('Pricing error: '+e.message);
+        setPricing({plan:'intro',amount:49,amountPaise:4900,label:'₹49/month',trialActive:false});
+      });
   },[]);
 
   function loadRazorpay(cb){
