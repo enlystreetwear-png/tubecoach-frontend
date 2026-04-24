@@ -667,8 +667,10 @@ function Paywall({user,onContinue}){
 
   function pay(){
     setLoading(true);setErr('');
+    console.log('[PAY] Creating order...');
     api('/payment/create-order',{method:'POST'})
       .then(function(order){
+        console.log('[PAY] Order created:', JSON.stringify(order));
         loadRazorpay(function(){
           var options={
             key:order.keyId,
@@ -693,7 +695,11 @@ function Paywall({user,onContinue}){
           };
           new window.Razorpay(options).open();
         });
-      }).catch(function(e){setErr(e.message);setLoading(false);});
+      }).catch(function(e){
+        console.log('[PAY] Create order error:', e.message);
+        setErr(e.message);
+        setLoading(false);
+      });
   }
 
   var tiers=[
