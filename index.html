@@ -107,6 +107,10 @@ label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
 .bar{width:100%;border-radius:4px 4px 0 0;background:var(--bg4)}.bar.highlight{background:var(--red)}
 .bar-label{font-size:10px;color:var(--text3)}
 .full-loader{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;overflow:hidden}
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+.skeleton-text{height:14px;margin-bottom:8px}
+.skeleton-title{height:20px;margin-bottom:12px}
+.skeleton-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:12px}
 .full-loader p{color:var(--text2);font-size:14px}
 
 /* ══ AITUBE — YouTube-inspired mobile UI ══ */
@@ -293,6 +297,28 @@ function FullLoader({text='Loading…'}){
   return React.createElement('div',{className:'full-loader'},
     React.createElement('div',{className:'spinner',style:{width:32,height:32,borderWidth:3}}),
     React.createElement('p',null,text));
+}
+
+function SkeletonPlan(){
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'skeleton skeleton-title',style:{width:'60%',marginBottom:20}}),
+    [1,2,3,4].map(function(_,i){
+      return React.createElement('div',{key:i,className:'skeleton-card'},
+        React.createElement('div',{className:'skeleton skeleton-text',style:{width:'30%'}}),
+        React.createElement('div',{className:'skeleton skeleton-title',style:{width:'80%'}}),
+        React.createElement('div',{className:'skeleton skeleton-text',style:{width:'50%'}}));
+    }));
+}
+
+function SkeletonAnalysis(){
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginBottom:20}},
+      [1,2,3].map(function(_,i){
+        return React.createElement('div',{key:i,className:'skeleton-card'},
+          React.createElement('div',{className:'skeleton skeleton-text',style:{width:'60%'}}),
+          React.createElement('div',{className:'skeleton',style:{height:28,width:'80%',marginTop:8}}));
+      })),
+    React.createElement('div',{className:'skeleton-card',style:{height:160}}));
 }
 
 /* ══════════════ LANDING ══════════════ */
@@ -597,7 +623,7 @@ function PlanTab({user}){
     setExpandedId(function(prev){return prev===id?null:id;});
   }
 
-  if(loading)return React.createElement(FullLoader,{text:'Generating your weekly plan with AI…'});
+  if(loading)return React.createElement(SkeletonPlan);
   if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
   if(!plan)return null;
 
@@ -667,7 +693,7 @@ function AnalysisTab(){
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState('');
   useEffect(()=>{api('/dashboard/analysis').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});},[]);
-  if(loading)return React.createElement(FullLoader,{text:'Fetching your channel data…'});
+  if(loading)return React.createElement(SkeletonAnalysis);
   if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
   if(!data)return null;
   const {stats={},aiAnalysis={},videos=[]}=data;
@@ -1312,6 +1338,14 @@ function MobileHeader(){
 function Dashboard({user,onLogout}){
   const [tab,setTab]=useState('plan');
   const [showSettings,setShowSettings]=useState(false);
+
+  // Prefetch all tab data silently in background
+  useEffect(function(){
+    setTimeout(function(){api('/dashboard/analysis').catch(function(){});},2000);
+    setTimeout(function(){api('/dashboard/goal').catch(function(){});},4000);
+    setTimeout(function(){api('/dashboard/chat-points').catch(function(){});},1000);
+  },[]);
+
   const content={
     plan:React.createElement(PlanTab,{user}),
     analysis:React.createElement(AnalysisTab,{user}),
