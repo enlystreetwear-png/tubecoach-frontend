@@ -321,6 +321,34 @@ function SkeletonAnalysis(){
     React.createElement('div',{className:'skeleton-card',style:{height:160}}));
 }
 
+function SkeletonGoal(){
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'skeleton skeleton-title',style:{width:'50%',marginBottom:20}}),
+    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
+      React.createElement('div',{className:'skeleton-card',style:{textAlign:'center'}},
+        React.createElement('div',{className:'skeleton',style:{width:120,height:120,borderRadius:'50%',margin:'0 auto 16px'}}),
+        React.createElement('div',{className:'skeleton skeleton-title',style:{width:'70%',margin:'0 auto 8px'}}),
+        React.createElement('div',{className:'skeleton skeleton-text',style:{width:'40%',margin:'0 auto'}})),
+      React.createElement('div',{className:'skeleton-card'},
+        [1,2,3,4].map(function(_,i){return React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:12}},
+          React.createElement('div',{className:'skeleton',style:{width:32,height:32,borderRadius:'50%',flexShrink:0}}),
+          React.createElement('div',{style:{flex:1}},React.createElement('div',{className:'skeleton skeleton-text',style:{width:'80%'}})));}))
+    ),
+    React.createElement('div',{className:'skeleton-card',style:{height:140}}));
+}
+
+function SkeletonChat(){
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'skeleton skeleton-title',style:{width:'40%',marginBottom:16}}),
+    React.createElement('div',{className:'skeleton-card',style:{marginBottom:12}},
+      React.createElement('div',{className:'skeleton skeleton-text',style:{width:'60%',marginBottom:12}}),
+      [1,2,3].map(function(_,i){return React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:10}},
+        React.createElement('div',{className:'skeleton',style:{width:40,height:40,borderRadius:8,flexShrink:0}}),
+        React.createElement('div',{style:{flex:1}},
+          React.createElement('div',{className:'skeleton skeleton-text',style:{width:'90%'}}),
+          React.createElement('div',{className:'skeleton skeleton-text',style:{width:'60%'}})));})));
+}
+
 /* ══════════════ LANDING ══════════════ */
 function Landing({onLogin,onNewUser}){
   return React.createElement('div',{className:'landing'},
@@ -593,19 +621,33 @@ function TaskGuide({task,cachedGuide,onGuideLoaded}){
 }
 
 /* ══════════════ WEEKLY PLAN TAB ══════════════ */
-function PlanTab({user}){
-  const [plan,setPlan]=useState(null);
-  const [loading,setLoading]=useState(true);
+function PlanTab({user,preloadedData}){
+  const [plan,setPlan]=useState(preloadedData||null);
+  const [loading,setLoading]=useState(!preloadedData);
   const [error,setError]=useState('');
-  const [taskStates,setTaskStates]=useState({});
+  const [taskStates,setTaskStates]=useState(preloadedData?preloadedData.taskStates||{}:{});
   const [expandedId,setExpandedId]=useState(null);
   const [guideCache,setGuideCache]=useState({});
 
   useEffect(()=>{
-    api('/dashboard/plan')
-      .then(d=>{setPlan(d);setTaskStates(d.taskStates||{});setLoading(false);})
-      .catch(e=>{setError(e.message);setLoading(false);});
-  },[]);
+    function onPlanLoaded(d){
+      setPlan(d);
+      setTaskStates(d.taskStates||{});
+      setLoading(false);
+      // Pre-generate guides for all tasks in background
+      var tasksToPregen=(d.tasks||[]).filter(function(t){return t.type==='video'||t.type==='short'||t.type==='seo';});
+      tasksToPregen.forEach(function(task,i){
+        setTimeout(function(){
+          api('/dashboard/task-guide',{method:'POST',body:{task:task}})
+            .then(function(guide){
+              setGuideCache(function(prev){var n=Object.assign({},prev);n[task.id]=guide;return n;});
+            }).catch(function(){});
+        }, (i+1)*3000); // stagger by 3s each to avoid overwhelming backend
+      });
+    }
+    if(preloadedData){onPlanLoaded(preloadedData);return;}
+    api('/dashboard/plan').then(onPlanLoaded).catch(e=>{setError(e.message);setLoading(false);});
+  },[preloadedData]);
 
   function saveGuide(taskId,guide){
     setGuideCache(function(prev){var n=Object.assign({},prev);n[taskId]=guide;return n;});
@@ -688,11 +730,14 @@ function PlanTab({user}){
 }
 
 /* ══════════════ ANALYSIS TAB ══════════════ */
-function AnalysisTab(){
-  const [data,setData]=useState(null);
-  const [loading,setLoading]=useState(true);
+function AnalysisTab({user,preloadedData}){
+  const [data,setData]=useState(preloadedData||null);
+  const [loading,setLoading]=useState(!preloadedData);
   const [error,setError]=useState('');
-  useEffect(()=>{api('/dashboard/analysis').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});},[]);
+  useEffect(()=>{
+    if(preloadedData){setData(preloadedData);setLoading(false);return;}
+    api('/dashboard/analysis').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});
+  },[preloadedData]);
   if(loading)return React.createElement(SkeletonAnalysis);
   if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
   if(!data)return null;
@@ -738,7 +783,7 @@ const POINTS_PER_MSG=5;
 const WEEKLY_POINTS=50;
 const POINTS_COST=19; // ₹19 for 50 points recharge
 
-function ChatTab({user}){
+function ChatTab({user,preloadedPoints,preloadedPlan}){
   const firstName=user.name?.split(' ')[0]||'there';
   const niche=user.profile?.niche||'your niche';
 
@@ -762,16 +807,25 @@ function ChatTab({user}){
 
   useEffect(()=>endRef.current?.scrollIntoView({behavior:'smooth'}),[msgs,loading]);
 
-  // Load points + tasks on mount
+  // Load points + tasks on mount — use preloaded if available
   useEffect(()=>{
-    api('/dashboard/chat-points').then(function(d){
-      setPoints(d.points);
+    if(preloadedPoints!==undefined&&preloadedPoints!==null){
+      setPoints(preloadedPoints);
       setLoadingPoints(false);
-    }).catch(function(){setPoints(WEEKLY_POINTS);setLoadingPoints(false);});
-    api('/dashboard/plan').then(function(d){
-      setTasks(d.tasks||[]);
-    }).catch(function(){});
-  },[]);
+    } else {
+      api('/dashboard/chat-points').then(function(d){
+        setPoints(d.points);
+        setLoadingPoints(false);
+      }).catch(function(){setPoints(WEEKLY_POINTS);setLoadingPoints(false);});
+    }
+    if(preloadedPlan){
+      setTasks(preloadedPlan.tasks||[]);
+    } else {
+      api('/dashboard/plan').then(function(d){
+        setTasks(d.tasks||[]);
+      }).catch(function(){});
+    }
+  },[preloadedPoints,preloadedPlan]);
 
   function pickTask(task){
     setSelectedTask(task);
@@ -932,27 +986,27 @@ function ChatTab({user}){
 }
 
 /* ══════════════ GOAL TAB ══════════════ */
-function GoalTab({user}){
-  const [data,setData]=useState(null);
-  const [loading,setLoading]=useState(true);
+function GoalTab({user,preloadedData}){
+  const [data,setData]=useState(preloadedData||null);
+  const [loading,setLoading]=useState(!preloadedData);
   const [error,setError]=useState('');
   const [celebrating,setCelebrating]=useState(false);
   const [nextGoal,setNextGoal]=useState(null);
   const [updatingGoal,setUpdatingGoal]=useState(false);
 
   useEffect(()=>{
-    api('/dashboard/goal').then(d=>{
+    function processGoalData(d){
       setData(d);
       setLoading(false);
-      // Check if goal reached (use backend detection)
       if(d.goalReached||d.current>=d.goal){
         setCelebrating(true);
-        // Use backend suggested next goal or calculate locally
         var next=d.suggestedNextGoal||suggestNextGoal(d.current);
         setNextGoal(next);
       }
-    }).catch(e=>{setError(e.message);setLoading(false);});
-  },[]);
+    }
+    if(preloadedData){processGoalData(preloadedData);return;}
+    api('/dashboard/goal').then(processGoalData).catch(e=>{setError(e.message);setLoading(false);});
+  },[preloadedData]);
 
   function suggestNextGoal(current){
     var milestones=[100,500,1000,5000,10000,50000,100000,500000,1000000];
@@ -975,7 +1029,7 @@ function GoalTab({user}){
       .finally(function(){setUpdatingGoal(false);});
   }
 
-  if(loading)return React.createElement(FullLoader,{text:'Building your growth roadmap…'});
+  if(loading)return React.createElement(SkeletonGoal);
   if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
   if(!data)return null;
   const current=data.current||0,goal=data.goal||10000;
@@ -1339,18 +1393,26 @@ function Dashboard({user,onLogout}){
   const [tab,setTab]=useState('plan');
   const [showSettings,setShowSettings]=useState(false);
 
-  // Prefetch all tab data silently in background
+  // Global data cache — all tabs share this
+  const [cache,setCache]=useState({});
+
+  function setCache_(key,val){
+    setCache(function(prev){var n=Object.assign({},prev);n[key]=val;return n;});
+  }
+
+  // Load all tabs in parallel on mount
   useEffect(function(){
-    setTimeout(function(){api('/dashboard/analysis').catch(function(){});},2000);
-    setTimeout(function(){api('/dashboard/goal').catch(function(){});},4000);
-    setTimeout(function(){api('/dashboard/chat-points').catch(function(){});},1000);
+    api('/dashboard/plan').then(function(d){setCache_(function(p){return Object.assign({},p,{plan:d});});}).catch(function(){});
+    api('/dashboard/analysis').then(function(d){setCache_(function(p){return Object.assign({},p,{analysis:d});});}).catch(function(){});
+    api('/dashboard/goal').then(function(d){setCache_(function(p){return Object.assign({},p,{goal:d});});}).catch(function(){});
+    api('/dashboard/chat-points').then(function(d){setCache_(function(p){return Object.assign({},p,{chatPoints:d.points});});}).catch(function(){});
   },[]);
 
   const content={
-    plan:React.createElement(PlanTab,{user}),
-    analysis:React.createElement(AnalysisTab,{user}),
-    chat:React.createElement(ChatTab,{user}),
-    goal:React.createElement(GoalTab,{user}),
+    plan:React.createElement(PlanTab,{user,preloadedData:cache.plan}),
+    analysis:React.createElement(AnalysisTab,{user,preloadedData:cache.analysis}),
+    chat:React.createElement(ChatTab,{user,preloadedPoints:cache.chatPoints,preloadedPlan:cache.plan}),
+    goal:React.createElement(GoalTab,{user,preloadedData:cache.goal}),
   };
   return React.createElement('div',null,
     React.createElement(Sidebar,{tab,setTab,user,onLogout,onSettings:()=>setShowSettings(true)}),
