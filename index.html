@@ -583,7 +583,7 @@ function ChatTab({user}){
       setLoadingPoints(false);
     }).catch(function(){setPoints(WEEKLY_POINTS);setLoadingPoints(false);});
     api('/dashboard/plan').then(function(d){
-      setTasks((d.tasks||[]).filter(function(t){return !t.isIdea;}));
+      setTasks(d.tasks||[]);
     }).catch(function(){});
   },[]);
 
