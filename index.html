@@ -346,7 +346,7 @@ function GuidePage({onBack,onLogin}){
 }
 
 /* ══════════════ ONBOARDING ══════════════ */
-function Onboarding({onDone}){
+function Onboarding({onDone,user}){
   const [step,setStep]=useState(0);
   const [form,setForm]=useState({niche:'',lang:'',goal:'',freq:'',goalNumber:10000});
   const [loading,setLoading]=useState(false);
@@ -382,11 +382,17 @@ function Onboarding({onDone}){
         React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:8}},
           langs.map(l=>React.createElement('button',{key:l,className:'btn'+(form.lang===l?' btn-primary':' btn-ghost'),style:{fontSize:13},onClick:()=>setForm({...form,lang:l})},l)))),
       step===1&&React.createElement('div',{className:'fade-up'},
-        React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},"What's your goal?"),
-        React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},"We'll build your roadmap around this."),
+        React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},"Set your subscriber goal"),
+        React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:16}},"We'll build your roadmap around this."),
+        user&&user.channel&&React.createElement('div',{style:{background:'rgba(255,59,59,.06)',border:'1px solid rgba(255,59,59,.15)',borderRadius:10,padding:'12px 16px',marginBottom:16,display:'flex',alignItems:'center',justifyContent:'space-between'}},
+          React.createElement('div',null,
+            React.createElement('div',{style:{fontSize:12,color:'var(--text3)',marginBottom:2}},'Your current subscribers'),
+            React.createElement('div',{style:{fontFamily:'Syne',fontSize:24,fontWeight:800,color:'var(--text)'}},(user.channel.subscribers||0).toLocaleString())),
+          React.createElement('div',{style:{fontSize:24}},'📊')),
         React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:10}},
-          goals.map(g=>React.createElement('button',{key:g.l,className:'btn'+(form.goal===g.l?' btn-primary':' btn-secondary'),style:{justifyContent:'flex-start',fontSize:14,padding:'13px 16px'},onClick:()=>setForm({...form,goal:g.l,goalNumber:g.n})},
-            React.createElement(Icon,{d:ic.goal,size:15,stroke:form.goal===g.l?'#fff':'var(--text3)'}),g.l)))),
+          goals.filter(g=>g.n>(user&&user.channel?user.channel.subscribers||0:0)).slice(0,4).map(g=>React.createElement('button',{key:g.l,className:'btn'+(form.goal===g.l?' btn-primary':' btn-secondary'),style:{justifyContent:'flex-start',fontSize:14,padding:'13px 16px'},onClick:()=>setForm({...form,goal:g.l,goalNumber:g.n})},
+            React.createElement(Icon,{d:ic.goal,size:15,stroke:form.goal===g.l?'#fff':'var(--text3)'}),g.l,
+            g.n===(user&&user.channel&&user.channel.subscribers<100?1000:user&&user.channel&&user.channel.subscribers<1000?10000:100000)?React.createElement('span',{style:{marginLeft:'auto',fontSize:11,opacity:.7}},'⭐ Recommended'):null)))),
       step===2&&React.createElement('div',{className:'fade-up'},
         React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},'How often can you post?'),
         React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'Be realistic — consistency beats frequency.'),
@@ -592,11 +598,49 @@ function ChatTab({user}){
 }
 
 /* ══════════════ GOAL TAB ══════════════ */
-function GoalTab(){
+function GoalTab({user}){
   const [data,setData]=useState(null);
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState('');
-  useEffect(()=>{api('/dashboard/goal').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});},[]);
+  const [celebrating,setCelebrating]=useState(false);
+  const [nextGoal,setNextGoal]=useState(null);
+  const [updatingGoal,setUpdatingGoal]=useState(false);
+
+  useEffect(()=>{
+    api('/dashboard/goal').then(d=>{
+      setData(d);
+      setLoading(false);
+      // Check if goal reached (use backend detection)
+      if(d.goalReached||d.current>=d.goal){
+        setCelebrating(true);
+        // Use backend suggested next goal or calculate locally
+        var next=d.suggestedNextGoal||suggestNextGoal(d.current);
+        setNextGoal(next);
+      }
+    }).catch(e=>{setError(e.message);setLoading(false);});
+  },[]);
+
+  function suggestNextGoal(current){
+    var milestones=[100,500,1000,5000,10000,50000,100000,500000,1000000];
+    for(var i=0;i<milestones.length;i++){
+      if(milestones[i]>current) return milestones[i];
+    }
+    return current*2;
+  }
+
+  function acceptNextGoal(){
+    if(!nextGoal) return;
+    setUpdatingGoal(true);
+    api('/dashboard/update-goal',{method:'POST',body:{goalNumber:nextGoal,goal:nextGoal.toLocaleString()+' subscribers'}})
+      .then(function(){
+        setCelebrating(false);
+        setLoading(true);
+        api('/dashboard/goal').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});
+      })
+      .catch(function(e){setError(e.message);})
+      .finally(function(){setUpdatingGoal(false);});
+  }
+
   if(loading)return React.createElement(FullLoader,{text:'Building your growth roadmap…'});
   if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
   if(!data)return null;
@@ -604,6 +648,21 @@ function GoalTab(){
   const pct=Math.min(100,Math.round((current/goal)*100));
   const C=2*Math.PI*48,offset=C-(pct/100)*C;
   return React.createElement('div',{className:'fade-up'},
+    // Goal reached celebration banner
+    celebrating&&React.createElement('div',{style:{background:'linear-gradient(135deg,rgba(34,197,94,.15),rgba(34,197,94,.05))',border:'1px solid rgba(34,197,94,.3)',borderRadius:16,padding:24,marginBottom:20,textAlign:'center'}},
+      React.createElement('div',{style:{fontSize:40,marginBottom:8}},'🎉'),
+      React.createElement('div',{style:{fontFamily:'Syne',fontSize:22,fontWeight:800,color:'var(--green)',marginBottom:4}},'Goal Reached!'),
+      React.createElement('div',{style:{fontSize:14,color:'var(--text2)',marginBottom:16}},`You hit ${goal.toLocaleString()} subscribers! Time to set a bigger goal.`),
+      nextGoal&&React.createElement('div',null,
+        React.createElement('div',{style:{fontSize:13,color:'var(--text3)',marginBottom:10}},'Your next milestone:'),
+        React.createElement('div',{style:{fontFamily:'Syne',fontSize:28,fontWeight:800,color:'var(--text)',marginBottom:16}},nextGoal.toLocaleString()+' subscribers'),
+        React.createElement('button',{
+          className:'btn btn-primary',
+          style:{marginRight:10},
+          onClick:acceptNextGoal,
+          disabled:updatingGoal
+        },updatingGoal?React.createElement('div',{className:'spinner'}):null,updatingGoal?'Setting…':'Set this goal 🚀'),
+        React.createElement('button',{className:'btn btn-ghost',onClick:()=>setCelebrating(false)},'Later'))),
     React.createElement('div',{className:'page-header'},React.createElement('h1',null,'Goal Tracker'),React.createElement('p',null,`Your roadmap to ${goal.toLocaleString()} subscribers`)),
     React.createElement('div',{className:'goal-grid',style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
       React.createElement('div',{className:'card',style:{textAlign:'center'}},
@@ -1078,7 +1137,7 @@ function App(){
   if(screen==='loading')   return React.createElement(FullLoader,{text:'Loading TubeCoach…'});
   if(screen==='landing')   return React.createElement(Landing,{onLogin:handleLogin,onNewUser:()=>setScreen('guide')});
   if(screen==='guide')     return React.createElement(GuidePage,{onBack:()=>setScreen('landing'),onLogin:handleLogin});
-  if(screen==='onboard')   return React.createElement(Onboarding,{user,onDone:handleOnboardDone});
+  if(screen==='onboard')   return React.createElement(Onboarding,{user,onDone:handleOnboardDone,user});
   if(screen==='paywall')   return React.createElement(Paywall,{user,onContinue:()=>setScreen('dashboard'),onLogout:handleLogout});
   if(screen==='dashboard') return React.createElement(Dashboard,{user,onLogout:handleLogout});
   return null;
