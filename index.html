@@ -429,12 +429,151 @@ function Sidebar({tab,setTab,user,onLogout,onSettings}){
         React.createElement('div',{style:{fontSize:11,color:'var(--text3)',flexShrink:0}},'⚙'))));
 }
 
+/* ══════════════ COPY BUTTON ══════════════ */
+function CopyBtn({text}){
+  const [copied,setCopied]=useState(false);
+  function doCopy(e){
+    e.stopPropagation();
+    if(!text) return;
+    navigator.clipboard.writeText(String(text)).then(function(){
+      setCopied(true);
+      setTimeout(function(){setCopied(false);},2000);
+    }).catch(function(){
+      var ta=document.createElement('textarea');
+      ta.value=String(text);
+      document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+      setCopied(true);setTimeout(function(){setCopied(false);},2000);
+    });
+  }
+  return React.createElement('button',{
+    onClick:doCopy,
+    style:{background:copied?'rgba(34,197,94,.15)':'var(--bg4)',border:'1px solid '+(copied?'rgba(34,197,94,.3)':'var(--border2)'),borderRadius:6,padding:'3px 10px',fontSize:11,color:copied?'var(--green)':'var(--text3)',cursor:'pointer',flexShrink:0,whiteSpace:'nowrap',transition:'all .15s'}
+  },copied?'✓ Copied':'Copy');
+}
+
+/* ══════════════ TASK GUIDE ══════════════ */
+function TaskGuide({task,cachedGuide,onGuideLoaded}){
+  const [guide,setGuide]=useState(cachedGuide||null);
+  const [loading,setLoading]=useState(!cachedGuide);
+  const [err,setErr]=useState('');
+
+  useEffect(function(){
+    if(!task) return;
+    if(cachedGuide){setGuide(cachedGuide);setLoading(false);return;}
+    setLoading(true);setErr('');
+    api('/dashboard/task-guide',{method:'POST',body:{task:task}})
+      .then(function(d){
+        setGuide(d);setLoading(false);
+        if(onGuideLoaded) onGuideLoaded(task.id,d);
+      })
+      .catch(function(e){setErr('Could not generate guide. '+e.message);setLoading(false);});
+  },[task&&task.id]);
+
+  if(loading) return React.createElement('div',{style:{padding:'16px',display:'flex',alignItems:'center',gap:10,color:'var(--text3)',fontSize:13,borderTop:'1px solid var(--border)'}},
+    React.createElement('div',{className:'spinner',style:{width:16,height:16,borderWidth:2}}),
+    'Generating guide — takes about 15 seconds...');
+
+  if(err) return React.createElement('div',{style:{padding:'12px 16px',fontSize:12,color:'#FF6B6B',borderTop:'1px solid var(--border)'}},err);
+
+  if(!guide||!guide.steps||!Array.isArray(guide.steps)||guide.steps.length===0)
+    return React.createElement('div',{style:{padding:'12px 16px',fontSize:12,color:'var(--text3)',borderTop:'1px solid var(--border)'}},'Guide not available.');
+
+  var steps=guide.steps;
+  var seo=guide.seoContent&&typeof guide.seoContent==='object'?guide.seoContent:null;
+  var isVideoTask=task.type==='video'||task.type==='short';
+
+  return React.createElement('div',{style:{borderTop:'1px solid var(--border)',padding:'16px'}},
+    React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}},
+      React.createElement('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},'Step-by-step guide'),
+      guide.totalTime?React.createElement('div',{className:'tag tag-blue',style:{fontSize:11}},guide.totalTime):null),
+
+    steps.map(function(step,i){
+      if(!step||typeof step!=='object') return null;
+      var scriptText=step.script&&step.script!=='null'?String(step.script):null;
+      var onScreenText=step.onScreen&&step.onScreen!=='null'?String(step.onScreen):null;
+      var tipText=step.tip&&step.tip!=='null'?String(step.tip):null;
+      var titleText=step.title?String(step.title):'Step '+(i+1);
+      var whatText=step.what?String(step.what):'';
+      var tsText=step.timestamp&&step.timestamp!=='null'?String(step.timestamp):null;
+      var durText=step.duration&&step.duration!=='null'?String(step.duration):null;
+      return React.createElement('div',{key:i,style:{display:'flex',gap:12,marginBottom:16}},
+        React.createElement('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0}},
+          React.createElement('div',{style:{width:28,height:28,borderRadius:'50%',background:i===0?'var(--red)':'var(--bg4)',border:'2px solid '+(i===0?'var(--red)':'var(--border2)'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:i===0?'#fff':'var(--text2)'}},step.stepNum||i+1),
+          i<steps.length-1?React.createElement('div',{style:{width:2,flex:1,background:'var(--border)',margin:'4px 0',minHeight:20}}):null),
+        React.createElement('div',{style:{flex:1,paddingBottom:i<steps.length-1?8:0}},
+          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6,flexWrap:'wrap'}},
+            React.createElement('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},titleText),
+            tsText?React.createElement('div',{className:'tag tag-amber',style:{fontSize:10,padding:'1px 7px'}},tsText):
+            durText?React.createElement('div',{className:'tag tag-amber',style:{fontSize:10,padding:'1px 7px'}},durText):null),
+          whatText?React.createElement('div',{style:{fontSize:13,color:'var(--text2)',lineHeight:1.7,marginBottom:scriptText||onScreenText||tipText?10:0}},whatText):null,
+          scriptText?React.createElement('div',{style:{background:'rgba(59,130,246,.06)',border:'1px solid rgba(59,130,246,.15)',borderRadius:8,padding:'10px 14px',marginBottom:8}},
+            React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}},
+              React.createElement('div',{style:{fontSize:9,fontWeight:700,color:'var(--blue)',textTransform:'uppercase',letterSpacing:1}},'Script — say this on camera'),
+              React.createElement(CopyBtn,{text:scriptText})),
+            React.createElement('div',{style:{fontSize:12.5,color:'var(--text)',lineHeight:1.8,fontStyle:'italic',whiteSpace:'pre-wrap'}},scriptText)):null,
+          onScreenText?React.createElement('div',{style:{background:'rgba(34,197,94,.05)',border:'1px solid rgba(34,197,94,.18)',borderRadius:8,padding:'10px 14px',marginBottom:8}},
+            React.createElement('div',{style:{fontSize:9,fontWeight:700,color:'var(--green)',textTransform:'uppercase',letterSpacing:1,marginBottom:6}},'On Screen — show this'),
+            React.createElement('div',{style:{fontSize:12.5,color:'var(--text2)',lineHeight:1.7}},onScreenText)):null,
+          tipText?React.createElement('div',{style:{display:'flex',gap:8,alignItems:'flex-start',background:'var(--bg3)',borderRadius:7,padding:'8px 10px'}},
+            React.createElement('span',{style:{fontSize:13,flexShrink:0}},'💡'),
+            React.createElement('div',{style:{fontSize:12,color:'var(--text3)',lineHeight:1.6}},tipText)):null));
+    }),
+
+    // SEO Package for video tasks
+    isVideoTask&&seo?React.createElement('div',{style:{marginTop:20,borderTop:'1px solid var(--border)',paddingTop:16}},
+      React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:16}},
+        React.createElement('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},'📦 YouTube SEO Package'),
+        React.createElement('div',{className:'tag tag-green',style:{fontSize:11}},'Copy & paste')),
+
+      // Video Titles
+      seo.title&&typeof seo.title==='object'?React.createElement('div',{style:{marginBottom:14}},
+        React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1,marginBottom:8}},'Video Titles (pick one)'),
+        ['option1','option2','option3'].map(function(opt,i){
+          var t=seo.title[opt];
+          if(!t||typeof t!=='string') return null;
+          return React.createElement('div',{key:i,style:{display:'flex',alignItems:'flex-start',gap:8,marginBottom:6,background:'var(--bg3)',borderRadius:8,padding:'8px 12px'}},
+            React.createElement('div',{style:{flex:1,fontSize:13,color:'var(--text)',lineHeight:1.5}},t),
+            React.createElement(CopyBtn,{text:t}));
+        })):null,
+
+      // Description
+      seo.description&&typeof seo.description==='string'?React.createElement('div',{style:{marginBottom:14}},
+        React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
+          React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Description'),
+          React.createElement(CopyBtn,{text:seo.description})),
+        React.createElement('div',{style:{background:'var(--bg3)',borderRadius:8,padding:'12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.8,whiteSpace:'pre-wrap',maxHeight:200,overflowY:'auto'}},seo.description)):null,
+
+      // Tags
+      seo.tags&&Array.isArray(seo.tags)&&seo.tags.length>0?React.createElement('div',{style:{marginBottom:14}},
+        React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
+          React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Tags ('+seo.tags.length+')'),
+          React.createElement(CopyBtn,{text:seo.tags.join(', ')})),
+        React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:6}},
+          seo.tags.map(function(tag,i){
+            return React.createElement('div',{key:i,style:{background:'var(--bg3)',border:'1px solid var(--border2)',borderRadius:6,padding:'3px 9px',fontSize:12,color:'var(--text2)'}},tag);
+          }))):null,
+
+      // Thumbnail concept
+      seo.thumbnailConcept&&typeof seo.thumbnailConcept==='string'?React.createElement('div',{style:{marginBottom:14}},
+        React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1,marginBottom:8}},'Thumbnail Concept'),
+        React.createElement('div',{style:{background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.15)',borderRadius:8,padding:'10px 12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.7}},seo.thumbnailConcept)):null,
+
+      // Pinned comment
+      seo.firstComment&&typeof seo.firstComment==='string'?React.createElement('div',null,
+        React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
+          React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Pinned First Comment'),
+          React.createElement(CopyBtn,{text:seo.firstComment})),
+        React.createElement('div',{style:{background:'var(--bg3)',borderRadius:8,padding:'10px 12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.7,fontStyle:'italic'}},seo.firstComment)):null):null);
+}
+
 /* ══════════════ WEEKLY PLAN TAB ══════════════ */
 function PlanTab({user}){
   const [plan,setPlan]=useState(null);
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState('');
   const [taskStates,setTaskStates]=useState({});
+  const [expandedId,setExpandedId]=useState(null);
+  const [guideCache,setGuideCache]=useState({});
 
   useEffect(()=>{
     api('/dashboard/plan')
@@ -442,11 +581,20 @@ function PlanTab({user}){
       .catch(e=>{setError(e.message);setLoading(false);});
   },[]);
 
-  async function toggleTask(id){
+  function saveGuide(taskId,guide){
+    setGuideCache(function(prev){var n=Object.assign({},prev);n[taskId]=guide;return n;});
+  }
+
+  async function toggleTask(id,e){
+    e&&e.stopPropagation();
     const newDone=!taskStates[id];
     setTaskStates(s=>({...s,[id]:newDone}));
     try{await api('/dashboard/plan/task',{method:'PATCH',body:{taskId:id,done:newDone}});}
     catch{setTaskStates(s=>({...s,[id]:!newDone}));}
+  }
+
+  function toggleExpand(id){
+    setExpandedId(function(prev){return prev===id?null:id;});
   }
 
   if(loading)return React.createElement(FullLoader,{text:'Generating your weekly plan with AI…'});
@@ -474,17 +622,29 @@ function PlanTab({user}){
           React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,flex:1,maxWidth:180,marginLeft:16}},
             React.createElement('div',{className:'progress-track',style:{flex:1}},React.createElement('div',{className:'progress-fill',style:{width:`${pct}%`}})),
             React.createElement('span',{style:{fontSize:12,color:'var(--text2)',minWidth:30}},`${pct}%`))),
-        React.createElement('div',{className:'task-list'},
-          tasks.map(task=>React.createElement('div',{key:task.id,className:'task-item'+(taskStates[task.id]?' done':''),onClick:()=>toggleTask(task.id)},
-            React.createElement('div',{className:'task-checkbox'+(taskStates[task.id]?' checked':'')},
-              taskStates[task.id]&&React.createElement(Icon,{d:ic.check,size:12,stroke:'#fff',sw:2.5})),
-            React.createElement('div',{style:{flex:1}},
-              React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4}},
-                React.createElement('span',{className:`tag ${tagCol[task.type]||'tag-blue'}`,style:{fontSize:11,padding:'2px 8px'}},task.type||'task'),
-                task.isIdea&&React.createElement('span',{className:'tag',style:{fontSize:11,padding:'2px 8px',background:'rgba(245,158,11,.08)',color:'var(--amber)',border:'1px solid rgba(245,158,11,.15)'}},React.createElement(Icon,{d:ic.spark,size:10}),' idea')),
-              React.createElement('div',{className:'task-title'},task.title),
-              task.detail&&React.createElement('div',{className:'task-meta'},task.detail),
-              task.trendReason&&React.createElement('div',{style:{marginTop:6,fontSize:11,color:'#FCD34D',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.12)',borderRadius:6,padding:'4px 8px'}},'📈 ',task.trendReason)))))),
+        React.createElement('div',{className:'task-list',style:{gap:10,display:'flex',flexDirection:'column'}},
+          tasks.map(function(task){
+            var isDone=!!taskStates[task.id];
+            var isExpanded=expandedId===task.id;
+            return React.createElement('div',{key:task.id,style:{background:'var(--bg2)',border:'1px solid '+(isExpanded?'var(--border2)':'var(--border)'),borderRadius:'var(--radius)',overflow:'hidden',transition:'border-color .15s',opacity:isDone?0.6:1}},
+              React.createElement('div',{style:{display:'flex',alignItems:'flex-start',gap:12,padding:'14px 16px',cursor:'pointer'},onClick:function(){toggleExpand(task.id);}},
+                React.createElement('div',{
+                  className:'task-checkbox'+(isDone?' checked':''),
+                  style:{flexShrink:0,marginTop:2,cursor:'pointer'},
+                  onClick:function(e){toggleTask(task.id,e);}
+                }, isDone?React.createElement(Icon,{d:ic.check,size:12,stroke:'#fff',sw:2.5}):null),
+                React.createElement('div',{style:{flex:1,minWidth:0}},
+                  React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4,flexWrap:'wrap'}},
+                    React.createElement('span',{className:'tag '+(tagCol[task.type]||'tag-blue'),style:{fontSize:11,padding:'2px 8px'}},task.type||'task'),
+                    task.isIdea?React.createElement('span',{className:'tag',style:{fontSize:11,padding:'2px 8px',background:'rgba(245,158,11,.08)',color:'var(--amber)',border:'1px solid rgba(245,158,11,.15)'}},React.createElement(Icon,{d:ic.spark,size:10}),' idea'):null),
+                  React.createElement('div',{style:{fontSize:14,fontWeight:500,color:isDone?'var(--text3)':'var(--text)',lineHeight:1.4,textDecoration:isDone?'line-through':'none'}},task.title),
+                  task.detail?React.createElement('div',{style:{fontSize:12,color:'var(--text3)',marginTop:3}},task.detail):null,
+                  task.trendReason?React.createElement('div',{style:{marginTop:6,fontSize:11,color:'#FCD34D',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.12)',borderRadius:6,padding:'4px 8px'}},'📈 ',task.trendReason):null),
+                React.createElement('div',{style:{display:'flex',alignItems:'center',gap:6,flexShrink:0,marginTop:2}},
+                  React.createElement('span',{style:{fontSize:11,color:'var(--text3)'}},(task.type==='video'||task.type==='short')?'Script+SEO':'Guide'),
+                  React.createElement('span',{style:{fontSize:14,color:'var(--text3)',transform:isExpanded?'rotate(180deg)':'none',transition:'transform .2s',display:'inline-block'}},'▾'))),
+              isExpanded?React.createElement(TaskGuide,{task:task,cachedGuide:guideCache[task.id]||null,onGuideLoaded:saveGuide}):null);
+          }))),
       React.createElement('div',{className:'plan-right-panel',style:{width:320,flexShrink:0}},
         trends.length>0&&React.createElement('div',{className:'card',style:{marginBottom:14}},
           React.createElement('div',{className:'section-title'},'Trending in your niche'),
