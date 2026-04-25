@@ -251,7 +251,7 @@ const {useState,useEffect,useRef}=React;
 /* ══════════════════════════════════════════════
    CHANGE THIS if your backend URL is different
    ══════════════════════════════════════════════ */
-const API=(function(){var h=window.location.hostname;if(h==='localhost'&&!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()))return 'http://localhost:4000';if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())return 'https://tubecoach-backend-production.up.railway.app';return 'https://tubecoach-frontend.vercel.app/api';})();
+const API=(function(){var h=window.location.hostname;if(h==='localhost'&&!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()))return 'http://localhost:4000';return 'https://tubecoach-frontend.vercel.app/api';})();
 
 /* ── Token helpers ── */
 const getToken=()=>localStorage.getItem('tc_token');
