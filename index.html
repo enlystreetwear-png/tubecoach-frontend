@@ -247,7 +247,8 @@ const {useState,useEffect,useRef}=React;
 /* ══════════════════════════════════════════════
    CHANGE THIS if your backend URL is different
    ══════════════════════════════════════════════ */
-const API='https://tubecoach-backend-production1.up.railway.app';
+const API=(function(){var h=window.location.hostname;if(h==='localhost'&&!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()))return 'http://localhost:4000';return 'https://tubecoach-frontend.vercel.app/api';})();
+const OAUTH_URL='https://tubecoach-backend-production.up.railway.app';
 
 /* ── Token helpers ── */
 const getToken=()=>localStorage.getItem('tc_token');
@@ -966,7 +967,7 @@ function App(){
   function handleLogin(){
     var isApp=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform();
     if(isApp){
-      var loginUrl=API+'/auth/google?state=app';
+      var loginUrl=OAUTH_URL+'/auth/google?state=app';
       if(window.Capacitor.Plugins&&window.Capacitor.Plugins.Browser){
         window.Capacitor.Plugins.Browser.open({
           url:loginUrl,
@@ -977,7 +978,7 @@ function App(){
         window.open(loginUrl,'_blank');
       }
     } else {
-      window.location.href=API+'/auth/google';
+      window.location.href=OAUTH_URL+'/auth/google';
     }
   }
 
@@ -987,10 +988,7 @@ function App(){
 
   async function handleOnboardDone(){
     const u=await api('/auth/verify',{method:'POST',body:{token:getToken()}});
-    setUser(u);
-    if(!u.onboarded) setScreen('onboard');
-    else if(!u.isPremium&&!u.trialActive) setScreen('paywall');
-    else setScreen('dashboard');
+    setUser(u);setScreen('paywall');
   }
 
   if(screen==='loading')   return React.createElement(FullLoader,{text:'Loading TubeCoach…'});
