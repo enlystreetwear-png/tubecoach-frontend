@@ -963,11 +963,10 @@ function App(){
     }
   },[]);
 
-  var OAUTH_URL='https://tubecoach-backend-production.up.railway.app';
   function handleLogin(){
     var isApp=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform();
     if(isApp){
-      var loginUrl=OAUTH_URL+'/auth/google?state=app';
+      var loginUrl=API+'/auth/google?state=app';
       if(window.Capacitor.Plugins&&window.Capacitor.Plugins.Browser){
         window.Capacitor.Plugins.Browser.open({
           url:loginUrl,
@@ -978,7 +977,7 @@ function App(){
         window.open(loginUrl,'_blank');
       }
     } else {
-      window.location.href=OAUTH_URL+'/auth/google';
+      window.location.href=API+'/auth/google';
     }
   }
 
