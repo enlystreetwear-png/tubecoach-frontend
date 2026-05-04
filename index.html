@@ -107,6 +107,10 @@ label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
 .bar{width:100%;border-radius:4px 4px 0 0;background:var(--bg4)}.bar.highlight{background:var(--red)}
 .bar-label{font-size:10px;color:var(--text3)}
 .full-loader{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;overflow:hidden}
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+.skeleton-text{height:14px;margin-bottom:8px}
+.skeleton-title{height:20px;margin-bottom:12px}
+.skeleton-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:12px}
 .full-loader p{color:var(--text2);font-size:14px}
 
 /* ══ AITUBE — YouTube-inspired mobile UI ══ */
@@ -247,7 +251,7 @@ const {useState,useEffect,useRef}=React;
 /* ══════════════════════════════════════════════
    CHANGE THIS if your backend URL is different
    ══════════════════════════════════════════════ */
-const API='https://tubecoach-backend-production1.up.railway.app';
+const API=(function(){var h=window.location.hostname;if(h==='localhost'&&!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()))return 'http://localhost:4000';return 'https://tubecoach-frontend.vercel.app/api';})();
 
 /* ── Token helpers ── */
 const getToken=()=>localStorage.getItem('tc_token');
@@ -262,8 +266,11 @@ async function api(path,opts={}){
     ...opts,
     body:opts.body?JSON.stringify(opts.body):undefined,
   });
-  const data=await res.json();
-  if(!res.ok)throw new Error(data.error||'Something went wrong');
+  const text=await res.text();
+  console.log('[API]',path,'status:',res.status,'body:',text.substring(0,200));
+  let data;
+  try{data=JSON.parse(text);}catch(e){throw new Error('Invalid response: '+text.substring(0,100));}
+  if(!res.ok)throw new Error(data.error||'HTTP '+res.status);
   return data;
 }
 
@@ -290,6 +297,56 @@ function FullLoader({text='Loading…'}){
   return React.createElement('div',{className:'full-loader'},
     React.createElement('div',{className:'spinner',style:{width:32,height:32,borderWidth:3}}),
     React.createElement('p',null,text));
+}
+
+function SkeletonPlan(){
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'skeleton skeleton-title',style:{width:'60%',marginBottom:20}}),
+    [1,2,3,4].map(function(_,i){
+      return React.createElement('div',{key:i,className:'skeleton-card'},
+        React.createElement('div',{className:'skeleton skeleton-text',style:{width:'30%'}}),
+        React.createElement('div',{className:'skeleton skeleton-title',style:{width:'80%'}}),
+        React.createElement('div',{className:'skeleton skeleton-text',style:{width:'50%'}}));
+    }));
+}
+
+function SkeletonAnalysis(){
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginBottom:20}},
+      [1,2,3].map(function(_,i){
+        return React.createElement('div',{key:i,className:'skeleton-card'},
+          React.createElement('div',{className:'skeleton skeleton-text',style:{width:'60%'}}),
+          React.createElement('div',{className:'skeleton',style:{height:28,width:'80%',marginTop:8}}));
+      })),
+    React.createElement('div',{className:'skeleton-card',style:{height:160}}));
+}
+
+function SkeletonGoal(){
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'skeleton skeleton-title',style:{width:'50%',marginBottom:20}}),
+    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
+      React.createElement('div',{className:'skeleton-card',style:{textAlign:'center'}},
+        React.createElement('div',{className:'skeleton',style:{width:120,height:120,borderRadius:'50%',margin:'0 auto 16px'}}),
+        React.createElement('div',{className:'skeleton skeleton-title',style:{width:'70%',margin:'0 auto 8px'}}),
+        React.createElement('div',{className:'skeleton skeleton-text',style:{width:'40%',margin:'0 auto'}})),
+      React.createElement('div',{className:'skeleton-card'},
+        [1,2,3,4].map(function(_,i){return React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:12}},
+          React.createElement('div',{className:'skeleton',style:{width:32,height:32,borderRadius:'50%',flexShrink:0}}),
+          React.createElement('div',{style:{flex:1}},React.createElement('div',{className:'skeleton skeleton-text',style:{width:'80%'}})));}))
+    ),
+    React.createElement('div',{className:'skeleton-card',style:{height:140}}));
+}
+
+function SkeletonChat(){
+  return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'skeleton skeleton-title',style:{width:'40%',marginBottom:16}}),
+    React.createElement('div',{className:'skeleton-card',style:{marginBottom:12}},
+      React.createElement('div',{className:'skeleton skeleton-text',style:{width:'60%',marginBottom:12}}),
+      [1,2,3].map(function(_,i){return React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:10}},
+        React.createElement('div',{className:'skeleton',style:{width:40,height:40,borderRadius:8,flexShrink:0}}),
+        React.createElement('div',{style:{flex:1}},
+          React.createElement('div',{className:'skeleton skeleton-text',style:{width:'90%'}}),
+          React.createElement('div',{className:'skeleton skeleton-text',style:{width:'60%'}})));})));
 }
 
 /* ══════════════ LANDING ══════════════ */
@@ -343,7 +400,7 @@ function GuidePage({onBack,onLogin}){
 }
 
 /* ══════════════ ONBOARDING ══════════════ */
-function Onboarding({onDone}){
+function Onboarding({onDone,user}){
   const [step,setStep]=useState(0);
   const [form,setForm]=useState({niche:'',lang:'',goal:'',freq:'',goalNumber:10000});
   const [loading,setLoading]=useState(false);
@@ -379,11 +436,17 @@ function Onboarding({onDone}){
         React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:8}},
           langs.map(l=>React.createElement('button',{key:l,className:'btn'+(form.lang===l?' btn-primary':' btn-ghost'),style:{fontSize:13},onClick:()=>setForm({...form,lang:l})},l)))),
       step===1&&React.createElement('div',{className:'fade-up'},
-        React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},"What's your goal?"),
-        React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},"We'll build your roadmap around this."),
+        React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},"Set your subscriber goal"),
+        React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:16}},"We'll build your roadmap around this."),
+        user&&user.channel&&React.createElement('div',{style:{background:'rgba(255,59,59,.06)',border:'1px solid rgba(255,59,59,.15)',borderRadius:10,padding:'12px 16px',marginBottom:16,display:'flex',alignItems:'center',justifyContent:'space-between'}},
+          React.createElement('div',null,
+            React.createElement('div',{style:{fontSize:12,color:'var(--text3)',marginBottom:2}},'Your current subscribers'),
+            React.createElement('div',{style:{fontFamily:'Syne',fontSize:24,fontWeight:800,color:'var(--text)'}},(user.channel.subscribers||0).toLocaleString())),
+          React.createElement('div',{style:{fontSize:24}},'📊')),
         React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:10}},
-          goals.map(g=>React.createElement('button',{key:g.l,className:'btn'+(form.goal===g.l?' btn-primary':' btn-secondary'),style:{justifyContent:'flex-start',fontSize:14,padding:'13px 16px'},onClick:()=>setForm({...form,goal:g.l,goalNumber:g.n})},
-            React.createElement(Icon,{d:ic.goal,size:15,stroke:form.goal===g.l?'#fff':'var(--text3)'}),g.l)))),
+          goals.filter(g=>g.n>(user&&user.channel?user.channel.subscribers||0:0)).slice(0,4).map(g=>React.createElement('button',{key:g.l,className:'btn'+(form.goal===g.l?' btn-primary':' btn-secondary'),style:{justifyContent:'flex-start',fontSize:14,padding:'13px 16px'},onClick:()=>setForm({...form,goal:g.l,goalNumber:g.n})},
+            React.createElement(Icon,{d:ic.goal,size:15,stroke:form.goal===g.l?'#fff':'var(--text3)'}),g.l,
+            g.n===(user&&user.channel&&user.channel.subscribers<100?1000:user&&user.channel&&user.channel.subscribers<1000?10000:100000)?React.createElement('span',{style:{marginLeft:'auto',fontSize:11,opacity:.7}},'⭐ Recommended'):null)))),
       step===2&&React.createElement('div',{className:'fade-up'},
         React.createElement('h2',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:6}},'How often can you post?'),
         React.createElement('p',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'Be realistic — consistency beats frequency.'),
@@ -420,27 +483,180 @@ function Sidebar({tab,setTab,user,onLogout,onSettings}){
         React.createElement('div',{style:{fontSize:11,color:'var(--text3)',flexShrink:0}},'⚙'))));
 }
 
+/* ══════════════ COPY BUTTON ══════════════ */
+function CopyBtn({text}){
+  const [copied,setCopied]=useState(false);
+  function doCopy(e){
+    e.stopPropagation();
+    if(!text) return;
+    navigator.clipboard.writeText(String(text)).then(function(){
+      setCopied(true);
+      setTimeout(function(){setCopied(false);},2000);
+    }).catch(function(){
+      var ta=document.createElement('textarea');
+      ta.value=String(text);
+      document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+      setCopied(true);setTimeout(function(){setCopied(false);},2000);
+    });
+  }
+  return React.createElement('button',{
+    onClick:doCopy,
+    style:{background:copied?'rgba(34,197,94,.15)':'var(--bg4)',border:'1px solid '+(copied?'rgba(34,197,94,.3)':'var(--border2)'),borderRadius:6,padding:'3px 10px',fontSize:11,color:copied?'var(--green)':'var(--text3)',cursor:'pointer',flexShrink:0,whiteSpace:'nowrap',transition:'all .15s'}
+  },copied?'✓ Copied':'Copy');
+}
+
+/* ══════════════ TASK GUIDE ══════════════ */
+function TaskGuide({task,cachedGuide,onGuideLoaded}){
+  const [guide,setGuide]=useState(cachedGuide||null);
+  const [loading,setLoading]=useState(!cachedGuide);
+  const [err,setErr]=useState('');
+
+  useEffect(function(){
+    if(!task) return;
+    if(cachedGuide){setGuide(cachedGuide);setLoading(false);return;}
+    setLoading(true);setErr('');
+    api('/dashboard/task-guide',{method:'POST',body:{task:task}})
+      .then(function(d){
+        setGuide(d);setLoading(false);
+        if(onGuideLoaded) onGuideLoaded(task.id,d);
+      })
+      .catch(function(e){setErr('Could not generate guide. '+e.message);setLoading(false);});
+  },[task&&task.id]);
+
+  if(loading) return React.createElement('div',{style:{padding:'16px',display:'flex',alignItems:'center',gap:10,color:'var(--text3)',fontSize:13,borderTop:'1px solid var(--border)'}},
+    React.createElement('div',{className:'spinner',style:{width:16,height:16,borderWidth:2}}),
+    'Generating guide — takes about 15 seconds...');
+
+  if(err) return React.createElement('div',{style:{padding:'12px 16px',fontSize:12,color:'#FF6B6B',borderTop:'1px solid var(--border)'}},err);
+
+  if(!guide||!guide.steps||!Array.isArray(guide.steps)||guide.steps.length===0)
+    return React.createElement('div',{style:{padding:'12px 16px',fontSize:12,color:'var(--text3)',borderTop:'1px solid var(--border)'}},'Guide not available.');
+
+  var steps=guide.steps;
+  var seo=guide.seoContent&&typeof guide.seoContent==='object'?guide.seoContent:null;
+  var isVideoTask=task.type==='video'||task.type==='short';
+
+  return React.createElement('div',{style:{borderTop:'1px solid var(--border)',padding:'16px'}},
+    React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}},
+      React.createElement('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},'Step-by-step guide'),
+      guide.totalTime?React.createElement('div',{className:'tag tag-blue',style:{fontSize:11}},guide.totalTime):null),
+
+    steps.map(function(step,i){
+      if(!step||typeof step!=='object') return null;
+      var scriptText=step.script&&step.script!=='null'?String(step.script):null;
+      var onScreenText=step.onScreen&&step.onScreen!=='null'?String(step.onScreen):null;
+      var tipText=step.tip&&step.tip!=='null'?String(step.tip):null;
+      var titleText=step.title?String(step.title):'Step '+(i+1);
+      var whatText=step.what?String(step.what):'';
+      var tsText=step.timestamp&&step.timestamp!=='null'?String(step.timestamp):null;
+      var durText=step.duration&&step.duration!=='null'?String(step.duration):null;
+      return React.createElement('div',{key:i,style:{display:'flex',gap:12,marginBottom:16}},
+        React.createElement('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0}},
+          React.createElement('div',{style:{width:28,height:28,borderRadius:'50%',background:i===0?'var(--red)':'var(--bg4)',border:'2px solid '+(i===0?'var(--red)':'var(--border2)'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:i===0?'#fff':'var(--text2)'}},step.stepNum||i+1),
+          i<steps.length-1?React.createElement('div',{style:{width:2,flex:1,background:'var(--border)',margin:'4px 0',minHeight:20}}):null),
+        React.createElement('div',{style:{flex:1,paddingBottom:i<steps.length-1?8:0}},
+          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6,flexWrap:'wrap'}},
+            React.createElement('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},titleText),
+            tsText?React.createElement('div',{className:'tag tag-amber',style:{fontSize:10,padding:'1px 7px'}},tsText):
+            durText?React.createElement('div',{className:'tag tag-amber',style:{fontSize:10,padding:'1px 7px'}},durText):null),
+          whatText?React.createElement('div',{style:{fontSize:13,color:'var(--text2)',lineHeight:1.7,marginBottom:scriptText||onScreenText||tipText?10:0}},whatText):null,
+          scriptText?React.createElement('div',{style:{background:'rgba(59,130,246,.06)',border:'1px solid rgba(59,130,246,.15)',borderRadius:8,padding:'10px 14px',marginBottom:8}},
+            React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}},
+              React.createElement('div',{style:{fontSize:9,fontWeight:700,color:'var(--blue)',textTransform:'uppercase',letterSpacing:1}},'Script — say this on camera'),
+              React.createElement(CopyBtn,{text:scriptText})),
+            React.createElement('div',{style:{fontSize:12.5,color:'var(--text)',lineHeight:1.8,fontStyle:'italic',whiteSpace:'pre-wrap'}},scriptText)):null,
+          onScreenText?React.createElement('div',{style:{background:'rgba(34,197,94,.05)',border:'1px solid rgba(34,197,94,.18)',borderRadius:8,padding:'10px 14px',marginBottom:8}},
+            React.createElement('div',{style:{fontSize:9,fontWeight:700,color:'var(--green)',textTransform:'uppercase',letterSpacing:1,marginBottom:6}},'On Screen — show this'),
+            React.createElement('div',{style:{fontSize:12.5,color:'var(--text2)',lineHeight:1.7}},onScreenText)):null,
+          tipText?React.createElement('div',{style:{display:'flex',gap:8,alignItems:'flex-start',background:'var(--bg3)',borderRadius:7,padding:'8px 10px'}},
+            React.createElement('span',{style:{fontSize:13,flexShrink:0}},'💡'),
+            React.createElement('div',{style:{fontSize:12,color:'var(--text3)',lineHeight:1.6}},tipText)):null));
+    }),
+
+    // SEO Package for video tasks
+    isVideoTask&&seo?React.createElement('div',{style:{marginTop:20,borderTop:'1px solid var(--border)',paddingTop:16}},
+      React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:16}},
+        React.createElement('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},'📦 YouTube SEO Package'),
+        React.createElement('div',{className:'tag tag-green',style:{fontSize:11}},'Copy & paste')),
+
+      // Video Titles
+      seo.title&&typeof seo.title==='object'?React.createElement('div',{style:{marginBottom:14}},
+        React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1,marginBottom:8}},'Video Titles (pick one)'),
+        ['option1','option2','option3'].map(function(opt,i){
+          var t=seo.title[opt];
+          if(!t||typeof t!=='string') return null;
+          return React.createElement('div',{key:i,style:{display:'flex',alignItems:'flex-start',gap:8,marginBottom:6,background:'var(--bg3)',borderRadius:8,padding:'8px 12px'}},
+            React.createElement('div',{style:{flex:1,fontSize:13,color:'var(--text)',lineHeight:1.5}},t),
+            React.createElement(CopyBtn,{text:t}));
+        })):null,
+
+      // Description
+      seo.description&&typeof seo.description==='string'?React.createElement('div',{style:{marginBottom:14}},
+        React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
+          React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Description'),
+          React.createElement(CopyBtn,{text:seo.description})),
+        React.createElement('div',{style:{background:'var(--bg3)',borderRadius:8,padding:'12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.8,whiteSpace:'pre-wrap',maxHeight:200,overflowY:'auto'}},seo.description)):null,
+
+      // Tags
+      seo.tags&&Array.isArray(seo.tags)&&seo.tags.length>0?React.createElement('div',{style:{marginBottom:14}},
+        React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
+          React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Tags ('+seo.tags.length+')'),
+          React.createElement(CopyBtn,{text:seo.tags.join(', ')})),
+        React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:6}},
+          seo.tags.map(function(tag,i){
+            return React.createElement('div',{key:i,style:{background:'var(--bg3)',border:'1px solid var(--border2)',borderRadius:6,padding:'3px 9px',fontSize:12,color:'var(--text2)'}},tag);
+          }))):null,
+
+      // Thumbnail concept
+      seo.thumbnailConcept&&typeof seo.thumbnailConcept==='string'?React.createElement('div',{style:{marginBottom:14}},
+        React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1,marginBottom:8}},'Thumbnail Concept'),
+        React.createElement('div',{style:{background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.15)',borderRadius:8,padding:'10px 12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.7}},seo.thumbnailConcept)):null,
+
+      // Pinned comment
+      seo.firstComment&&typeof seo.firstComment==='string'?React.createElement('div',null,
+        React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
+          React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}},'Pinned First Comment'),
+          React.createElement(CopyBtn,{text:seo.firstComment})),
+        React.createElement('div',{style:{background:'var(--bg3)',borderRadius:8,padding:'10px 12px',fontSize:12.5,color:'var(--text2)',lineHeight:1.7,fontStyle:'italic'}},seo.firstComment)):null):null);
+}
+
 /* ══════════════ WEEKLY PLAN TAB ══════════════ */
-function PlanTab({user}){
-  const [plan,setPlan]=useState(null);
-  const [loading,setLoading]=useState(true);
+function PlanTab({user,preloadedData}){
+  const [plan,setPlan]=useState(preloadedData||null);
+  const [loading,setLoading]=useState(!preloadedData);
   const [error,setError]=useState('');
-  const [taskStates,setTaskStates]=useState({});
+  const [taskStates,setTaskStates]=useState(preloadedData?preloadedData.taskStates||{}:{});
+  const [expandedId,setExpandedId]=useState(null);
+  const [guideCache,setGuideCache]=useState({});
 
   useEffect(()=>{
-    api('/dashboard/plan')
-      .then(d=>{setPlan(d);setTaskStates(d.taskStates||{});setLoading(false);})
-      .catch(e=>{setError(e.message);setLoading(false);});
-  },[]);
+    function onPlanLoaded(d){
+      setPlan(d);
+      setTaskStates(d.taskStates||{});
+      setLoading(false);
+      // Guides generated on-demand when user clicks a task
+    }
+    if(preloadedData){onPlanLoaded(preloadedData);return;}
+    api('/dashboard/plan').then(onPlanLoaded).catch(e=>{setError(e.message);setLoading(false);});
+  },[preloadedData]);
 
-  async function toggleTask(id){
+  function saveGuide(taskId,guide){
+    setGuideCache(function(prev){var n=Object.assign({},prev);n[taskId]=guide;return n;});
+  }
+
+  async function toggleTask(id,e){
+    e&&e.stopPropagation();
     const newDone=!taskStates[id];
     setTaskStates(s=>({...s,[id]:newDone}));
     try{await api('/dashboard/plan/task',{method:'PATCH',body:{taskId:id,done:newDone}});}
     catch{setTaskStates(s=>({...s,[id]:!newDone}));}
   }
 
-  if(loading)return React.createElement(FullLoader,{text:'Generating your weekly plan with AI…'});
+  function toggleExpand(id){
+    setExpandedId(function(prev){return prev===id?null:id;});
+  }
+
+  if(loading)return React.createElement(SkeletonPlan);
   if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
   if(!plan)return null;
 
@@ -465,17 +681,29 @@ function PlanTab({user}){
           React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,flex:1,maxWidth:180,marginLeft:16}},
             React.createElement('div',{className:'progress-track',style:{flex:1}},React.createElement('div',{className:'progress-fill',style:{width:`${pct}%`}})),
             React.createElement('span',{style:{fontSize:12,color:'var(--text2)',minWidth:30}},`${pct}%`))),
-        React.createElement('div',{className:'task-list'},
-          tasks.map(task=>React.createElement('div',{key:task.id,className:'task-item'+(taskStates[task.id]?' done':''),onClick:()=>toggleTask(task.id)},
-            React.createElement('div',{className:'task-checkbox'+(taskStates[task.id]?' checked':'')},
-              taskStates[task.id]&&React.createElement(Icon,{d:ic.check,size:12,stroke:'#fff',sw:2.5})),
-            React.createElement('div',{style:{flex:1}},
-              React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4}},
-                React.createElement('span',{className:`tag ${tagCol[task.type]||'tag-blue'}`,style:{fontSize:11,padding:'2px 8px'}},task.type||'task'),
-                task.isIdea&&React.createElement('span',{className:'tag',style:{fontSize:11,padding:'2px 8px',background:'rgba(245,158,11,.08)',color:'var(--amber)',border:'1px solid rgba(245,158,11,.15)'}},React.createElement(Icon,{d:ic.spark,size:10}),' idea')),
-              React.createElement('div',{className:'task-title'},task.title),
-              task.detail&&React.createElement('div',{className:'task-meta'},task.detail),
-              task.trendReason&&React.createElement('div',{style:{marginTop:6,fontSize:11,color:'#FCD34D',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.12)',borderRadius:6,padding:'4px 8px'}},'📈 ',task.trendReason)))))),
+        React.createElement('div',{className:'task-list',style:{gap:10,display:'flex',flexDirection:'column'}},
+          tasks.map(function(task){
+            var isDone=!!taskStates[task.id];
+            var isExpanded=expandedId===task.id;
+            return React.createElement('div',{key:task.id,style:{background:'var(--bg2)',border:'1px solid '+(isExpanded?'var(--border2)':'var(--border)'),borderRadius:'var(--radius)',overflow:'hidden',transition:'border-color .15s',opacity:isDone?0.6:1}},
+              React.createElement('div',{style:{display:'flex',alignItems:'flex-start',gap:12,padding:'14px 16px',cursor:'pointer'},onClick:function(){toggleExpand(task.id);}},
+                React.createElement('div',{
+                  className:'task-checkbox'+(isDone?' checked':''),
+                  style:{flexShrink:0,marginTop:2,cursor:'pointer'},
+                  onClick:function(e){toggleTask(task.id,e);}
+                }, isDone?React.createElement(Icon,{d:ic.check,size:12,stroke:'#fff',sw:2.5}):null),
+                React.createElement('div',{style:{flex:1,minWidth:0}},
+                  React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4,flexWrap:'wrap'}},
+                    React.createElement('span',{className:'tag '+(tagCol[task.type]||'tag-blue'),style:{fontSize:11,padding:'2px 8px'}},task.type||'task'),
+                    task.isIdea?React.createElement('span',{className:'tag',style:{fontSize:11,padding:'2px 8px',background:'rgba(245,158,11,.08)',color:'var(--amber)',border:'1px solid rgba(245,158,11,.15)'}},React.createElement(Icon,{d:ic.spark,size:10}),' idea'):null),
+                  React.createElement('div',{style:{fontSize:14,fontWeight:500,color:isDone?'var(--text3)':'var(--text)',lineHeight:1.4,textDecoration:isDone?'line-through':'none'}},task.title),
+                  task.detail?React.createElement('div',{style:{fontSize:12,color:'var(--text3)',marginTop:3}},task.detail):null,
+                  task.trendReason?React.createElement('div',{style:{marginTop:6,fontSize:11,color:'#FCD34D',background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.12)',borderRadius:6,padding:'4px 8px'}},'📈 ',task.trendReason):null),
+                React.createElement('div',{style:{display:'flex',alignItems:'center',gap:6,flexShrink:0,marginTop:2}},
+                  React.createElement('span',{style:{fontSize:11,color:'var(--text3)'}},(task.type==='video'||task.type==='short')?'Script+SEO':'Guide'),
+                  React.createElement('span',{style:{fontSize:14,color:'var(--text3)',transform:isExpanded?'rotate(180deg)':'none',transition:'transform .2s',display:'inline-block'}},'▾'))),
+              isExpanded?React.createElement(TaskGuide,{task:task,cachedGuide:guideCache[task.id]||null,onGuideLoaded:saveGuide}):null);
+          }))),
       React.createElement('div',{className:'plan-right-panel',style:{width:320,flexShrink:0}},
         trends.length>0&&React.createElement('div',{className:'card',style:{marginBottom:14}},
           React.createElement('div',{className:'section-title'},'Trending in your niche'),
@@ -493,12 +721,15 @@ function PlanTab({user}){
 }
 
 /* ══════════════ ANALYSIS TAB ══════════════ */
-function AnalysisTab(){
-  const [data,setData]=useState(null);
-  const [loading,setLoading]=useState(true);
+function AnalysisTab({user,preloadedData}){
+  const [data,setData]=useState(preloadedData||null);
+  const [loading,setLoading]=useState(!preloadedData);
   const [error,setError]=useState('');
-  useEffect(()=>{api('/dashboard/analysis').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});},[]);
-  if(loading)return React.createElement(FullLoader,{text:'Fetching your channel data…'});
+  useEffect(()=>{
+    if(preloadedData){setData(preloadedData);setLoading(false);return;}
+    api('/dashboard/analysis').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});
+  },[preloadedData]);
+  if(loading)return React.createElement(SkeletonAnalysis);
   if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
   if(!data)return null;
   const {stats={},aiAnalysis={},videos=[]}=data;
@@ -539,68 +770,278 @@ function AnalysisTab(){
 }
 
 /* ══════════════ CHAT TAB ══════════════ */
-function ChatTab({user}){
-  const [msgs,setMsgs]=useState([{role:'ai',text:`Hi ${user.name?.split(' ')[0]||'there'}! 👋 I'm your AITube AI coach. Ask me anything — video ideas, script help, thumbnail tips, or how to grow your ${user.profile?.niche||'channel'} faster.`}]);
+const POINTS_PER_MSG=5;
+const WEEKLY_POINTS=50;
+const POINTS_COST=19; // ₹19 for 50 points recharge
+
+function ChatTab({user,preloadedPoints,preloadedPlan}){
+  const firstName=user.name?.split(' ')[0]||'there';
+  const niche=user.profile?.niche||'your niche';
+
+  // Points state
+  const [points,setPoints]=useState(null);
+  const [loadingPoints,setLoadingPoints]=useState(true);
+  const [recharging,setRecharging]=useState(false);
+  const [showRecharge,setShowRecharge]=useState(false);
+
+  // Task selection state
+  const [tasks,setTasks]=useState([]);
+  const [selectedTask,setSelectedTask]=useState(null);
+  const [taskPicked,setTaskPicked]=useState(false);
+
+  // Chat state
+  const [msgs,setMsgs]=useState([]);
   const [input,setInput]=useState('');
   const [loading,setLoading]=useState(false);
   const endRef=useRef(null);
   const inputRef=useRef(null);
+
   useEffect(()=>endRef.current?.scrollIntoView({behavior:'smooth'}),[msgs,loading]);
+
+  // Load points + tasks on mount — use preloaded if available
+  useEffect(()=>{
+    if(preloadedPoints!==undefined&&preloadedPoints!==null){
+      setPoints(preloadedPoints);
+      setLoadingPoints(false);
+    } else {
+      api('/dashboard/chat-points').then(function(d){
+        setPoints(d.points);
+        setLoadingPoints(false);
+      }).catch(function(){setPoints(WEEKLY_POINTS);setLoadingPoints(false);});
+    }
+    if(preloadedPlan){
+      setTasks(preloadedPlan.tasks||[]);
+    } else {
+      api('/dashboard/plan').then(function(d){
+        setTasks(d.tasks||[]);
+      }).catch(function(){});
+    }
+  },[preloadedPoints,preloadedPlan]);
+
+  function pickTask(task){
+    setSelectedTask(task);
+    setTaskPicked(true);
+    setMsgs([{
+      role:'ai',
+      text:'Hi '+firstName+'! 👋 I will help you with:\n\n📌 '+task.title+'\n\nWhat exactly are you stuck on? Ask me anything about this task!'
+    }]);
+  }
 
   async function send(){
     if(!input.trim()||loading)return;
+    if(points!==null&&points<POINTS_PER_MSG){
+      setShowRecharge(true);
+      return;
+    }
     const q=input.trim();setInput('');
     const newMsgs=[...msgs,{role:'user',text:q}];
     setMsgs(newMsgs);setLoading(true);
     try{
-      const res=await api('/dashboard/chat',{method:'POST',body:{messages:newMsgs}});
-      setMsgs(m=>[...m,{role:'ai',text:res.reply}]);
-    }catch(e){setMsgs(m=>[...m,{role:'ai',text:'Sorry, could not connect. Please try again.'}]);}
+      const res=await api('/dashboard/chat',{method:'POST',body:{
+        messages:newMsgs,
+        taskContext:selectedTask?{title:selectedTask.title,detail:selectedTask.detail,type:selectedTask.type}:null,
+        niche,
+        lang:user.profile?.lang||'English',
+      }});
+      setMsgs(function(m){return [...m,{role:'ai',text:res.reply}];});
+      // Deduct points
+      var newPts=Math.max(0,(points||0)-POINTS_PER_MSG);
+      setPoints(newPts);
+      api('/dashboard/chat-points',{method:'POST',body:{points:newPts}}).catch(function(){});
+    }catch(e){
+      setMsgs(function(m){return [...m,{role:'ai',text:'Sorry, could not connect. Please try again.'}];});
+    }
     setLoading(false);
   }
 
-  const suggestions=['Write me a video script','Best thumbnail tips','How to get my first 10K subs?','SEO tips for my niche'];
+  function recharge(){
+    setRecharging(true);
+    api('/payment/recharge-order',{method:'POST',body:{amount:POINTS_COST}})
+      .then(function(order){
+        function loadRazorpay(cb){if(window.Razorpay){cb();return;}var s=document.createElement('script');s.src='https://checkout.razorpay.com/v1/checkout.js';s.onload=cb;document.body.appendChild(s);}
+        loadRazorpay(function(){
+          new window.Razorpay({
+            key:order.keyId,amount:order.amount,currency:'INR',
+            name:'AITube',description:'50 AI Coach Points',
+            order_id:order.orderId,
+            prefill:{name:user.name||'',email:user.email||''},
+            theme:{color:'#FF3B3B'},
+            handler:function(response){
+              api('/payment/recharge-verify',{method:'POST',body:{
+                razorpay_order_id:response.razorpay_order_id,
+                razorpay_payment_id:response.razorpay_payment_id,
+                razorpay_signature:response.razorpay_signature,
+              }}).then(function(d){
+                setPoints(d.points);
+                setShowRecharge(false);
+                setRecharging(false);
+              }).catch(function(){setRecharging(false);});
+            },
+            modal:{ondismiss:function(){setRecharging(false);}}
+          }).open();
+        });
+      }).catch(function(){setRecharging(false);});
+  }
+
+  var pointsColor=points>=20?'var(--green)':points>=10?'var(--amber)':'var(--red)';
+
+  // Points exhausted overlay
+  if(showRecharge) return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'page-header'},React.createElement('h1',null,'AI Coach'),React.createElement('p',null,'Points exhausted')),
+    React.createElement('div',{className:'card',style:{textAlign:'center',padding:32}},
+      React.createElement('div',{style:{fontSize:48,marginBottom:12}},'⚡'),
+      React.createElement('div',{style:{fontFamily:'Syne',fontSize:22,fontWeight:700,marginBottom:8}},"You're out of points!"),
+      React.createElement('div',{style:{fontSize:14,color:'var(--text2)',marginBottom:24}},'Recharge 50 points for ₹'+POINTS_COST+' to continue chatting with your AI coach.'),
+      React.createElement('div',{style:{background:'var(--bg3)',borderRadius:12,padding:16,marginBottom:24}},
+        React.createElement('div',{style:{fontSize:13,color:'var(--text3)',marginBottom:8}},'What you get'),
+        [{l:'50 AI Coach messages',i:'💬'},{l:'Resets every Monday (free)',i:'🔄'},{l:'Task-specific guidance',i:'🎯'}]
+          .map(function(r,i){return React.createElement('div',{key:i,style:{display:'flex',alignItems:'center',gap:10,fontSize:13,marginBottom:8}},
+            React.createElement('span',null,r.i),React.createElement('span',{style:{color:'var(--text2)'}},r.l));})),
+      React.createElement('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center',marginBottom:10},onClick:recharge,disabled:recharging},
+        recharging?React.createElement('div',{className:'spinner'}):null,
+        recharging?'Processing…':'Recharge 50 points — ₹'+POINTS_COST),
+      React.createElement('button',{className:'btn btn-ghost',style:{width:'100%',justifyContent:'center'},onClick:function(){setShowRecharge(false);}},
+        'Back')));
+
+  // Task picker (shown before chat starts)
+  if(!taskPicked) return React.createElement('div',{className:'fade-up'},
+    React.createElement('div',{className:'page-header'},
+      React.createElement('h1',null,'AI Coach'),
+      React.createElement('p',null,'Select a task from your weekly plan to get help')),
+    // Points display — always show recharge button
+    !loadingPoints&&React.createElement('div',{style:{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:12,padding:'12px 16px',marginBottom:20}},
+      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}},
+        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8}},
+          React.createElement('span',{style:{fontSize:18}},'⚡'),
+          React.createElement('div',null,
+            React.createElement('div',{style:{fontSize:13,fontWeight:600,color:pointsColor}},points+' points remaining'),
+            React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},'Resets every Monday · '+POINTS_PER_MSG+' pts per message'))),
+        React.createElement('button',{
+          className:'btn btn-secondary',
+          style:{fontSize:12,padding:'6px 12px',borderColor:points<10?'rgba(255,59,59,.3)':'var(--border2)',color:points<10?'var(--red)':'var(--text)'},
+          onClick:function(){setShowRecharge(true);}
+        },'+ Recharge')),
+      React.createElement('div',{style:{background:'var(--bg3)',borderRadius:8,overflow:'hidden',height:6}},
+        React.createElement('div',{style:{height:'100%',width:Math.round((points/WEEKLY_POINTS)*100)+'%',background:pointsColor,borderRadius:8,transition:'width .4s ease'}}))),
+    // Task list
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Which task do you need help with?'),
+      tasks.length===0
+        ?React.createElement('div',{style:{fontSize:13,color:'var(--text3)',textAlign:'center',padding:20}},'Loading your weekly tasks...')
+        :tasks.map(function(t,i){
+          var tagCol={video:'tag-red',short:'tag-blue',engage:'tag-green',seo:'tag-amber',community:'tag-blue'};
+          return React.createElement('button',{
+            key:i,
+            onClick:function(){pickTask(t);},
+            style:{width:'100%',background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:10,padding:'12px 14px',marginBottom:8,textAlign:'left',cursor:'pointer',transition:'all .15s'},
+            onMouseEnter:function(e){e.currentTarget.style.borderColor='var(--border2)';},
+            onMouseLeave:function(e){e.currentTarget.style.borderColor='var(--border)';}
+          },
+            React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4}},
+              React.createElement('span',{className:'tag '+(tagCol[t.type]||'tag-blue'),style:{fontSize:11,padding:'2px 8px'}},t.type||'task')),
+            React.createElement('div',{style:{fontSize:13,fontWeight:500,color:'var(--text)',lineHeight:1.4}},t.title),
+            t.detail&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginTop:3}},t.detail));})));
+
+  // Chat view (after task is picked)
   return React.createElement('div',{className:'fade-up'},
-    React.createElement('div',{className:'page-header'},React.createElement('h1',null,'AI Coach'),React.createElement('p',null,'Ask anything about growing your channel — powered by Claude AI')),
-    React.createElement('div',{className:'chat-grid',style:{display:'grid',gridTemplateColumns:'1fr 280px',gap:20}},
-      React.createElement('div',{className:'card',style:{display:'flex',flexDirection:'column',height:560}},
+    React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}},
+      React.createElement('div',{className:'page-header',style:{marginBottom:0}},
+        React.createElement('h1',null,'AI Coach'),
+        React.createElement('p',null,'Helping with: '+selectedTask.title.substring(0,40)+(selectedTask.title.length>40?'…':''))),
+      React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,flexShrink:0}},
+        React.createElement('div',{style:{fontSize:13,fontWeight:600,color:pointsColor}},React.createElement('span',{style:{fontSize:16}},'⚡'),' '+points),
+        React.createElement('button',{className:'btn btn-ghost',style:{fontSize:11,padding:'5px 10px'},onClick:function(){setShowRecharge(true);}},
+          '+ Recharge'),
+        React.createElement('button',{className:'btn btn-ghost',style:{fontSize:11,padding:'5px 10px'},onClick:function(){setTaskPicked(false);setMsgs([]);}},
+          '← Tasks'))),
+    React.createElement('div',{className:'chat-grid',style:{display:'grid',gridTemplateColumns:'1fr',gap:20}},
+      React.createElement('div',{className:'card',style:{display:'flex',flexDirection:'column',height:480}},
         React.createElement('div',{style:{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:14,paddingBottom:8}},
-          msgs.map((m,i)=>React.createElement('div',{key:i,className:`msg msg-${m.role==='ai'?'ai':'user'}`},
-            React.createElement('div',{className:'msg-avatar'},m.role==='ai'?'TC':(user.name||'U')[0]),
-            React.createElement('div',{className:'msg-bubble'},m.text))),
+          msgs.map(function(m,i){return React.createElement('div',{key:i,className:'msg msg-'+(m.role==='ai'?'ai':'user')},
+            React.createElement('div',{className:'msg-avatar'},m.role==='ai'?'AI':(user.name||'U')[0]),
+            React.createElement('div',{className:'msg-bubble',style:{whiteSpace:'pre-wrap'}},m.text));}),
           loading&&React.createElement('div',{className:'msg msg-ai'},
-            React.createElement('div',{className:'msg-avatar'},'TC'),
+            React.createElement('div',{className:'msg-avatar'},'AI'),
             React.createElement('div',{className:'msg-bubble',style:{display:'flex',gap:5,alignItems:'center',padding:14}},
               React.createElement('div',{className:'typing-dot'}),React.createElement('div',{className:'typing-dot'}),React.createElement('div',{className:'typing-dot'}))),
           React.createElement('div',{ref:endRef})),
-        React.createElement('div',{className:'chat-input-row'},
-          React.createElement('input',{ref:inputRef,placeholder:'Ask your AI coach anything…',value:input,onChange:e=>setInput(e.target.value),onKeyDown:e=>e.key==='Enter'&&send()}),
-          React.createElement('button',{className:'btn btn-primary',onClick:send,disabled:loading||!input.trim()},React.createElement(Icon,{d:ic.send,size:15,stroke:'#fff'})))),
-      React.createElement('div',null,
-        React.createElement('div',{className:'card',style:{marginBottom:14}},
-          React.createElement('div',{className:'section-title'},'Quick questions'),
-          suggestions.map(s=>React.createElement('button',{key:s,className:'btn btn-ghost',style:{width:'100%',justifyContent:'flex-start',fontSize:13,marginBottom:6,textAlign:'left'},onClick:()=>{setInput(s);inputRef.current?.focus()}},s))),
-        React.createElement('div',{className:'card'},
-          React.createElement('div',{className:'section-title'},'Your channel'),
-          [{l:'Niche',v:user.profile?.niche||'—'},{l:'Language',v:user.profile?.lang||'—'},{l:'Goal',v:user.profile?.goal||'—'},{l:'Subscribers',v:(user.channel?.subscribers||0).toLocaleString()}]
-          .map(r=>React.createElement('div',{key:r.l,style:{display:'flex',justifyContent:'space-between',fontSize:13,padding:'6px 0',borderBottom:'1px solid var(--border)'}},
-            React.createElement('span',{style:{color:'var(--text3)'}},r.l),
-            React.createElement('span',{style:{fontWeight:500}},r.v)))))));
+        points<POINTS_PER_MSG
+          ?React.createElement('div',{style:{padding:'12px 0',textAlign:'center'}},
+            React.createElement('div',{style:{fontSize:13,color:'var(--red)',marginBottom:8}},'⚡ Not enough points to send a message'),
+            React.createElement('button',{className:'btn btn-primary',style:{fontSize:13},onClick:function(){setShowRecharge(true);}},
+              'Recharge — ₹'+POINTS_COST))
+          :React.createElement('div',{className:'chat-input-row'},
+            React.createElement('input',{ref:inputRef,placeholder:'Ask about this task…',value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==='Enter')send();}}),
+            React.createElement('button',{className:'btn btn-primary',onClick:send,disabled:loading||!input.trim()},
+              React.createElement(Icon,{d:ic.send,size:15,stroke:'#fff'}))))));
 }
 
 /* ══════════════ GOAL TAB ══════════════ */
-function GoalTab(){
-  const [data,setData]=useState(null);
-  const [loading,setLoading]=useState(true);
+function GoalTab({user,preloadedData}){
+  const [data,setData]=useState(preloadedData||null);
+  const [loading,setLoading]=useState(!preloadedData);
   const [error,setError]=useState('');
-  useEffect(()=>{api('/dashboard/goal').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});},[]);
-  if(loading)return React.createElement(FullLoader,{text:'Building your growth roadmap…'});
+  const [celebrating,setCelebrating]=useState(false);
+  const [nextGoal,setNextGoal]=useState(null);
+  const [updatingGoal,setUpdatingGoal]=useState(false);
+
+  useEffect(()=>{
+    function processGoalData(d){
+      setData(d);
+      setLoading(false);
+      if(d.goalReached||d.current>=d.goal){
+        setCelebrating(true);
+        var next=d.suggestedNextGoal||suggestNextGoal(d.current);
+        setNextGoal(next);
+      }
+    }
+    if(preloadedData){processGoalData(preloadedData);return;}
+    api('/dashboard/goal').then(processGoalData).catch(e=>{setError(e.message);setLoading(false);});
+  },[preloadedData]);
+
+  function suggestNextGoal(current){
+    var milestones=[100,500,1000,5000,10000,50000,100000,500000,1000000];
+    for(var i=0;i<milestones.length;i++){
+      if(milestones[i]>current) return milestones[i];
+    }
+    return current*2;
+  }
+
+  function acceptNextGoal(){
+    if(!nextGoal) return;
+    setUpdatingGoal(true);
+    api('/dashboard/update-goal',{method:'POST',body:{goalNumber:nextGoal,goal:nextGoal.toLocaleString()+' subscribers'}})
+      .then(function(){
+        setCelebrating(false);
+        setLoading(true);
+        api('/dashboard/goal').then(d=>{setData(d);setLoading(false);}).catch(e=>{setError(e.message);setLoading(false);});
+      })
+      .catch(function(e){setError(e.message);})
+      .finally(function(){setUpdatingGoal(false);});
+  }
+
+  if(loading)return React.createElement(SkeletonGoal);
   if(error)return React.createElement('div',{className:'error-box',style:{marginTop:40}},error);
   if(!data)return null;
   const current=data.current||0,goal=data.goal||10000;
   const pct=Math.min(100,Math.round((current/goal)*100));
   const C=2*Math.PI*48,offset=C-(pct/100)*C;
   return React.createElement('div',{className:'fade-up'},
+    // Goal reached celebration banner
+    celebrating&&React.createElement('div',{style:{background:'linear-gradient(135deg,rgba(34,197,94,.15),rgba(34,197,94,.05))',border:'1px solid rgba(34,197,94,.3)',borderRadius:16,padding:24,marginBottom:20,textAlign:'center'}},
+      React.createElement('div',{style:{fontSize:40,marginBottom:8}},'🎉'),
+      React.createElement('div',{style:{fontFamily:'Syne',fontSize:22,fontWeight:800,color:'var(--green)',marginBottom:4}},'Goal Reached!'),
+      React.createElement('div',{style:{fontSize:14,color:'var(--text2)',marginBottom:16}},`You hit ${goal.toLocaleString()} subscribers! Time to set a bigger goal.`),
+      nextGoal&&React.createElement('div',null,
+        React.createElement('div',{style:{fontSize:13,color:'var(--text3)',marginBottom:10}},'Your next milestone:'),
+        React.createElement('div',{style:{fontFamily:'Syne',fontSize:28,fontWeight:800,color:'var(--text)',marginBottom:16}},nextGoal.toLocaleString()+' subscribers'),
+        React.createElement('button',{
+          className:'btn btn-primary',
+          style:{marginRight:10},
+          onClick:acceptNextGoal,
+          disabled:updatingGoal
+        },updatingGoal?React.createElement('div',{className:'spinner'}):null,updatingGoal?'Setting…':'Set this goal 🚀'),
+        React.createElement('button',{className:'btn btn-ghost',onClick:()=>setCelebrating(false)},'Later'))),
     React.createElement('div',{className:'page-header'},React.createElement('h1',null,'Goal Tracker'),React.createElement('p',null,`Your roadmap to ${goal.toLocaleString()} subscribers`)),
     React.createElement('div',{className:'goal-grid',style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
       React.createElement('div',{className:'card',style:{textAlign:'center'}},
@@ -636,30 +1077,112 @@ function GoalTab(){
 }
 
 /* ══════════════ PAYWALL ══════════════ */
-function Paywall({user,onContinue}){
+function Paywall({user,onContinue,onLogout}){
   const [loading,setLoading]=useState(false);
+  const [pricing,setPricing]=useState(null);
+  const [err,setErr]=useState('');
   const features=['Weekly AI action plan with trend-based video ideas','Weekly channel analysis + AI insights','Unlimited AI coach chat','Goal tracker with milestone roadmap','Best time to post for your audience','Competitor channel tips'];
-  function go(){setLoading(true);setTimeout(()=>{setLoading(false);onContinue();},800);}
+
+  useEffect(()=>{
+    console.log('[PAY] API base:', API);
+    console.log('[PAY] Fetching pricing...');
+    api('/payment/pricing')
+      .then(function(d){
+        console.log('[PAY] Pricing response:', JSON.stringify(d));
+        setPricing(d);
+      })
+      .catch(function(e){
+        console.log('[PAY] Pricing error:', e.message);
+        setErr('Pricing error: '+e.message);
+        setPricing({plan:'intro',amount:49,amountPaise:4900,label:'₹49/month',trialActive:false});
+      });
+  },[]);
+
+  function loadRazorpay(cb){
+    if(window.Razorpay){cb();return;}
+    var s=document.createElement('script');
+    s.src='https://checkout.razorpay.com/v1/checkout.js';
+    s.onload=cb;
+    document.body.appendChild(s);
+  }
+
+  function pay(){
+    setLoading(true);setErr('');
+    console.log('[PAY] Creating order...');
+    api('/payment/create-order',{method:'POST'})
+      .then(function(order){
+        console.log('[PAY] Order created:', JSON.stringify(order));
+        loadRazorpay(function(){
+          var options={
+            key:order.keyId,
+            amount:order.amount,
+            currency:order.currency||'INR',
+            name:'AITube',
+            description:'AITube Pro — '+(order.planLabel||''),
+            order_id:order.orderId,
+            prefill:{name:user.name||'',email:user.email||''},
+            theme:{color:'#FF3B3B'},
+            handler:function(response){
+              api('/payment/verify',{method:'POST',body:{
+                razorpay_order_id:response.razorpay_order_id,
+                razorpay_payment_id:response.razorpay_payment_id,
+                razorpay_signature:response.razorpay_signature,
+                amount:order.amount/100,
+                plan:order.plan
+              }}).then(function(){setLoading(false);onContinue();})
+              .catch(function(e){setErr('Payment verification failed: '+e.message);setLoading(false);});
+            },
+            modal:{ondismiss:function(){setLoading(false);}}
+          };
+          new window.Razorpay(options).open();
+        });
+      }).catch(function(e){
+        console.log('[PAY] Create order error:', e.message);
+        setErr(e.message);
+        setLoading(false);
+      });
+  }
+
+  var tiers=[
+    {month:'Month 1',price:'FREE',color:'var(--green)'},
+    {month:'Months 2–4',price:'₹49/mo',color:'var(--amber)'},
+    {month:'Month 5+',price:'₹499/mo',color:'var(--red)'},
+  ];
+
   return React.createElement('div',{className:'landing'},
     React.createElement('div',{className:'landing-glow'}),
     React.createElement('div',{style:{maxWidth:500,width:'100%'}},
-      React.createElement('div',{className:'fade-up',style:{textAlign:'center',marginBottom:28}},
-        React.createElement('span',{className:'tag tag-green',style:{marginBottom:14}},React.createElement(Icon,{d:ic.spark,size:12}),' 7-day free trial'),
-        React.createElement('h1',{style:{fontFamily:'Syne',fontSize:32,fontWeight:800,letterSpacing:-1,marginBottom:8}},'Start your free trial'),
-        React.createElement('p',{style:{color:'var(--text2)',fontSize:15}},`Welcome, ${(user.name||'').split(' ')[0]}! Your plan is ready.`)),
-      React.createElement('div',{className:'card fade-up-d1'},
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}},
-          React.createElement('div',null,
-            React.createElement('div',{style:{fontFamily:'Syne',fontSize:28,fontWeight:800}},'₹499'),
-            React.createElement('div',{style:{fontSize:13,color:'var(--text3)'}},'per month · cancel anytime')),
-          React.createElement('span',{className:'tag tag-red'},'Most popular')),
-        features.map((f,i)=>React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:12,fontSize:14}},
-          React.createElement(Icon,{d:ic.check,size:15,stroke:'var(--green)',sw:2.5}),
-          React.createElement('span',{style:{color:'var(--text2)'}},f))),
-        React.createElement('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center',marginTop:8,padding:'14px',fontSize:15,animation:'glow 3s ease infinite'},onClick:go,disabled:loading},
+      React.createElement('div',{className:'fade-up',style:{textAlign:'center',marginBottom:24}},
+        React.createElement('span',{className:'tag tag-red',style:{marginBottom:14}},React.createElement(Icon,{d:ic.spark,size:12}),' Special Launch Offer'),
+        React.createElement('h1',{style:{fontFamily:'Syne',fontSize:28,fontWeight:800,letterSpacing:-1,marginBottom:6}},'Unlock AITube Pro'),
+        React.createElement('p',{style:{color:'var(--text2)',fontSize:14}},`Your free trial has ended, ${(user.name||'').split(' ')[0]}. Continue growing your channel!`)),
+      React.createElement('div',{className:'fade-up-d1',style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:16}},
+        tiers.map(function(t,i){
+          return React.createElement('div',{key:i,style:{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:12,padding:'12px 8px',textAlign:'center'}},
+            React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:4}},t.month),
+            React.createElement('div',{style:{fontFamily:'Syne',fontSize:16,fontWeight:800,color:t.color}},t.price));
+        })),
+      React.createElement('div',{className:'card fade-up-d2'},
+        features.map(function(f,i){return React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:10,fontSize:13}},
+          React.createElement(Icon,{d:ic.check,size:14,stroke:'var(--green)',sw:2.5}),
+          React.createElement('span',{style:{color:'var(--text2)'}},f));}),
+        React.createElement('div',{className:'divider'}),
+        err?React.createElement('div',{className:'error-box',style:{marginBottom:12}},err):null,
+        React.createElement('button',{
+          className:'btn btn-primary',
+          style:{width:'100%',justifyContent:'center',padding:'14px',fontSize:15,animation:'glow 3s ease infinite'},
+          onClick:pay,
+          disabled:loading||!pricing
+        },
           loading?React.createElement('div',{className:'spinner'}):null,
-          loading?'Setting up…':'Start 7-day free trial →'),
-        React.createElement('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'No charge for 7 days · UPI, Cards, Net banking via Razorpay'))));
+          loading?'Processing…':pricing?'Pay '+(pricing.label||'₹49')+' → Get full access':'Loading…'),
+        err?React.createElement('div',{style:{marginTop:10,fontSize:12,color:'#FF6B6B',textAlign:'center',wordBreak:'break-all'}},err):null,
+        React.createElement('p',{style:{textAlign:'center',fontSize:12,color:'var(--text3)',marginTop:10}},'UPI · Cards · Net banking · Cancel anytime'),
+        React.createElement('div',{style:{textAlign:'center',marginTop:16}},
+          React.createElement('button',{
+            onClick:onLogout,
+            style:{background:'none',border:'none',cursor:'pointer',fontSize:13,color:'var(--text3)',textDecoration:'underline'}
+          },'← Logout & switch account')))));
 }
 
 /* ══════════════ MOBILE NAV ══════════════ */
@@ -860,11 +1383,27 @@ function MobileHeader(){
 function Dashboard({user,onLogout}){
   const [tab,setTab]=useState('plan');
   const [showSettings,setShowSettings]=useState(false);
+
+  // Global data cache — all tabs share this
+  const [cache,setCache]=useState({});
+
+  function setCache_(key,val){
+    setCache(function(prev){var n=Object.assign({},prev);n[key]=val;return n;});
+  }
+
+  // Load all tabs in parallel on mount
+  useEffect(function(){
+    api('/dashboard/plan').then(function(d){setCache_(function(p){return Object.assign({},p,{plan:d});});}).catch(function(){});
+    api('/dashboard/analysis').then(function(d){setCache_(function(p){return Object.assign({},p,{analysis:d});});}).catch(function(){});
+    api('/dashboard/goal').then(function(d){setCache_(function(p){return Object.assign({},p,{goal:d});});}).catch(function(){});
+    api('/dashboard/chat-points').then(function(d){setCache_(function(p){return Object.assign({},p,{chatPoints:d.points});});}).catch(function(){});
+  },[]);
+
   const content={
-    plan:React.createElement(PlanTab,{user}),
-    analysis:React.createElement(AnalysisTab,{user}),
-    chat:React.createElement(ChatTab,{user}),
-    goal:React.createElement(GoalTab,{user}),
+    plan:React.createElement(PlanTab,{user,preloadedData:cache.plan}),
+    analysis:React.createElement(AnalysisTab,{user,preloadedData:cache.analysis}),
+    chat:React.createElement(ChatTab,{user,preloadedPoints:cache.chatPoints,preloadedPlan:cache.plan}),
+    goal:React.createElement(GoalTab,{user,preloadedData:cache.goal}),
   };
   return React.createElement('div',null,
     React.createElement(Sidebar,{tab,setTab,user,onLogout,onSettings:()=>setShowSettings(true)}),
@@ -987,16 +1526,14 @@ function App(){
 
   async function handleOnboardDone(){
     const u=await api('/auth/verify',{method:'POST',body:{token:getToken()}});
-    setUser(u);
-    if(!u.isPremium&&!u.trialActive) setScreen('paywall');
-    else setScreen('dashboard');
+    setUser(u);setScreen('paywall');
   }
 
   if(screen==='loading')   return React.createElement(FullLoader,{text:'Loading TubeCoach…'});
   if(screen==='landing')   return React.createElement(Landing,{onLogin:handleLogin,onNewUser:()=>setScreen('guide')});
   if(screen==='guide')     return React.createElement(GuidePage,{onBack:()=>setScreen('landing'),onLogin:handleLogin});
-  if(screen==='onboard')   return React.createElement(Onboarding,{user,onDone:handleOnboardDone});
-  if(screen==='paywall')   return React.createElement(Paywall,{user,onContinue:()=>setScreen('dashboard')});
+  if(screen==='onboard')   return React.createElement(Onboarding,{user,onDone:handleOnboardDone,user});
+  if(screen==='paywall')   return React.createElement(Paywall,{user,onContinue:()=>setScreen('dashboard'),onLogout:handleLogout});
   if(screen==='dashboard') return React.createElement(Dashboard,{user,onLogout:handleLogout});
   return null;
 }
