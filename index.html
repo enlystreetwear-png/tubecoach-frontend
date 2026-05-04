@@ -634,7 +634,7 @@ function PlanTab({user,preloadedData}){
       setPlan(d);
       setTaskStates(d.taskStates||{});
       setLoading(false);
-      // Guides generated on-demand when user clicks a task
+      // Guides load on-demand when user clicks a task
     }
     if(preloadedData){onPlanLoaded(preloadedData);return;}
     api('/dashboard/plan').then(onPlanLoaded).catch(e=>{setError(e.message);setLoading(false);});
