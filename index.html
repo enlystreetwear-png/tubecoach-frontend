@@ -634,7 +634,16 @@ function PlanTab({user,preloadedData}){
       setPlan(d);
       setTaskStates(d.taskStates||{});
       setLoading(false);
-      // Guides load on-demand when user clicks a task
+      // Pre-generate guides for all tasks in background
+      var tasksToPregen=(d.tasks||[]).filter(function(t){return t.type==='video'||t.type==='short'||t.type==='seo';});
+      tasksToPregen.forEach(function(task,i){
+        setTimeout(function(){
+          api('/dashboard/task-guide',{method:'POST',body:{task:task}})
+            .then(function(guide){
+              setGuideCache(function(prev){var n=Object.assign({},prev);n[task.id]=guide;return n;});
+            }).catch(function(){});
+        }, (i+1)*3000); // stagger by 3s each to avoid overwhelming backend
+      });
     }
     if(preloadedData){onPlanLoaded(preloadedData);return;}
     api('/dashboard/plan').then(onPlanLoaded).catch(e=>{setError(e.message);setLoading(false);});
@@ -1505,7 +1514,7 @@ function App(){
   function handleLogin(){
     var isApp=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform();
     if(isApp){
-      var loginUrl=API+'/auth/google?state=app';
+      var loginUrl='https://tubecoach-backend-production.up.railway.app/auth/google?state=app';
       if(window.Capacitor.Plugins&&window.Capacitor.Plugins.Browser){
         window.Capacitor.Plugins.Browser.open({
           url:loginUrl,
@@ -1516,7 +1525,7 @@ function App(){
         window.open(loginUrl,'_blank');
       }
     } else {
-      window.location.href=API+'/auth/google';
+      window.location.href='https://tubecoach-backend-production.up.railway.app/auth/google';
     }
   }
 
@@ -1526,7 +1535,9 @@ function App(){
 
   async function handleOnboardDone(){
     const u=await api('/auth/verify',{method:'POST',body:{token:getToken()}});
-    setUser(u);setScreen('paywall');
+    setUser(u);
+    if(!u.isPremium&&!u.trialActive) setScreen('paywall');
+    else setScreen('dashboard');
   }
 
   if(screen==='loading')   return React.createElement(FullLoader,{text:'Loading TubeCoach…'});
