@@ -634,16 +634,6 @@ function PlanTab({user,preloadedData}){
       setPlan(d);
       setTaskStates(d.taskStates||{});
       setLoading(false);
-      // Pre-generate guides for all tasks in background
-      var tasksToPregen=(d.tasks||[]).filter(function(t){return t.type==='video'||t.type==='short'||t.type==='seo';});
-      tasksToPregen.forEach(function(task,i){
-        setTimeout(function(){
-          api('/dashboard/task-guide',{method:'POST',body:{task:task}})
-            .then(function(guide){
-              setGuideCache(function(prev){var n=Object.assign({},prev);n[task.id]=guide;return n;});
-            }).catch(function(){});
-        }, (i+1)*3000); // stagger by 3s each to avoid overwhelming backend
-      });
     }
     if(preloadedData){onPlanLoaded(preloadedData);return;}
     api('/dashboard/plan').then(onPlanLoaded).catch(e=>{setError(e.message);setLoading(false);});
