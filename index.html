@@ -1504,7 +1504,7 @@ function App(){
   function handleLogin(){
     var isApp=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform();
     if(isApp){
-      var loginUrl='https://tubecoach-backend-production.up.railway.app/auth/google?state=app';
+      var loginUrl='/api/auth/google?state=app';
       if(window.Capacitor.Plugins&&window.Capacitor.Plugins.Browser){
         window.Capacitor.Plugins.Browser.open({
           url:loginUrl,
@@ -1515,7 +1515,7 @@ function App(){
         window.open(loginUrl,'_blank');
       }
     } else {
-      window.location.href='https://tubecoach-backend-production.up.railway.app/auth/google';
+      window.location.href='/api/auth/google';
     }
   }
 
