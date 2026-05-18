@@ -1,94 +1,58 @@
 // frontend_ai.js
-import axios from "axios";
+// Optional helper for calling the TubeCoach backend. The backend uses Ollama.
 
-// =====================
-// CONFIG
-// =====================
-const API_BASE = "/api"; // GitHub rewrites will redirect to your Railway backend
-const API_KEY = "baiu-secret-12345"; // Replace with your real key or use env variable
+const API_BASE = "/api";
 
-// =====================
-// HELPER TO CALL BAIUGPT
-// =====================
-async function callBaiuGPT(path, body, timeout = 120000) {
+function getToken() {
+  return localStorage.getItem("tubecoach_token") || localStorage.getItem("token") || "";
+}
+
+async function callBackend(path, options = {}) {
+  const token = getToken();
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: options.method || "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+
+  const text = await res.text();
+  let data;
   try {
-    const res = await axios.post(
-      `${API_BASE}${path}`,
-      body,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": API_KEY
-        },
-        timeout
-      }
-    );
-    return res.data;
-  } catch (err) {
-    console.error(`BaiuGPT API error (${path}):`, err);
-    return null;
+    data = JSON.parse(text);
+  } catch (_err) {
+    throw new Error(`Invalid response: ${text.slice(0, 120)}`);
   }
+
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
 }
 
-// =====================
-// WEEKLY PLAN
-// =====================
-export async function generateWeeklyPlan(channel, profile, snapshots) {
-  return callBaiuGPT("/ai/weekly-plan", { channel, profile, snapshots });
+export async function generateWeeklyPlan() {
+  return callBackend("/dashboard/plan");
 }
 
-// =====================
-// ANALYSIS
-// =====================
-export async function generateAnalysis(channel, profile, snapshots) {
-  return callBaiuGPT("/ai/analysis", { channel, profile, snapshots });
+export async function generateAnalysis() {
+  return callBackend("/dashboard/analysis");
 }
 
-// =====================
-// AI COACH CHAT
-// =====================
 export async function chatWithCoach(messages, user, channel, profile, taskContext, niche, lang) {
-  const body = { messages, user, channel, profile, taskContext, niche, lang };
-  const result = await callBaiuGPT("/ai/coach", body);
-  return result?.reply || result?.answer || "Sorry, I couldn't answer that.";
+  const result = await callBackend("/dashboard/chat", {
+    method: "POST",
+    body: { messages, user, channel, profile, taskContext, niche, lang },
+  });
+  return result.reply || "Sorry, I couldn't answer that.";
 }
 
-// =====================
-// GOAL ROADMAP
-// =====================
-export async function estimateGoalTimeline(channel, profile, snapshots) {
-  return callBaiuGPT("/ai/goal-roadmap", { channel, profile, snapshots });
+export async function estimateGoalTimeline() {
+  return callBackend("/dashboard/goal");
 }
 
-// =====================
-// TASK GUIDE
-// =====================
-export async function generateTaskGuide(task, channel, profile) {
-  return callBaiuGPT("/ai/task-guide", { task, channel, profile });
+export async function generateTaskGuide(task) {
+  return callBackend("/dashboard/task-guide", {
+    method: "POST",
+    body: { task },
+  });
 }
-
-// =====================
-// EXAMPLES
-// =====================
-/*
-Example usage:
-
-import { generateWeeklyPlan, generateAnalysis, chatWithCoach } from './frontend_ai.js';
-
-const weekly = await generateWeeklyPlan({name: "MyChannel"}, {subscribers: 100}, []);
-console.log(weekly);
-
-const analysis = await generateAnalysis({name: "MyChannel"}, {subscribers: 100}, []);
-console.log(analysis);
-
-const reply = await chatWithCoach(
-  [{role: "user", text: "Give me a YouTube video idea"}],
-  {id: "user123"},
-  {name: "TechChannel"},
-  {subscribers: 0},
-  null,
-  "Tech Reviews",
-  "English"
-);
-console.log(reply);
-*/
