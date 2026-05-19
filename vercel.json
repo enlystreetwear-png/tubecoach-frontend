@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://poach-bauble-citation.ngrok-free.dev/:path*"
+      "destination": "https://ethernet-populations-cleaner-gaming.trycloudflare.com/:path*"
     }
   ]
 }
